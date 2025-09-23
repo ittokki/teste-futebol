@@ -98,6 +98,7 @@
                 <h1 class="text-3xl font-bold text-blue-500">Inimigos da Bola</h1>
             </div>
             <div class="flex items-center space-x-3 mt-4 sm:mt-0">
+                <button id="update-data-button" class="px-3 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-sync-alt mr-2"></i>Atualizar</button>
                 <button id="export-csv-button" class="px-3 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-file-csv mr-2"></i>Exportar CSV</button>
                 <button id="share-button" class="px-3 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-share-alt mr-2"></i>Compartilhar</button>
                 <label for="mobile-mode-toggle" class="flex items-center cursor-pointer text-sm">
@@ -138,13 +139,18 @@
                     <button data-tab="graficos" class="tab-button text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-chart-line mr-2"></i>Gráficos</button>
                     <button data-tab="hall-da-fama" class="tab-button text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-star mr-2"></i>Hall da Fama</button>
                     <button data-tab="partidas" class="tab-button text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-history mr-2"></i>Partidas</button>
+                    <button data-tab="curiosidades" class="tab-button text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-lightbulb mr-2"></i>Curiosidades</button>
                 </div>
             </div>
         </nav>
 
         <main id="tab-content">
             <div id="rankings" class="tab-pane active">
-                <div class="flex justify-end mb-4">
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+                    <div class="relative w-full sm:w-64">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="player-search" placeholder="Buscar jogador..." class="w-full p-2 pl-10 rounded-md card focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
                     <div class="w-full sm:w-auto">
                         <label for="month-filter" class="sr-only">Filtrar por Mês</label>
                         <select id="month-filter" class="w-full p-2 rounded-md card">
@@ -191,6 +197,18 @@
             </div>
 
             <div id="partidas" class="tab-pane hidden space-y-6">
+            </div>
+
+            <div id="curiosidades" class="tab-pane hidden">
+                <div class="flex justify-between items-center mb-6">
+                     <h2 class="text-2xl font-bold">Fatos Curiosos</h2>
+                     <button id="new-facts-button" class="px-4 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors">
+                         <i class="fas fa-sync-alt mr-2"></i>Gerar Novas
+                     </button>
+                </div>
+                <div id="curiosidades-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Fatos curiosos serão inseridos aqui -->
+                </div>
             </div>
         </main>
     </div>
@@ -914,6 +932,155 @@ document.addEventListener('DOMContentLoaded', () => {
         renderDestaqueDoMes(playersForPeriod, monthLabel);
         renderRankings(playersForPeriod);
     }
+    
+    function renderCuriosidades() {
+        const container = document.getElementById('curiosidades-container');
+        container.innerHTML = ''; // Limpa curiosidades antigas
+        const facts = generateFunFacts(allPlayersData, allMatchesData);
+
+        if(facts.length === 0){
+            container.innerHTML = `<p class="text-gray-500 col-span-full text-center">Não foi possível gerar curiosidades. Tente novamente mais tarde.</p>`;
+            return;
+        }
+
+        facts.forEach(fact => {
+            const card = `
+                <div class="card p-4 rounded-lg flex flex-col items-center justify-center text-center fade-in">
+                    <div class="text-3xl mb-3">${fact.icon}</div>
+                    <p class="text-base">${fact.text}</p>
+                </div>
+            `;
+            container.innerHTML += card;
+        });
+    }
+
+    function getStandardDeviation(array) {
+        const n = array.length;
+        if (n < 2) return 0;
+        const mean = array.reduce((a, b) => a + b) / n;
+        return Math.sqrt(array.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
+    }
+
+    function generateFunFacts(players, matches) {
+        const factFunctions = [
+            (p, m) => {
+                const bocaMatches = m.filter(match => match.time.toUpperCase() === 'BOCA' && match.jogoAconteceu);
+                if (bocaMatches.length === 0) return null;
+                const goalsByPlayer = bocaMatches.reduce((acc, match) => {
+                    acc[match.nome] = (acc[match.nome] || 0) + match.gols;
+                    return acc;
+                }, {});
+                const topScorerNome = Object.keys(goalsByPlayer).sort((a, b) => goalsByPlayer[b] - goalsByPlayer[a])[0];
+                if (!topScorerNome || goalsByPlayer[topScorerNome] === 0) return null;
+                const topScorerOriginal = p.find(player => player.nome === topScorerNome)?.nomeOriginal || topScorerNome;
+                return { icon: '⚽', text: `O maior artilheiro jogando pelo <span class="font-bold text-blue-500">Boca</span> é <b>${topScorerOriginal}</b>, com <b>${goalsByPlayer[topScorerNome]}</b> gols.`};
+            },
+            (p, m) => {
+                const riverMatches = m.filter(match => match.time.toUpperCase() === 'RIVER' && match.jogoAconteceu);
+                if (riverMatches.length === 0) return null;
+                const goalsByPlayer = riverMatches.reduce((acc, match) => {
+                    acc[match.nome] = (acc[match.nome] || 0) + match.gols;
+                    return acc;
+                }, {});
+                const topScorerNome = Object.keys(goalsByPlayer).sort((a, b) => goalsByPlayer[b] - goalsByPlayer[a])[0];
+                if (!topScorerNome || goalsByPlayer[topScorerNome] === 0) return null;
+                const topScorerOriginal = p.find(player => player.nome === topScorerNome)?.nomeOriginal || topScorerNome;
+                return { icon: '⚽', text: `O maior artilheiro jogando pelo <span class="font-bold text-red-500">River</span> é <b>${topScorerOriginal}</b>, com <b>${goalsByPlayer[topScorerNome]}</b> gols.`};
+            },
+            (p, m) => {
+                const mostWinsPlayer = [...p].sort((a,b) => b.vitorias - a.vitorias)[0];
+                if (!mostWinsPlayer) return null;
+                return { icon: '🏆', text: `O jogador mais vitorioso é <b>${mostWinsPlayer.nomeOriginal}</b>, com um total de <b>${mostWinsPlayer.vitorias}</b> vitórias.` };
+            },
+            (p, m) => {
+                const minGames = 5;
+                const eligiblePlayers = p.filter(player => player.jogos >= minGames);
+                if (eligiblePlayers.length < 1) return null;
+                const peFrio = eligiblePlayers.sort((a,b) => (b.jogos - b.vitorias - b.empates) - (a.jogos - a.vitorias - a.empates))[0];
+                const derrotas = peFrio.jogos - peFrio.vitorias - peFrio.empates;
+                if (derrotas === 0) return null;
+                return { icon: '😢', text: `O jogador "pé-frio", com mais derrotas (tendo no mínimo ${minGames} jogos), é <b>${peFrio.nomeOriginal}</b> com <b>${derrotas}</b> no total.`};
+            },
+            (p, m) => {
+                let hatTricks = {};
+                m.forEach(match => {
+                    if(match.gols >= 3) {
+                        hatTricks[match.nome] = (hatTricks[match.nome] || 0) + 1;
+                    }
+                });
+                const topPlayer = Object.keys(hatTricks).sort((a,b) => hatTricks[b] - hatTricks[a])[0];
+                if(!topPlayer) return null;
+                const topPlayerOriginal = p.find(player => player.nome === topPlayer)?.nomeOriginal || topPlayer;
+                return { icon: '🎩', text: `O "Senhor Hat-Trick" é <b>${topPlayerOriginal}</b>, com <b>${hatTricks[topPlayer]}</b> jogos marcando 3 ou mais gols.`};
+            },
+            (p, m) => {
+                const bestMatch = [...m].filter(match => match.jogoAconteceu).sort((a,b) => b.notaPartida - a.notaPartida)[0];
+                if(!bestMatch) return null;
+                const player = p.find(pl => pl.nome === bestMatch.nome);
+                return { icon: '⭐', text: `A maior nota já registrada em uma única partida foi de <b>${bestMatch.notaPartida.toFixed(1)}</b>, alcançada por <b>${player?.nomeOriginal || bestMatch.nome}</b> no dia ${bestMatch.dataJogo}.`};
+            },
+             (p, m) => {
+                const minGames = 5;
+                const eligiblePlayers = p.filter(player => player.jogos >= minGames);
+                if (eligiblePlayers.length < 1) return null;
+                const luckyCharm = eligiblePlayers.sort((a,b) => (b.vitorias / b.jogos) - (a.vitorias / a.jogos))[0];
+                const winRate = ((luckyCharm.vitorias / luckyCharm.jogos) * 100).toFixed(0);
+                return { icon: '🍀', text: `O "Amuleto da Sorte" (maior % de vitória com min. ${minGames} jogos) é <b>${luckyCharm.nomeOriginal}</b>, vencendo <b>${winRate}%</b> das partidas que joga.` };
+            },
+            (p, m) => {
+                const minGames = 5;
+                const eligiblePlayers = p.filter(player => player.jogos >= minGames);
+                if (eligiblePlayers.length < 1) return null;
+                const goalMachine = eligiblePlayers.sort((a,b) => (b.gols / b.jogos) - (a.gols / a.jogos))[0];
+                const gpg = (goalMachine.gols / goalMachine.jogos).toFixed(2);
+                return { icon: '🤖', text: `A "Máquina de Gols" (melhor média com min. ${minGames} jogos) é <b>${goalMachine.nomeOriginal}</b>, com uma média de <b>${gpg}</b> gols por partida.` };
+            },
+            (p, m) => {
+                const goalsByDate = m.reduce((acc, match) => {
+                    if(match.jogoAconteceu) {
+                        acc[match.dataJogo] = (acc[match.dataJogo] || 0) + match.gols;
+                    }
+                    return acc;
+                }, {});
+                const topDate = Object.keys(goalsByDate).sort((a,b) => goalsByDate[b] - goalsByDate[a])[0];
+                if (!topDate) return null;
+                return { icon: '🔥', text: `A partida com mais gols foi em <b>${topDate}</b>, com um total de <b>${goalsByDate[topDate]}</b> gols marcados.`};
+            },
+            (p, m) => {
+                const minGames = 5;
+                const eligiblePlayers = p.filter(player => player.jogos >= minGames && player.partidas.filter(partida => partida.jogoAconteceu).length > 1);
+                if (eligiblePlayers.length < 1) return null;
+                
+                eligiblePlayers.forEach(player => {
+                    const notes = player.partidas.filter(partida => partida.jogoAconteceu).map(partida => partida.notaPartida);
+                    player.stdDev = getStandardDeviation(notes);
+                });
+
+                const mrConsistency = eligiblePlayers.sort((a,b) => a.stdDev - b.stdDev)[0];
+                return { icon: '⚖️', text: `O "Sr. Consistência" (performance mais regular, min. ${minGames} jogos) é <b>${mrConsistency.nomeOriginal}</b>, com um desvio padrão de apenas <b>${mrConsistency.stdDev.toFixed(2)}</b> em suas notas.`};
+            }
+        ];
+        
+        // Embaralha e seleciona um número de fatos
+        const shuffled = factFunctions.sort(() => 0.5 - Math.random());
+        let selectedFacts = [];
+        for (const func of shuffled) {
+            const fact = func(players, matches);
+            if (fact) selectedFacts.push(fact);
+        }
+        return selectedFacts.slice(0, 4); // Retorna até 4 fatos
+    }
+    
+    function clearCacheAndReload() {
+        loadingEl.style.display = 'flex';
+        localStorage.removeItem('partidasCache');
+        localStorage.removeItem('partidasCacheTime');
+        localStorage.removeItem('jogadoresCache');
+        localStorage.removeItem('jogadoresCacheTime');
+        setTimeout(() => {
+            location.reload();
+        }, 250);
+    }
 
     function setupEventListeners() {
         tabsContainer.addEventListener('click', e => {
@@ -924,10 +1091,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 tabContent.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
                 const activeTab = document.getElementById(button.dataset.tab);
                 activeTab.classList.remove('hidden');
+                
                 if (button.dataset.tab === 'graficos') {
                     renderAllCharts(allPlayersData);
                 }
+                if (button.dataset.tab === 'curiosidades') {
+                    renderCuriosidades();
+                }
             }
+        });
+        
+        document.getElementById('new-facts-button').addEventListener('click', renderCuriosidades);
+        document.getElementById('update-data-button').addEventListener('click', clearCacheAndReload);
+
+        document.getElementById('player-search').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const playerCards = document.querySelectorAll('#rankings-grid .player-card');
+            
+            playerCards.forEach(card => {
+                const playerName = card.dataset.playerName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                if (playerName.includes(searchTerm)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         });
 
         document.body.addEventListener('click', e => {
@@ -1106,3 +1294,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
