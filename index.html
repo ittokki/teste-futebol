@@ -504,8 +504,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderDashboard(players) {
-        setupMonthFilter();
-        updateRankingsView('Geral');
+        setupFiltersAndSearch();
+        updateFilteredView();
         renderHallOfFame(allPlayersData);
         renderPartidas();
         setupComparisonTool(allPlayersData);
@@ -518,7 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const top5 = sortedData.slice(0, 5);
         let html = `<div class="card p-4 rounded-lg flex flex-col fade-in"><h3 class="font-bold text-lg mb-4">${title}</h3><div class="flex-grow space-y-3">`;
         if (top5.length === 0) {
-             html += `<p class="text-gray-500 text-sm h-full flex items-center justify-center">Sem dados para este período.</p>`;
+             html += `<p class="text-gray-500 text-sm h-full flex items-center justify-center">Nenhum jogador encontrado.</p>`;
         } else {
             top5.forEach((p, index) => {
                 const value = formatValue(p[key], key);
@@ -896,7 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.innerHTML = tableHtml;
     }
     
-    function setupMonthFilter() {
+    function setupFiltersAndSearch() {
         const filter = document.getElementById('month-filter');
         const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         const uniqueMonths = [...new Set(allMatchesData.map(p => p.dataJogo.slice(3)))].sort((a, b) => {
@@ -909,28 +909,47 @@ document.addEventListener('DOMContentLoaded', () => {
             const monthName = monthNames[parseInt(month, 10) - 1];
             filter.innerHTML += `<option value="${monthYear}">${monthName} de ${year}</option>`;
         });
-        filter.addEventListener('change', (e) => updateRankingsView(e.target.value));
+        
+        filter.addEventListener('change', updateFilteredView);
+        document.getElementById('player-search').addEventListener('input', updateFilteredView);
     }
 
-    function updateRankingsView(month) {
+    function updateFilteredView() {
+        const selectedMonth = document.getElementById('month-filter').value;
+        const searchTerm = document.getElementById('player-search').value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
         let playersForPeriod;
         let monthLabel;
 
-        if (month === 'Geral') {
+        if (selectedMonth === 'Geral') {
             playersForPeriod = allPlayersData;
             const date = new Date();
             const currentMonthName = date.toLocaleString('default', { month: 'long' });
             monthLabel = currentMonthName.charAt(0).toUpperCase() + currentMonthName.slice(1);
         } else {
-            const periodMatches = allMatchesData.filter(p => p.dataJogo.slice(3) === month);
+            const periodMatches = allMatchesData.filter(p => p.dataJogo.slice(3) === selectedMonth);
             playersForPeriod = recalculateStatsForPeriod(allPlayersData, periodMatches);
-            const [m, y] = month.split('/');
+            const [m, y] = selectedMonth.split('/');
             monthLabel = new Date(y, m - 1).toLocaleString('default', { month: 'long', year: 'numeric'});
             monthLabel = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
         }
 
-        renderDestaqueDoMes(playersForPeriod, monthLabel);
-        renderRankings(playersForPeriod);
+        let finalFilteredPlayers = playersForPeriod;
+        if (searchTerm.trim() !== '') {
+            finalFilteredPlayers = playersForPeriod.filter(player => 
+                player.nomeOriginal.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(searchTerm)
+            );
+        }
+        
+        const destaqueContainer = document.getElementById('destaque-mes-container');
+        if (searchTerm.trim() !== '') {
+            destaqueContainer.style.display = 'none';
+        } else {
+            destaqueContainer.style.display = 'block';
+            renderDestaqueDoMes(playersForPeriod, monthLabel);
+        }
+        
+        renderRankings(finalFilteredPlayers);
     }
     
     function renderCuriosidades() {
@@ -963,13 +982,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function generateFunFacts(players, matches) {
         const factFunctions = [
+            // Curiosidades existentes
             (p, m) => {
                 const bocaMatches = m.filter(match => match.time.toUpperCase() === 'BOCA' && match.jogoAconteceu);
                 if (bocaMatches.length === 0) return null;
-                const goalsByPlayer = bocaMatches.reduce((acc, match) => {
-                    acc[match.nome] = (acc[match.nome] || 0) + match.gols;
-                    return acc;
-                }, {});
+                const goalsByPlayer = bocaMatches.reduce((acc, match) => { acc[match.nome] = (acc[match.nome] || 0) + match.gols; return acc; }, {});
                 const topScorerNome = Object.keys(goalsByPlayer).sort((a, b) => goalsByPlayer[b] - goalsByPlayer[a])[0];
                 if (!topScorerNome || goalsByPlayer[topScorerNome] === 0) return null;
                 const topScorerOriginal = p.find(player => player.nome === topScorerNome)?.nomeOriginal || topScorerNome;
@@ -978,10 +995,7 @@ document.addEventListener('DOMContentLoaded', () => {
             (p, m) => {
                 const riverMatches = m.filter(match => match.time.toUpperCase() === 'RIVER' && match.jogoAconteceu);
                 if (riverMatches.length === 0) return null;
-                const goalsByPlayer = riverMatches.reduce((acc, match) => {
-                    acc[match.nome] = (acc[match.nome] || 0) + match.gols;
-                    return acc;
-                }, {});
+                const goalsByPlayer = riverMatches.reduce((acc, match) => { acc[match.nome] = (acc[match.nome] || 0) + match.gols; return acc; }, {});
                 const topScorerNome = Object.keys(goalsByPlayer).sort((a, b) => goalsByPlayer[b] - goalsByPlayer[a])[0];
                 if (!topScorerNome || goalsByPlayer[topScorerNome] === 0) return null;
                 const topScorerOriginal = p.find(player => player.nome === topScorerNome)?.nomeOriginal || topScorerNome;
@@ -999,33 +1013,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 const peFrio = eligiblePlayers.sort((a,b) => (b.jogos - b.vitorias - b.empates) - (a.jogos - a.vitorias - a.empates))[0];
                 const derrotas = peFrio.jogos - peFrio.vitorias - peFrio.empates;
                 if (derrotas === 0) return null;
-                return { icon: '😢', text: `O jogador "pé-frio", com mais derrotas (tendo no mínimo ${minGames} jogos), é <b>${peFrio.nomeOriginal}</b> com <b>${derrotas}</b> no total.`};
+                return { icon: '😢', text: `O jogador "pé-frio", com mais derrotas (mínimo ${minGames} jogos), é <b>${peFrio.nomeOriginal}</b> com <b>${derrotas}</b> no total.`};
             },
             (p, m) => {
                 let hatTricks = {};
-                m.forEach(match => {
-                    if(match.gols >= 3) {
-                        hatTricks[match.nome] = (hatTricks[match.nome] || 0) + 1;
-                    }
-                });
+                m.forEach(match => { if(match.gols >= 3) { hatTricks[match.nome] = (hatTricks[match.nome] || 0) + 1; } });
                 const topPlayer = Object.keys(hatTricks).sort((a,b) => hatTricks[b] - hatTricks[a])[0];
                 if(!topPlayer) return null;
                 const topPlayerOriginal = p.find(player => player.nome === topPlayer)?.nomeOriginal || topPlayer;
-                return { icon: '🎩', text: `O "Senhor Hat-Trick" é <b>${topPlayerOriginal}</b>, com <b>${hatTricks[topPlayer]}</b> jogos marcando 3 ou mais gols.`};
+                return { icon: '🎩', text: `O "Senhor Hat-Trick" é <b>${topPlayerOriginal}</b>, com <b>${hatTricks[topPlayer]}</b> jogos marcando 3+ gols.`};
             },
             (p, m) => {
                 const bestMatch = [...m].filter(match => match.jogoAconteceu).sort((a,b) => b.notaPartida - a.notaPartida)[0];
                 if(!bestMatch) return null;
                 const player = p.find(pl => pl.nome === bestMatch.nome);
-                return { icon: '⭐', text: `A maior nota já registrada em uma única partida foi de <b>${bestMatch.notaPartida.toFixed(1)}</b>, alcançada por <b>${player?.nomeOriginal || bestMatch.nome}</b> no dia ${bestMatch.dataJogo}.`};
+                return { icon: '⭐', text: `A maior nota já registrada foi de <b>${bestMatch.notaPartida.toFixed(1)}</b>, por <b>${player?.nomeOriginal || bestMatch.nome}</b> em ${bestMatch.dataJogo}.`};
             },
-             (p, m) => {
+            (p, m) => {
                 const minGames = 5;
                 const eligiblePlayers = p.filter(player => player.jogos >= minGames);
                 if (eligiblePlayers.length < 1) return null;
                 const luckyCharm = eligiblePlayers.sort((a,b) => (b.vitorias / b.jogos) - (a.vitorias / a.jogos))[0];
                 const winRate = ((luckyCharm.vitorias / luckyCharm.jogos) * 100).toFixed(0);
-                return { icon: '🍀', text: `O "Amuleto da Sorte" (maior % de vitória com min. ${minGames} jogos) é <b>${luckyCharm.nomeOriginal}</b>, vencendo <b>${winRate}%</b> das partidas que joga.` };
+                return { icon: '🍀', text: `O "Amuleto da Sorte" (maior % de vitória com min. ${minGames} jogos) é <b>${luckyCharm.nomeOriginal}</b>, vencendo <b>${winRate}%</b> das partidas.` };
             },
             (p, m) => {
                 const minGames = 5;
@@ -1033,42 +1043,137 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (eligiblePlayers.length < 1) return null;
                 const goalMachine = eligiblePlayers.sort((a,b) => (b.gols / b.jogos) - (a.gols / a.jogos))[0];
                 const gpg = (goalMachine.gols / goalMachine.jogos).toFixed(2);
-                return { icon: '🤖', text: `A "Máquina de Gols" (melhor média com min. ${minGames} jogos) é <b>${goalMachine.nomeOriginal}</b>, com uma média de <b>${gpg}</b> gols por partida.` };
+                return { icon: '🤖', text: `A "Máquina de Gols" (melhor média com min. ${minGames} jogos) é <b>${goalMachine.nomeOriginal}</b>, com <b>${gpg}</b> gols por partida.` };
             },
             (p, m) => {
-                const goalsByDate = m.reduce((acc, match) => {
-                    if(match.jogoAconteceu) {
-                        acc[match.dataJogo] = (acc[match.dataJogo] || 0) + match.gols;
-                    }
-                    return acc;
-                }, {});
+                const goalsByDate = m.reduce((acc, match) => { if(match.jogoAconteceu) { acc[match.dataJogo] = (acc[match.dataJogo] || 0) + match.gols; } return acc; }, {});
                 const topDate = Object.keys(goalsByDate).sort((a,b) => goalsByDate[b] - goalsByDate[a])[0];
                 if (!topDate) return null;
-                return { icon: '🔥', text: `A partida com mais gols foi em <b>${topDate}</b>, com um total de <b>${goalsByDate[topDate]}</b> gols marcados.`};
+                return { icon: '🔥', text: `A partida com mais gols foi em <b>${topDate}</b>, com um total de <b>${goalsByDate[topDate]}</b> gols.`};
             },
             (p, m) => {
                 const minGames = 5;
                 const eligiblePlayers = p.filter(player => player.jogos >= minGames && player.partidas.filter(partida => partida.jogoAconteceu).length > 1);
                 if (eligiblePlayers.length < 1) return null;
-                
                 eligiblePlayers.forEach(player => {
                     const notes = player.partidas.filter(partida => partida.jogoAconteceu).map(partida => partida.notaPartida);
                     player.stdDev = getStandardDeviation(notes);
                 });
-
                 const mrConsistency = eligiblePlayers.sort((a,b) => a.stdDev - b.stdDev)[0];
                 return { icon: '⚖️', text: `O "Sr. Consistência" (performance mais regular, min. ${minGames} jogos) é <b>${mrConsistency.nomeOriginal}</b>, com um desvio padrão de apenas <b>${mrConsistency.stdDev.toFixed(2)}</b> em suas notas.`};
+            },
+            // Novas Curiosidades
+            (p, m) => {
+                const minGames = 5;
+                const eligiblePlayers = p.filter(player => player.jogos >= minGames);
+                if (eligiblePlayers.length < 1) return null;
+                const versatilePlayer = eligiblePlayers.map(player => ({...player, contributionRate: (player.gols + player.assistencias) / player.jogos }))
+                                                 .sort((a, b) => b.contributionRate - a.contributionRate)[0];
+                return { icon: '✨', text: `O jogador mais versátil (gols+assist./partida, min. ${minGames} jogos) é <b>${versatilePlayer.nomeOriginal}</b> com média de <b>${versatilePlayer.contributionRate.toFixed(2)}</b> contribuições.` };
+            },
+            (p, m) => {
+                const matchesByDate = m.filter(match => match.jogoAconteceu).reduce((acc, match) => { (acc[match.dataJogo] = acc[match.dataJogo] || []).push(match); return acc; }, {});
+                let balancedMatch = { date: null, diff: Infinity, score: '' };
+                for (const date in matchesByDate) {
+                    const matches = matchesByDate[date];
+                    const scoreA = matches.filter(match => match.time.toUpperCase() === 'BOCA').reduce((sum, match) => sum + match.gols, 0);
+                    const scoreB = matches.filter(match => match.time.toUpperCase() === 'RIVER').reduce((sum, match) => sum + match.gols, 0);
+                    const diff = Math.abs(scoreA - scoreB);
+                    if (diff < balancedMatch.diff) { balancedMatch = { date, diff, score: `${scoreA}x${scoreB}` }; }
+                }
+                if (!balancedMatch.date) return null;
+                return { icon: '🤝', text: `A partida mais equilibrada foi a de <b>${balancedMatch.date}</b>, com um placar de <b>${balancedMatch.score}</b>.` };
+            },
+            (p, m) => {
+                const matchesByDate = m.filter(match => match.jogoAconteceu).reduce((acc, match) => { (acc[match.dataJogo] = acc[match.dataJogo] || []).push(match); return acc; }, {});
+                let topMatch = { date: null, avgNote: -1 };
+                for (const date in matchesByDate) {
+                    const notes = matchesByDate[date].map(match => match.notaPartida);
+                    if (notes.length === 0) continue;
+                    const avgNote = notes.reduce((sum, note) => sum + note, 0) / notes.length;
+                    if (avgNote > topMatch.avgNote) { topMatch = { date, avgNote }; }
+                }
+                if (!topMatch.date) return null;
+                return { icon: '🌟', text: `O jogo de mais alto nível técnico foi em <b>${topMatch.date}</b>, com média de nota <b>${topMatch.avgNote.toFixed(2)}</b>.` };
+            },
+            (p, m) => {
+                const matchesByDate = m.filter(match => match.jogoAconteceu).reduce((acc, match) => { (acc[match.dataJogo] = acc[match.dataJogo] || []).push(match); return acc; }, {});
+                let blowoutMatch = { date: null, diff: -1, score: '' };
+                for (const date in matchesByDate) {
+                    const matches = matchesByDate[date];
+                    const scoreA = matches.filter(match => match.time.toUpperCase() === 'BOCA').reduce((sum, match) => sum + match.gols, 0);
+                    const scoreB = matches.filter(match => match.time.toUpperCase() === 'RIVER').reduce((sum, match) => sum + match.gols, 0);
+                    const diff = Math.abs(scoreA - scoreB);
+                    if (diff > blowoutMatch.diff) { blowoutMatch = { date, diff, score: `${Math.max(scoreA, scoreB)}x${Math.min(scoreA, scoreB)}` }; }
+                }
+                if (!blowoutMatch.date || blowoutMatch.diff <= 2) return null;
+                return { icon: '💥', text: `A maior goleada registrada foi em <b>${blowoutMatch.date}</b>, com um placar de <b>${blowoutMatch.score}</b>.` };
+            },
+            (p, m) => {
+                const uniqueDates = [...new Set(m.map(match => match.dataJogo))].sort((a, b) => new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-')));
+                let streaks = {};
+                p.forEach(player => { streaks[player.nome] = { current: 0, max: 0 }; });
+                uniqueDates.forEach(date => {
+                    const playersOnDate = m.filter(match => match.dataJogo === date).map(match => match.nome);
+                    for (const playerName in streaks) {
+                        if (playersOnDate.includes(playerName)) { streaks[playerName].current++; } 
+                        else { streaks[playerName].max = Math.max(streaks[playerName].max, streaks[playerName].current); streaks[playerName].current = 0; }
+                    }
+                });
+                let maxStreak = { nome: null, count: 0 };
+                for (const playerName in streaks) {
+                    streaks[playerName].max = Math.max(streaks[playerName].max, streaks[playerName].current);
+                    if (streaks[playerName].max > maxStreak.count) { maxStreak = { nome: playerName, count: streaks[playerName].max }; }
+                }
+                if (!maxStreak.nome || maxStreak.count < 3) return null;
+                const marathoner = p.find(player => player.nome === maxStreak.nome);
+                return { icon: '🏃‍♂️', text: `O "Maratonista" é <b>${marathoner.nomeOriginal}</b>, que jogou <b>${maxStreak.count}</b> partidas consecutivas.` };
+            },
+            (p, m) => {
+                let bestDebut = { nome: null, nota: -1, data: null };
+                p.forEach(player => {
+                    const playerMatches = m.filter(match => match.nome === player.nome && match.jogoAconteceu)
+                                         .sort((a, b) => new Date(a.dataJogo.split('/').reverse().join('-')) - new Date(b.dataJogo.split('/').reverse().join('-')));
+                    if (playerMatches.length > 0) {
+                        const firstMatch = playerMatches[0];
+                        if ((firstMatch.gols > 0 || firstMatch.assistencias > 0) && firstMatch.notaPartida > bestDebut.nota) {
+                            bestDebut = { nome: player.nomeOriginal, nota: firstMatch.notaPartida, data: firstMatch.dataJogo };
+                        }
+                    }
+                });
+                if (!bestDebut.nome) return null;
+                return { icon: '🥇', text: `O "Estreante de Ouro" foi <b>${bestDebut.nome}</b>, que na sua 1ª partida em <b>${bestDebut.data}</b> já impactou e tirou nota <b>${bestDebut.nota.toFixed(1)}</b>.` };
+            },
+            (p, m) => {
+                const goalkeepersPerformances = m.filter(match => match.isGoleiro && match.jogoAconteceu).sort((a, b) => b.notaPartida - a.notaPartida);
+                if (goalkeepersPerformances.length === 0) return null;
+                const bestPerformance = goalkeepersPerformances[0];
+                const player = p.find(pl => pl.nome === bestPerformance.nome);
+                return { icon: '🧤', text: `A melhor atuação de um goleiro foi de <b>${player?.nomeOriginal || bestPerformance.nome}</b> em <b>${bestPerformance.dataJogo}</b>, com nota <b>${bestPerformance.notaPartida.toFixed(1)}</b>, sofrendo <b>${bestPerformance.golsTomados}</b> gols.`};
+            },
+            (p, m) => {
+                const hatTricks = m.filter(match => match.gols >= 3 && match.jogoAconteceu).sort((a, b) => new Date(a.dataJogo.split('/').reverse().join('-')) - new Date(b.dataJogo.split('/').reverse().join('-')));
+                if (hatTricks.length === 0) return null;
+                const firstHatTrick = hatTricks[0];
+                const player = p.find(pl => pl.nome === firstHatTrick.nome);
+                return { icon: '🕒', text: `O primeiro hat-trick registrado foi de <b>${player?.nomeOriginal || firstHatTrick.nome}</b> na partida de <b>${firstHatTrick.dataJogo}</b>.`};
+            },
+            (p, m) => {
+                const assistsByDate = m.reduce((acc, match) => { if(match.jogoAconteceu) { acc[match.dataJogo] = (acc[match.dataJogo] || 0) + match.assistencias; } return acc; }, {});
+                const topDate = Object.keys(assistsByDate).sort((a,b) => assistsByDate[b] - assistsByDate[a])[0];
+                if (!topDate || assistsByDate[topDate] === 0) return null;
+                return { icon: '🤝', text: `O jogo com mais assistências foi em <b>${topDate}</b>, com um total de <b>${assistsByDate[topDate]}</b> passes para gol.`};
             }
         ];
         
-        // Embaralha e seleciona um número de fatos
         const shuffled = factFunctions.sort(() => 0.5 - Math.random());
         let selectedFacts = [];
         for (const func of shuffled) {
+            if (selectedFacts.length >= 3) break;
             const fact = func(players, matches);
             if (fact) selectedFacts.push(fact);
         }
-        return selectedFacts.slice(0, 4); // Retorna até 4 fatos
+        return selectedFacts;
     }
     
     function clearCacheAndReload() {
@@ -1103,20 +1208,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.getElementById('new-facts-button').addEventListener('click', renderCuriosidades);
         document.getElementById('update-data-button').addEventListener('click', clearCacheAndReload);
-
-        document.getElementById('player-search').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const playerCards = document.querySelectorAll('#rankings-grid .player-card');
-            
-            playerCards.forEach(card => {
-                const playerName = card.dataset.playerName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                if (playerName.includes(searchTerm)) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
 
         document.body.addEventListener('click', e => {
             const card = e.target.closest('[data-player-name]');
