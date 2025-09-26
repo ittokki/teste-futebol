@@ -10,14 +10,43 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --bg-light: #f3f4f6; --text-light: #1f2937; --card-light: #ffffff; --border-light: #e5e7eb;
-            --bg-dark: #111827; --text-dark: #d1d5db; --card-dark: #1f2937; --border-dark: #374151;
+            --bg-light: #f3f4f6;
+            --text-light: #1f2937;
+            --card-light: #ffffff;
+            --border-light: #e5e7eb;
+            --bg-dark: #111827;
+            --text-dark: #d1d5db;
+            --card-dark: #1f2937;
+            --border-dark: #374151;
         }
-        html.light { --bg-color: var(--bg-light); --text-color: var(--text-light); --card-color: var(--card-light); --border-color: var(--border-light); }
-        html.dark { --bg-color: var(--bg-dark); --text-color: var(--text-dark); --card-color: var(--card-dark); --border-color: var(--border-dark); }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
-        .card { background-color: var(--card-color); border: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s; }
-        .tab-button.active { border-color: #3b82f6; color: #3b82f6; background-color: rgba(59, 130, 246, 0.1); }
+        html.light {
+            --bg-color: var(--bg-light);
+            --text-color: var(--text-light);
+            --card-color: var(--card-light);
+            --border-color: var(--border-light);
+        }
+        html.dark {
+            --bg-color: var(--bg-dark);
+            --text-color: var(--text-dark);
+            --card-color: var(--card-dark);
+            --border-color: var(--border-dark);
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .card {
+            background-color: var(--card-color);
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .tab-button.active {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.1);
+        }
         .modal { display: none; }
         .modal.show { display: flex; }
         .xp-bar-inner { transition: width 0.5s ease-in-out; }
@@ -41,19 +70,20 @@
         .rarity-mitico { border: 2px solid; border-image-slice: 1; border-image-source: linear-gradient(to right, #f59e0b, #ef4444, #ec4899); color: #f59e0b; }
         .notification-popup { position: fixed; top: 20px; right: 20px; z-index: 1000; transform: translateX(200%); transition: transform 0.5s ease-in-out; }
         .notification-popup.show { transform: translateX(0); }
+        .text-level-lenda { color: #f59e0b; font-weight: bold; }
+        .text-level-craque { color: #c0c0c0; font-weight: bold; }
+        .text-level-diferenciado { color: #3b82f6; }
+        .text-level-esforcado { color: #10b981; }
+        .text-level-iniciante { color: #6b7280; }
         .badge-level { display: inline-block; padding: 0.25rem 0.75rem; font-size: 0.875rem; font-weight: 600; border-radius: 9999px; color: white; }
         .badge-level-lenda { background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
         .badge-level-craque { background-color: #9ca3af; }
         .badge-level-diferenciado { background-color: #3b82f6; }
         .badge-level-esforcado { background-color: #10b981; }
         .badge-level-iniciante { background-color: #6b7280; }
-        .status-vitoria { color: #22c55e; font-weight: bold; }
-        .status-derrota { color: #ef4444; font-weight: bold; }
-        .status-empate { color: #6b7280; font-weight: bold; }
     </style>
 </head>
 <body class="antialiased">
-    
     <div id="loading" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
         <div class="flex flex-col items-center">
             <i class="fas fa-futbol fa-spin text-5xl text-blue-500"></i>
@@ -69,6 +99,8 @@
             </div>
             <div class="flex items-center space-x-3 mt-4 sm:mt-0">
                 <button id="update-data-button" class="px-3 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-sync-alt mr-2"></i>Atualizar</button>
+                <button id="export-csv-button" class="px-3 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-file-csv mr-2"></i>Exportar CSV</button>
+                <button id="share-button" class="px-3 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-share-alt mr-2"></i>Compartilhar</button>
                 <label for="mobile-mode-toggle" class="flex items-center cursor-pointer text-sm">
                     <span class="mr-2">Mobile</span>
                     <div class="relative">
@@ -82,6 +114,23 @@
                 </button>
             </div>
         </header>
+
+        <div id="upload-fallback" class="hidden card p-6 mb-6">
+            <h2 class="text-xl font-bold mb-2 text-amber-500"><i class="fas fa-exclamation-triangle mr-2"></i>Falha ao carregar dados do Google Sheets</h2>
+            <p class="mb-4">Por favor, faça o upload dos arquivos CSV ou Excel correspondentes às abas da planilha.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="file-pagina1" class="block text-sm font-medium mb-1">Arquivo da Página 1 (Jogadores)</label>
+                    <input type="file" id="file-pagina1" class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                </div>
+                <div>
+                    <label for="file-pagina2" class="block text-sm font-medium mb-1">Arquivo da Página 2 (Partidas)</label>
+                    <input type="file" id="file-pagina2" class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                </div>
+            </div>
+            <div id="column-mapping-container" class="hidden mt-6"></div>
+            <button id="process-files-button" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400" disabled>Processar Arquivos</button>
+        </div>
 
         <nav class="mb-6">
             <div class="border-b border-gray-200 dark:border-gray-700">
@@ -105,26 +154,87 @@
                     </div>
                     <div class="w-full sm:w-auto">
                         <label for="month-filter" class="sr-only">Filtrar por Mês</label>
-                        <select id="month-filter" class="w-full p-2 rounded-md card"></select>
+                        <select id="month-filter" class="w-full p-2 rounded-md card">
+                        </select>
                     </div>
                 </div>
                 <div id="destaque-mes-container" class="mb-6"></div>
-                <div id="rankings-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+                <div id="rankings-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                </div>
             </div>
-            <div id="graficos" class="tab-pane hidden"></div>
+
+            <div id="graficos" class="tab-pane hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div class="card p-4 rounded-lg chart-container h-96"><canvas id="topGoleadoresChart"></canvas></div>
+                    <div class="card p-4 rounded-lg chart-container h-96"><canvas id="topAssistidoresChart"></canvas></div>
+                    <div class="card p-4 rounded-lg chart-container h-96"><canvas id="participacoesChart"></canvas></div>
+                    <div class="card p-4 rounded-lg chart-container h-96"><canvas id="aproveitamentoChart"></canvas></div>
+                    <div class="card p-4 rounded-lg chart-container h-96"><canvas id="contribuicaoChart"></canvas></div>
+                    <div class="card p-4 rounded-lg chart-container h-96"><canvas id="evolucaoGolsChart"></canvas></div>
+                    <div class="card p-4 rounded-lg chart-container h-96 xl:col-span-1"><canvas id="topEvolucoesChart"></canvas></div>
+                </div>
+                <div id="compare-section" class="mt-8 card p-6 rounded-lg">
+                    <h2 class="text-2xl font-bold mb-4">Comparar Jogadores</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                        <div class="w-full">
+                            <label for="player1-select" class="block text-sm font-medium mb-1">Jogador 1</label>
+                            <select id="player1-select" class="w-full p-2 rounded-md bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600"></select>
+                        </div>
+                        <div class="hidden text-center text-4xl font-bold md:flex items-center justify-center pb-2">VS</div>
+                        <div class="w-full">
+                            <label for="player2-select" class="block text-sm font-medium mb-1">Jogador 2</label>
+                            <select id="player2-select" class="w-full p-2 rounded-md bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600"></select>
+                        </div>
+                    </div>
+                    <div id="comparison-result" class="mt-6">
+                        <p class="text-center text-gray-500">Selecione dois jogadores para comparar.</p>
+                    </div>
+                </div>
+            </div>
+
             <div id="hall-da-fama" class="tab-pane hidden">
-                <div id="hall-of-fame-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                <div id="hall-of-fame-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
             </div>
-            <div id="partidas" class="tab-pane hidden space-y-6"></div>
-            <div id="admins" class="tab-pane hidden"></div>
+
+            <div id="partidas" class="tab-pane hidden space-y-6">
+            </div>
+
+            <div id="admins" class="tab-pane hidden">
+                <h2 class="text-2xl font-bold mb-6">Administradores & Créditos</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="card p-4 rounded-lg flex flex-col items-center text-center fade-in">
+                        <img src="https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Henrique.jpg" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-blue-500" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Henrique+Amaral&background=random';">
+                        <h4 class="font-bold text-lg">Henrique Amaral</h4>
+                        <p class="text-sm text-blue-500 font-semibold">Administrador</p>
+                    </div>
+                    <div class="card p-4 rounded-lg flex flex-col items-center text-center fade-in">
+                        <img src="https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Douglas.jpg" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-blue-500" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Douglas+Daitx&background=random';">
+                        <h4 class="font-bold text-lg">Douglas Daitx</h4>
+                        <p class="text-sm text-blue-500 font-semibold">Administrador</p>
+                    </div>
+                    <div class="card p-4 rounded-lg flex flex-col items-center text-center fade-in">
+                        <img src="https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/WILLY.jpg" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-blue-500" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Willy+Grafumbek&background=random';">
+                        <h4 class="font-bold text-lg">Willy Grafumbek</h4>
+                        <p class="text-sm text-blue-500 font-semibold">Administrador</p>
+                    </div>
+                    <div class="card p-4 rounded-lg flex flex-col items-center text-center fade-in bg-gradient-to-tr from-gray-700 to-gray-800 text-white">
+                         <img src="https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Iago%20Nunes.jpg" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-green-400" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Iago+Nunes&background=random&color=fff';">
+                        <h4 class="font-bold text-lg">Iago Nunes</h4>
+                        <p class="text-sm text-green-400 font-semibold">Programador</p>
+                    </div>
+                </div>
+            </div>
+
             <div id="curiosidades" class="tab-pane hidden">
                 <div class="flex justify-between items-center mb-6">
-                     <h2 class="text-2xl font-bold">Fatos Curiosos</h2>
-                     <button id="new-facts-button" class="px-4 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors">
-                         <i class="fas fa-sync-alt mr-2"></i>Gerar Novas
-                     </button>
+                      <h2 class="text-2xl font-bold">Fatos Curiosos</h2>
+                      <button id="new-facts-button" class="px-4 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors">
+                          <i class="fas fa-sync-alt mr-2"></i>Gerar Novas
+                      </button>
                 </div>
-                <div id="curiosidades-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                <div id="curiosidades-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
             </div>
         </main>
     </div>
@@ -132,142 +242,243 @@
     <div id="main-modal" class="modal fixed inset-0 bg-black bg-opacity-70 items-center justify-center p-4 z-40">
         <div id="modal-container" class="card rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto relative animate-scale-in">
             <button id="modal-close-button" class="absolute top-4 right-4 text-2xl hover:text-red-500 transition-colors z-10">&times;</button>
-            <div id="modal-content" class="p-6"></div>
+            <div id="modal-content" class="p-6">
+            </div>
         </div>
     </div>
-    
+
+    <div id="notification-popup" class="notification-popup">
+    </div>
+
+
 <script>
-const DashboardApp = (() => {
-    'use strict';
-
-    const config = {
-        apiKey: "AIzaSyCL19ds6YqVOv5vV-zygBjeC-byy-rDPfM",
-        spreadsheetId: "1TvrVT8ksYYMlpw8gkKIFvpnnCf02J8uYTkhHc5c0vdo",
-        rangePagina1: "Página1!A2:H100",
-        rangePagina2: "Página2!A2:K300",
-        cacheDuration: 3600 * 1000,
-        playerPhotos: { "HENRIQUE AMARAL": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Henrique.jpg", "VITOR": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Vitor%20gol.jpg", "MARCO DAITX": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Marco.jpg", "EDUARDO DUDU": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Eduardo.jpg", "WILIAN SILVA": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Wiliam%20Silva.jpg", "DOUGLAS DAITX": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Douglas.jpg", "GUSTAVO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Gustavo.jpg", "ADEMIR": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Ademir.jpg", "DAVI": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Davi%20Mattos.jpg", "VICTOR MATHEUS": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Victor%20Matheus.jpg", "ANDRE": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/main/Andre.jpg", "MAICON": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Maicon.jpg", "CRISTIANO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Cristiano.jpg", "CLAUDIO SCHNEIRDER": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Claudio.jpg", "WILIAN": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/main/Wiliam.jpg", "IAGO NUNES": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Iago%20Nunes.jpg", "WILLY": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/WILLY.jpg", "ZECA": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/ZECA.jpg", "FRANCISCO CHICO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/FRANCISCO%20CHICO.jpg", "PEDRALLI": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/PEDRALLI.jpg", "THALES RAMOS": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Thales%20Ramos.jpg", "BRUNO GUIMARAES": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Bruno.jpg", "EVERTON": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Everton.jpg", "JUAREZ CARDOSO": "https://github.com/ittokki/Fotos-jogadores/blob/main/juarez.jpg?raw=true", "CARLOS ALEXANDRE": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Carlos%20alexandre.jpg" },
-        levelBorderColors: { 'Lenda': '#f59e0b', 'Craque': '#9ca3af', 'Diferenciado': '#3b82f6', 'Esforçado': '#10b981', 'Iniciante': '#6b7280' },
-        sounds: { click: new Audio('https://raw.githubusercontent.com/ittokki/Futebol/5cc70b08d51f09dae0341672e52b2a435a276c05/PES%202013%20Select%20Game%20Main%20Menu%20Sound%20Effect%20(mp3cut.net).mp3') }
-    };
-
-    const state = {
-        allPlayers: [],
-        allMatches: [],
-        chartInstances: {},
-        userInteracted: false,
-    };
-
-    const DOMElements = {
-        loading: document.getElementById('loading'),
-        appContainer: document.getElementById('app-container'),
-        tabs: document.getElementById('tabs'),
-        tabContent: document.getElementById('tab-content'),
-        rankingsGrid: document.getElementById('rankings-grid'),
-        monthFilter: document.getElementById('month-filter'),
-        playerSearch: document.getElementById('player-search'),
-        destaqueMesContainer: document.getElementById('destaque-mes-container'),
-        hallOfFameContainer: document.getElementById('hall-of-fame-container'),
-        partidasContainer: document.getElementById('partidas'),
-        curiosidadesContainer: document.getElementById('curiosidades-container'),
-        mainModal: document.getElementById('main-modal'),
-        modalContainer: document.getElementById('modal-container'),
-        modalContent: document.getElementById('modal-content'),
-        modalCloseBtn: document.getElementById('modal-close-button'),
-        themeToggle: document.getElementById('theme-toggle'),
-        mobileModeToggle: document.getElementById('mobile-mode-toggle'),
-    };
-
-    const utils = {
-        parseNum: val => {
-            if (typeof val === "number") return val;
-            if (!val) return 0;
-            return Number(String(val).replace(',', '.').trim()) || 0;
-        },
-        normalizeName: name => {
-            if (!name || typeof name !== 'string') return '';
-            return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").replace(/\(GOL\)/gi, "").trim().toUpperCase();
-        },
-        formatValue: (value, type) => {
-            const formatters = {
-                'aproveitamento': () => value.toFixed(0),
-                'mediaGolsSofridos': () => value.toFixed(2),
-                'notaGeral': () => value.toFixed(1),
-            };
-            return formatters[type] ? formatters[type]() : Math.round(value);
-        },
-        getStandardDeviation: array => {
-            const n = array.length;
-            if (n < 2) return 0;
-            const mean = array.reduce((a, b) => a + b) / n;
-            return Math.sqrt(array.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
+document.addEventListener('DOMContentLoaded', () => {
+    let userInteracted = false;
+    function handleFirstInteraction() {
+        userInteracted = true;
+        document.removeEventListener('click', handleFirstInteraction, true);
+        document.removeEventListener('keydown', handleFirstInteraction, true);
+    }
+    document.addEventListener('click', handleFirstInteraction, true);
+    document.addEventListener('keydown', handleFirstInteraction, true);
+    
+    // --- EFEITO SONORO DE CLIQUE ---
+    const clickSound = new Audio('https://raw.githubusercontent.com/ittokki/Futebol/5cc70b08d51f09dae0341672e52b2a435a276c05/PES%202013%20Select%20Game%20Main%20Menu%20Sound%20Effect%20(mp3cut.net).mp3');
+    function playClickSound() {
+        if(userInteracted) {
+            clickSound.currentTime = 0;
+            clickSound.play().catch(e => {}); // Falha silenciosamente se o áudio for interrompido
         }
+    }
+
+    document.body.addEventListener('click', e => {
+        if(e.target.closest('button, [data-player-name], .match-card, .tab-button, select, label, input[type="checkbox"]')) {
+            playClickSound();
+        }
+    });
+
+    // =================================================================================
+    // CONFIGURAÇÕES PRINCIPAIS
+    // =================================================================================
+    const apiKey = "AIzaSyCL19ds6YqVOv5vV-zygBjeC-byy-rDPfM";
+    const spreadsheetId = "1TvrVT8ksYYMlpw8gkKIFvpnnCf02J8uYTkhHc5c0vdo";
+    const rangePagina1 = "Página1!A2:H100";
+    const rangePagina2 = "Página2!A2:K300";
+    
+    // Mapa de fotos dos jogadores
+    const playerPhotos = {
+        "HENRIQUE AMARAL": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Henrique.jpg", "VITOR": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Vitor%20gol.jpg", "MARCO DAITX": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Marco.jpg", "EDUARDO DUDU": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Eduardo.jpg", "WILIAN SILVA": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Wiliam%20Silva.jpg", "DOUGLAS DAITX": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Douglas.jpg", "GUSTAVO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Gustavo.jpg", "ADEMIR": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Ademir.jpg", "DAVI": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Davi%20Mattos.jpg", "VICTOR MATHEUS": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Victor%20Matheus.jpg", "ANDRE": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/main/Andre.jpg", "MAICON": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Maicon.jpg", "CRISTIANO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Cristiano.jpg", "CLAUDIO SCHNEIRDER": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Claudio.jpg", "WILIAN": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/main/Wiliam.jpg", "IAGO NUNES": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Iago%20Nunes.jpg", "WILLY": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/WILLY.jpg", "ZECA": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/ZECA.jpg", "FRANCISCO CHICO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/FRANCISCO%20CHICO.jpg", "PEDRALLI": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/PEDRALLI.jpg", "THALES RAMOS": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Thales%20Ramos.jpg", "BRUNO GUIMARAES": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Bruno.jpg", "EVERTON": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Everton.jpg", "JUAREZ CARDOSO": "https://github.com/ittokki/Fotos-jogadores/blob/main/juarez.jpg?raw=true", "CARLOS ALEXANDRE": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Carlos%20alexandre.jpg"
+    };
+    
+    // Mapeamento de cores para borda da foto de acordo com o nível
+    const levelBorderColors = {
+        'Lenda': '#f59e0b',       // Dourado
+        'Craque': '#9ca3af',      // Cinza/Prata
+        'Diferenciado': '#3b82f6', // Azul
+        'Esforçado': '#10b981',   // Verde
+        'Iniciante': '#6b7280'     // Cinza
     };
 
-    const api = {
-        fetchSheetData: async (range) => {
-            const url = `https://sheets.googleapis.com/v4/spreadsheets/${config.spreadsheetId}/values/${range}?key=${config.apiKey}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Erro ao buscar dados: ${response.statusText}`);
-            const data = await response.json();
-            return data.values || [];
-        },
-        fetchAllData: async () => {
-            const now = Date.now();
-            const partidasCacheTime = localStorage.getItem('partidasCacheTime');
-            const jogadoresCacheTime = localStorage.getItem('jogadoresCacheTime');
+    let allPlayersData = [];
+    let allMatchesData = [];
+    let chartInstances = {};
 
-            if (partidasCacheTime && jogadoresCacheTime && (now - partidasCacheTime < config.cacheDuration) && (now - jogadoresCacheTime < config.cacheDuration)) {
-                console.log("Carregando dados do cache.");
-                const partidas = JSON.parse(localStorage.getItem('partidasCache'));
-                const jogadores = JSON.parse(localStorage.getItem('jogadoresCache'));
-                if (partidas && jogadores) return { partidas, jogadores };
+    const loadingEl = document.getElementById('loading');
+    const appContainerEl = document.getElementById('app-container');
+    const uploadFallbackEl = document.getElementById('upload-fallback');
+    const tabsContainer = document.getElementById('tabs');
+    const tabContent = document.getElementById('tab-content');
+    const mainModalEl = document.getElementById('main-modal');
+    const modalContainer = document.getElementById('modal-container');
+    const modalContentEl = document.getElementById('modal-content');
+    const modalCloseBtn = document.getElementById('modal-close-button');
+    const themeToggleBtn = document.getElementById('theme-toggle');
+
+    const parseNum = (val) => {
+        if (typeof val === "number") return val;
+        if (!val) return 0;
+        return Number(val.toString().replace(',', '.').trim()) || 0;
+    };
+
+    const normalizaNome = (nome) => {
+        if (!nome || typeof nome !== 'string') return '';
+        return nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").replace(/\(GOL\)/gi, "").trim().toUpperCase();
+    };
+    
+    const formatValue = (value, type) => {
+        if (type === 'aproveitamento') return value.toFixed(0);
+        if (type === 'mediaGolsSofridos') return value.toFixed(2);
+        if (type === 'notaGeral') return value.toFixed(1);
+        return Math.round(value);
+    };
+
+    async function fetchSheetData(range) {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Erro ao buscar dados da planilha: ${response.statusText}`);
+        const data = await response.json();
+        return data.values || [];
+    }
+
+    async function fetchAllData() {
+        const cacheTime = 3600 * 1000; // 1 hora
+        const now = new Date().getTime();
+        const partidasCacheTime = localStorage.getItem('partidasCacheTime');
+        const jogadoresCacheTime = localStorage.getItem('jogadoresCacheTime');
+
+        if (partidasCacheTime && jogadoresCacheTime && (now - partidasCacheTime < cacheTime) && (now - jogadoresCacheTime < cacheTime)) {
+            console.log("Carregando dados do cache.");
+            const partidas = JSON.parse(localStorage.getItem('partidasCache'));
+            const jogadores = JSON.parse(localStorage.getItem('jogadoresCache'));
+            if (partidas && jogadores) return { partidas, jogadores };
+        }
+
+        console.log("Buscando dados da API do Google Sheets.");
+        const [partidas, jogadores] = await Promise.all([fetchSheetData(rangePagina2), fetchSheetData(rangePagina1)]);
+        
+        localStorage.setItem('partidasCache', JSON.stringify(partidas));
+        localStorage.setItem('partidasCacheTime', now);
+        localStorage.setItem('jogadoresCache', JSON.stringify(jogadores));
+        localStorage.setItem('jogadoresCacheTime', now);
+
+        return { partidas, jogadores };
+    }
+    
+    function calcularNotaPartida(dados) {
+        const isGoleiro = dados.isGoleiro;
+        const PESO_ADM = 5;
+        const PESO_GOLS = 0.7;
+        const PESO_ASSIST = 0.6;
+        const PESO_GOLS_TOMADOS = isGoleiro ? -0.15 : 0;
+        const PESO_GOLS_CONTRA = -0.7;
+        const NOTA_BASE = 6.0;
+
+        const notaTecnica = NOTA_BASE + (dados.gols * PESO_GOLS) + (dados.assistencias * PESO_ASSIST) + (dados.golsTomados * PESO_GOLS_TOMADOS) + (dados.golsContra * PESO_GOLS_CONTRA);
+        
+        let notaPonderada = (notaTecnica + (dados.notaADM * PESO_ADM)) / (1 + PESO_ADM);
+
+        const bonusResultado = dados.vitoria === 1 ? 0.3 : dados.vitoria === 0.5 ? 0.15 : 0;
+        let notaFinal = notaPonderada + bonusResultado;
+        
+        notaFinal = Math.max(0, Math.min(10, Math.round(notaFinal * 10) / 10));
+        return notaFinal;
+    }
+
+    function calcularConquistas(jogador, partidasJogador, todasAsPartidas) {
+        const conquistas = [];
+        if(!partidasJogador) return [];
+        
+        partidasJogador.forEach(p => {
+            if (p.gols >= 6) {
+                conquistas.push({ nome: "Exterminador", desc: `Marcou 6+ gols em ${p.dataJogo}`, icon: "fa-solid fa-skull-crossbones", rarity: "mitico" });
+            } else if (p.gols >= 5) {
+                conquistas.push({ nome: "Repoker", desc: `Marcou 5 gols em ${p.dataJogo}`, icon: "fa-solid fa-star", rarity: "lendario" });
+            } else if (p.gols >= 4) {
+                conquistas.push({ nome: "Pôquer", desc: `Marcou 4 gols em ${p.dataJogo}`, icon: "fa-solid fa-dice-four", rarity: "epico" });
+            } else if (p.gols >= 3) {
+                conquistas.push({ nome: "Hat-Trick", desc: `Marcou 3 gols em ${p.dataJogo}`, icon: "fa-solid fa-futbol", rarity: "raro" });
+            } else if (p.gols >= 2) {
+                conquistas.push({ nome: "Doblete", desc: `Marcou 2 gols em ${p.dataJogo}`, icon: "fa-solid fa-person-running", rarity: "comum" });
             }
 
-            console.log("Buscando dados da API.");
-            const [partidas, jogadores] = await Promise.all([api.fetchSheetData(config.rangePagina2), api.fetchSheetData(config.rangePagina1)]);
-            localStorage.setItem('partidasCache', JSON.stringify(partidas));
-            localStorage.setItem('partidasCacheTime', now);
-            localStorage.setItem('jogadoresCache', JSON.stringify(jogadores));
-            localStorage.setItem('jogadoresCacheTime', now);
-            return { partidas, jogadores };
-        }
-    };
+            if (p.assistencias >= 6) {
+                conquistas.push({ nome: "Maestro", desc: `6+ assistências em ${p.dataJogo}`, icon: "fa-solid fa-theater-masks", rarity: "mitico" });
+            } else if (p.assistencias >= 5) {
+                conquistas.push({ nome: "5 Assistências", desc: `5 assistências em ${p.dataJogo}`, icon: "fa-solid fa-crown", rarity: "lendario" });
+            } else if (p.assistencias >= 4) {
+                conquistas.push({ nome: "4 Assistências", desc: `4 assistências em ${p.dataJogo}`, icon: "fa-solid fa-brain", rarity: "epico" });
+            } else if (p.assistencias >= 3) {
+                conquistas.push({ nome: "Hat-Trick de Assistências", desc: `3 assistências em ${p.dataJogo}`, icon: "fa-solid fa-hat-wizard", rarity: "raro" });
+            } else if (p.assistencias >= 2) {
+                conquistas.push({ nome: "2 Assistências", desc: `2 assistências em ${p.dataJogo}`, icon: "fa-solid fa-hands-helping", rarity: "comum" });
+            }
 
-    const logic = {
-        calculateMatchScore: (dados) => {
-            const PESOS = { ADM: 5, GOLS: 0.7, ASSIST: 0.6, GOLS_TOMADOS: dados.isGoleiro ? -0.15 : 0, GOLS_CONTRA: -0.7 };
-            const vitoriaValor = dados.vitoria === 1 ? 0.3 : dados.vitoria === 0.5 ? 0.15 : 0;
-            const notaTecnica = 6.0 + (dados.gols * PESOS.GOLS) + (dados.assistencias * PESOS.ASSIST) + (dados.golsTomados * PESOS.GOLS_TOMADOS) + (dados.golsContra * PESOS.GOLS_CONTRA) + vitoriaValor;
-            let notaFinal = (notaTecnica + (dados.notaADM * PESOS.ADM)) / (1 + PESOS.ADM);
-            return Math.max(0, Math.min(10, Math.round(notaFinal * 10) / 10));
-        },
-        processData: (partidasRaw, jogadoresRaw) => {
-            const jogadoresMap = new Map(jogadoresRaw.map(row => [utils.normalizeName(row[1]), { id: row[0], nome: utils.normalizeName(row[1]), nomeOriginal: row[1] }]));
-            
-            const matches = partidasRaw.map(row => {
-                const isGoleiro = (row[0] || "").toUpperCase().includes('(GOL)') || utils.parseNum(row[3]) > 0;
-                const vitoriaStatus = (row[7] || "").toLowerCase().trim();
-                const matchData = {
-                    nome: utils.normalizeName(row[0]), nomeRaw: row[0], gols: utils.parseNum(row[1]), assistencias: utils.parseNum(row[2]),
-                    golsTomados: utils.parseNum(row[3]), golsContra: utils.parseNum(row[4]), notaADM: utils.parseNum(row[5]),
-                    dataJogo: row[6], vitoria: vitoriaStatus === 'sim' ? 1 : vitoriaStatus === 'empate' ? 0.5 : 0,
-                    time: row[8] || 'N/A', jogoAconteceu: (row[10] || "").toLowerCase() === 'sim', isGoleiro
-                };
-                matchData.notaPartida = matchData.jogoAconteceu ? logic.calculateMatchScore(matchData) : 0;
-                return matchData;
-            }).filter(p => p.nome && /^\d{2}\/\d{2}\/\d{4}$/.test(p.dataJogo));
+            if (p.notaPartida >= 9.5) {
+                conquistas.push({ nome: "Lenda do Jogo", desc: `Nota ${p.notaPartida} em ${p.dataJogo}`, icon: "fa-solid fa-gavel", rarity: "lendario" });
+            } else if (p.notaPartida >= 9) {
+                conquistas.push({ nome: "Partida Épica", desc: `Nota ${p.notaPartida} em ${p.dataJogo}`, icon: "fa-solid fa-meteor", rarity: "epico" });
+            }
+        });
+        
+        if (jogador.jogos >= 25) conquistas.push({ nome: "Veterano", desc: "Disputou 25 partidas", icon: "fa-solid fa-shield-halved", rarity: "raro" });
+        if (jogador.vitorias >= 10) conquistas.push({ nome: "Campeão", desc: "Alcançou 10 vitórias", icon: "fa-solid fa-trophy", rarity: "raro" });
 
-            const players = logic.recalculateStatsForPeriod(Array.from(jogadoresMap.values()), matches);
-            return { players, matches };
-        },
-        recalculateStatsForPeriod: (basePlayers, periodMatches) => {
-            const playersMap = new Map();
-            basePlayers.forEach(p => playersMap.set(p.nome, { ...p, jogos: 0, vitorias: 0, empates: 0, gols: 0, assistencias: 0, golsContra: 0, golsTomados: 0, partidas: [], notasGeral: [], notasGoleiro: [], notasLinha: [] }));
+        return conquistas;
+    }
 
-            periodMatches.filter(p => p.jogoAconteceu).forEach(p => {
-                if (!playersMap.has(p.nome)) return;
-                const j = playersMap.get(p.nome);
+    function calcularBonusMVP(conquistas) {
+        const pontos = { comum: 1, raro: 2, epico: 3, lendario: 5, mitico: 10 };
+        return conquistas.reduce((acc, c) => acc + (pontos[c.rarity] || 0), 0);
+    }
+
+    function processarDados(partidasRaw, jogadoresRaw) {
+        const jogadoresMap = new Map();
+        jogadoresRaw.forEach(row => {
+            const nome = normalizaNome(row[1]);
+            if (nome) {
+                jogadoresMap.set(nome, { id: row[0], nome, nomeOriginal: row[1] });
+            }
+        });
+
+        const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+        allMatchesData = partidasRaw.map(row => {
+            const vitoriaStatus = (row[7] || "").toLowerCase().trim();
+            const isGoleiro = (row[0] || "").toUpperCase().includes('(GOL)') || parseNum(row[3]) > 0;
+            return {
+                nome: normalizaNome(row[0]), nomeRaw: row[0],
+                gols: parseNum(row[1]), assistencias: parseNum(row[2]),
+                golsTomados: parseNum(row[3]), golsContra: parseNum(row[4]),
+                notaADM: parseNum(row[5]), dataJogo: row[6],
+                vitoria: vitoriaStatus === 'sim' ? 1 : vitoriaStatus === 'empate' ? 0.5 : 0,
+                time: row[8] || 'N/A',
+                jogoAconteceu: (row[10] || "").toLowerCase() === 'sim',
+                isGoleiro: isGoleiro
+            };
+        }).filter(p => p.nome && dateRegex.test(p.dataJogo));
+
+        allMatchesData.forEach(p => {
+            p.notaPartida = p.jogoAconteceu ? calcularNotaPartida(p) : 0;
+        });
+
+        allPlayersData = recalculateStatsForPeriod(Array.from(jogadoresMap.values()), allMatchesData);
+        
+        return allPlayersData;
+    }
+
+    function recalculateStatsForPeriod(basePlayers, periodMatches) {
+        const periodPlayersMap = new Map();
+        basePlayers.forEach(p => {
+             periodPlayersMap.set(p.nome, {
+                 ...p, jogos: 0, vitorias: 0, empates: 0,
+                 gols: 0, assistencias: 0, golsContra: 0, golsTomados: 0,
+                 partidas: [], notasGeral: [], notasGoleiro: [], notasLinha: []
+             });
+        });
+
+        const matchesPlayed = periodMatches.filter(p => p.jogoAconteceu);
+        matchesPlayed.forEach(p => {
+            if (periodPlayersMap.has(p.nome)) {
+                const j = periodPlayersMap.get(p.nome);
                 j.jogos++;
                 if (p.vitoria === 1) j.vitorias++;
                 if (p.vitoria === 0.5) j.empates++;
@@ -277,322 +488,907 @@ const DashboardApp = (() => {
                 j.golsTomados += p.golsTomados;
                 j.partidas.push(p);
                 j.notasGeral.push(p.notaPartida);
-                if (p.isGoleiro) j.notasGoleiro.push(p.notaPartida); else j.notasLinha.push(p.notaPartida);
-            });
-            
-            const playersWithGames = Array.from(playersMap.values()).filter(p => p.jogos > 0);
-            playersWithGames.forEach(j => {
-                j.aproveitamento = j.jogos > 0 ? ((j.vitorias + j.empates * 0.5) / j.jogos) * 100 : 0;
-                j.notaGeral = j.notasGeral.length ? j.notasGeral.reduce((a, b) => a + b, 0) / j.notasGeral.length : 0;
-                // Simplified MVP calculation for brevity; the original logic can be ported here
-                j._pontosBrutos = (j.gols * 2) + j.assistencias + j.vitorias - (j.golsContra * 0.5) + (j.notaGeral * 10);
-            });
-            
-            const maxPontos = Math.max(...playersWithGames.map(j => j._pontosBrutos || 0));
-            playersWithGames.forEach(j => {
-                j.pontosMVP = maxPontos > 0 ? Math.round((j._pontosBrutos / maxPontos) * 100) : 0;
-                j.nivel = j.pontosMVP >= 90 ? 'Lenda' : j.pontosMVP >= 70 ? 'Craque' : j.pontosMVP >= 50 ? 'Diferenciado' : j.pontosMVP >= 20 ? 'Esforçado' : 'Iniciante';
-            });
-
-            return playersWithGames;
-        },
-        generateFunFacts: (players, matches) => {
-            const factFunctions = [
-                // Fatos sobre artilharia e vitórias
-                (p, m) => { const best = p.sort((a,b)=>b.gols-a.gols)[0]; return best ? {icon:'⚽', text:`O maior artilheiro geral é <b>${best.nomeOriginal}</b> com <b>${best.gols}</b> gols.`} : null; },
-                (p, m) => { const best = p.sort((a,b)=>b.vitorias-a.vitorias)[0]; return best ? {icon:'🏆', text:`O jogador mais vitorioso é <b>${best.nomeOriginal}</b>, com <b>${best.vitorias}</b> vitórias.`} : null; },
-                (p, m) => {
-                    const bestMatch = m.filter(match => match.jogoAconteceu).sort((a,b) => b.notaPartida - a.notaPartida)[0];
-                    if(!bestMatch) return null;
-                    const player = p.find(pl => pl.nome === bestMatch.nome);
-                    return { icon: '⭐', text: `A maior nota já registrada foi <b>${bestMatch.notaPartida.toFixed(1)}</b>, por <b>${player?.nomeOriginal || bestMatch.nome}</b> em ${bestMatch.dataJogo}.`};
-                },
-                // NOVAS CURIOSIDADES INCLUSIVAS
-                (p, m) => { // De Olho no Marco
-                    const milestones = [{key: 'gols', value: 25}, {key: 'jogos', value: 50}, {key: 'vitorias', value: 15}];
-                    let closestPlayer = null;
-                    let minDiff = Infinity;
-
-                    p.forEach(player => {
-                        milestones.forEach(milestone => {
-                            const diff = milestone.value - player[milestone.key];
-                            if(diff > 0 && diff < minDiff && diff <= 5) {
-                                minDiff = diff;
-                                closestPlayer = { ...player, diff, milestone };
-                            }
-                        });
-                    });
-                    if(!closestPlayer) return null;
-                    return { icon: '🎯', text: `<b>De olho no marco!</b> ${closestPlayer.nomeOriginal} está a apenas <b>${closestPlayer.diff}</b> ${closestPlayer.milestone.key} de atingir a marca de <b>${closestPlayer.milestone.value}</b>.` };
-                },
-                (p, m) => { // Maior Rivalidade
-                    const rivalries = {};
-                    const matchesByDate = m.reduce((acc, match) => { (acc[match.dataJogo] = acc[match.dataJogo] || []).push(match); return acc; }, {});
-                    
-                    for(const date in matchesByDate) {
-                        const boca = matchesByDate[date].filter(match => match.time.toUpperCase() === 'BOCA').map(m => m.nome);
-                        const river = matchesByDate[date].filter(match => match.time.toUpperCase() === 'RIVER').map(m => m.nome);
-                        if (boca.length === 0 || river.length === 0) continue;
-                        boca.forEach(p1 => river.forEach(p2 => {
-                            const pair = [p1, p2].sort().join('-');
-                            rivalries[pair] = (rivalries[pair] || 0) + 1;
-                        }));
-                    }
-                    const topRivalry = Object.entries(rivalries).sort((a,b)=>b[1]-a[1])[0];
-                    if(!topRivalry || topRivalry[1] < 3) return null;
-                    const [p1Name, p2Name] = topRivalry[0].split('-');
-                    const player1 = p.find(pl => pl.nome === p1Name)?.nomeOriginal || p1Name;
-                    const player2 = p.find(pl => pl.nome === p2Name)?.nomeOriginal || p2Name;
-
-                    return { icon: '⚔️', text: `<b>A maior rivalidade</b> é entre <b>${player1}</b> e <b>${player2}</b>, que se enfrentaram em times opostos <b>${topRivalry[1]}</b> vezes.` };
-                },
-                 (p, m) => { // Dupla Mais Entrosada
-                    const duos = {};
-                    const matchesByDate = m.reduce((acc, match) => { (acc[match.dataJogo] = acc[match.dataJogo] || []).push(match); return acc; }, {});
-
-                    for(const date in matchesByDate) {
-                        const teams = {
-                            BOCA: matchesByDate[date].filter(match => match.time.toUpperCase() === 'BOCA').map(m => m.nome),
-                            RIVER: matchesByDate[date].filter(match => match.time.toUpperCase() === 'RIVER').map(m => m.nome)
-                        };
-                        for (const team in teams) {
-                            for(let i=0; i < teams[team].length; i++) {
-                                for(let j=i+1; j < teams[team].length; j++) {
-                                    const pair = [teams[team][i], teams[team][j]].sort().join('-');
-                                    duos[pair] = (duos[pair] || 0) + 1;
-                                }
-                            }
-                        }
-                    }
-                    const topDuo = Object.entries(duos).sort((a,b)=>b[1]-a[1])[0];
-                    if(!topDuo || topDuo[1] < 5) return null;
-                    const [p1Name, p2Name] = topDuo[0].split('-');
-                    const player1 = p.find(pl => pl.nome === p1Name)?.nomeOriginal || p1Name;
-                    const player2 = p.find(pl => pl.nome === p2Name)?.nomeOriginal || p2Name;
-
-                    return { icon: '🤝', text: `<b>A dupla mais entrosada</b> é <b>${player1}</b> e <b>${player2}</b>, que jogaram juntos no mesmo time <b>${topDuo[1]}</b> vezes.` };
-                }
-            ];
-            
-            const shuffled = factFunctions.sort(() => 0.5 - Math.random());
-            const selectedFacts = [];
-            for (const func of shuffled) {
-                if (selectedFacts.length >= 3) break;
-                const fact = func(players, matches);
-                if (fact) selectedFacts.push(fact);
+                if (p.isGoleiro) j.notasGoleiro.push(p.notaPartida);
+                else j.notasLinha.push(p.notaPartida);
             }
-            return selectedFacts;
-        }
-    };
-    
-    const ui = {
-        renderRankings: (players) => {
-            DOMElements.rankingsGrid.innerHTML = '';
-            const cards = [
-                { title: 'Pontos MVP', key: 'pontosMVP' }, { title: 'Gols', key: 'gols' },
-                { title: 'Assistências', key: 'assistencias' }, { title: 'Vitórias', key: 'vitorias' }
-            ];
-            cards.forEach(card => DOMElements.rankingsGrid.innerHTML += ui.createRankingCard(card.title, players, card.key));
-        },
-        createRankingCard: (title, data, key) => {
-            const sortedData = [...data].sort((a, b) => b[key] - a[key]).slice(0, 5);
-            const playersHtml = sortedData.length ? sortedData.map((p, index) => {
-                const photoUrl = config.playerPhotos[p.nome] || `https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random`;
-                return `
-                <div class="player-card flex items-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-md" data-player-name="${p.nomeOriginal}">
-                    <span class="font-bold w-6">${index + 1}.</span>
-                    <img src="${photoUrl}" class="w-10 h-10 rounded-full object-cover mr-3" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random';">
-                    <div class="flex-grow player-info"><p class="font-semibold truncate leading-tight">${p.nomeOriginal}</p></div>
-                    <span class="font-bold text-blue-500">${utils.formatValue(p[key], key)}</span>
-                </div>`;
-            }).join('') : `<p class="text-gray-500 text-sm h-full flex items-center justify-center">Nenhum jogador encontrado.</p>`;
+        });
 
-            return `<div class="card p-4 rounded-lg flex flex-col fade-in"><h3 class="font-bold text-lg mb-4">${title}</h3><div class="flex-grow space-y-3">${playersHtml}</div></div>`;
-        },
-        renderCuriosidades: () => {
-            const facts = logic.generateFunFacts(state.allPlayers, state.allMatches);
-            DOMElements.curiosidadesContainer.innerHTML = facts.map(fact => `
+        const players = Array.from(periodPlayersMap.values()).filter(p => p.jogos > 0);
+        
+        players.forEach(j => {
+            j.notaGeral = j.notasGeral.length > 0 ? j.notasGeral.reduce((a, b) => a + b, 0) / j.notasGeral.length : 0;
+            j.notaGeralGoleiro = j.notasGoleiro.length > 0 ? j.notasGoleiro.reduce((a, b) => a + b, 0) / j.notasGoleiro.length : 0;
+            j.notaGeralLinha = j.notasLinha.length > 0 ? j.notasLinha.reduce((a, b) => a + b, 0) / j.notasLinha.length : 0;
+            j.jogosGoleiro = j.notasGoleiro.length;
+            j.mediaGolsSofridos = j.jogosGoleiro > 0 ? (j.golsTomados / j.jogosGoleiro) : 0;
+            j.aproveitamento = j.jogos > 0 ? ((j.vitorias + j.empates * 0.5) / j.jogos) * 100 : 0;
+            
+            j.conquistas = calcularConquistas(j, j.partidas, matchesPlayed);
+            const bonusConquistas = calcularBonusMVP(j.conquistas);
+            
+            j._pontosBrutos = (j.gols * 2) + j.assistencias + j.vitorias - (j.golsContra * 0.5) + (j.notaGeral * 10) + bonusConquistas;
+            j.partidas.sort((a,b) => new Date(a.dataJogo.split('/').reverse().join('-')) - new Date(b.dataJogo.split('/').reverse().join('-')));
+        });
+        
+        const maxPontosBrutos = Math.max(...players.map(j => j._pontosBrutos || 0));
+
+        players.forEach(j => {
+            let pontosRecentes = 0, pesoTotal = 0;
+            j.partidas.slice(-5).forEach((p, idx) => {
+                const peso = (idx + 1);
+                const pb = p.gols*2 + p.assistencias + (p.vitoria === 1 ? 1 : p.vitoria === 0.5 ? 0.5 : 0) - p.golsContra*0.5 + p.notaPartida*10;
+                pontosRecentes += pb * peso;
+                pesoTotal += peso;
+            });
+            const mediaRecente = pesoTotal > 0 ? pontosRecentes / pesoTotal : j._pontosBrutos;
+            
+            const combinadoBase = (j._pontosBrutos * 0.7) + (mediaRecente * 0.3);
+            const combinado = j.jogosGoleiro > 0 ? combinadoBase * 1.2 : combinadoBase;
+            
+            j.pontosMVP = maxPontosBrutos > 0 ? Math.round((combinado / maxPontosBrutos) * 100) : 0;
+
+            j.nivel = j.pontosMVP >= 90 ? 'Lenda' : j.pontosMVP >= 70 ? 'Craque' : j.pontosMVP >= 50 ? 'Diferenciado' : j.pontosMVP >= 20 ? 'Esforçado' : 'Iniciante';
+        });
+
+        return players;
+    }
+
+    function renderDashboard(players) {
+        setupFiltersAndSearch();
+        updateFilteredView();
+        renderHallOfFame(allPlayersData);
+        renderPartidas();
+        setupComparisonTool(allPlayersData);
+        loadingEl.style.display = 'none';
+        appContainerEl.classList.remove('hidden');
+    }
+
+    function createRankingCard(title, data, key, unit = '', higherIsBetter = true) {
+        const sortedData = [...data].sort((a, b) => higherIsBetter ? b[key] - a[key] : a[key] - b[key]);
+        const top5 = sortedData.slice(0, 5);
+        let html = `<div class="card p-4 rounded-lg flex flex-col fade-in"><h3 class="font-bold text-lg mb-4">${title}</h3><div class="flex-grow space-y-3">`;
+        if (top5.length === 0) {
+             html += `<p class="text-gray-500 text-sm h-full flex items-center justify-center">Nenhum jogador encontrado.</p>`;
+        } else {
+            top5.forEach((p, index) => {
+                const value = formatValue(p[key], key);
+                const photoUrl = playerPhotos[p.nome] || `https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random`;
+                const playerLabel = key === 'pontosMVP' ? `<span class="block text-xs font-medium text-level-${p.nivel.toLowerCase()}">${p.nivel}</span>` : '';
+                html += `
+                    <div class="player-card flex items-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-md" data-player-name="${p.nomeOriginal}">
+                        <span class="font-bold w-6">${index + 1}.</span>
+                        <img src="${photoUrl}" class="w-10 h-10 rounded-full object-cover mr-3" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random';">
+                        <div class="flex-grow player-info">
+                            <p class="font-semibold truncate leading-tight">${p.nomeOriginal}</p>
+                            ${playerLabel}
+                        </div>
+                        <span class="font-bold text-blue-500">${value}${unit}</span>
+                    </div>
+                `;
+            });
+        }
+        html += `</div><button class="ver-mais-btn mt-4 text-sm text-blue-500 hover:underline" data-key="${key}" data-title="${title}" data-unit="${unit}" data-hib="${higherIsBetter}">Ver Mais</button></div>`;
+        return html;
+    }
+    
+    function renderDestaqueDoMes(players, monthLabel) {
+         const container = document.getElementById('destaque-mes-container');
+         const bestPlayer = [...players].filter(p => p.jogos > 0).sort((a,b) => b.notaGeral - a.notaGeral)[0];
+         if(bestPlayer) {
+            const photoUrl = playerPhotos[bestPlayer.nome] || `https://ui-avatars.com/api/?name=${bestPlayer.nome.replace(' ', '+')}&background=random`;
+            container.innerHTML = `
+            <div class="card p-5 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg">
+                <h3 class="text-xl font-bold mb-3"><i class="fas fa-crown mr-2 text-yellow-300"></i>Destaque de ${monthLabel}</h3>
+                <div class="flex items-center space-x-4 cursor-pointer" data-player-name="${bestPlayer.nomeOriginal}">
+                    <img src="${photoUrl}" class="w-20 h-20 rounded-full object-cover border-4 border-yellow-300" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${bestPlayer.nome.replace(' ', '+')}&background=random';">
+                    <div>
+                        <p class="text-2xl font-bold">${bestPlayer.nomeOriginal}</p>
+                        <p class="text-lg">Nota Média: <span class="font-bold text-yellow-300">${bestPlayer.notaGeral.toFixed(1)}</span></p>
+                    </div>
+                </div>
+            </div>`;
+        } else {
+             container.innerHTML = `
+             <div class="card p-5 rounded-lg">
+                 <h3 class="text-xl font-bold mb-2">Destaque de ${monthLabel}</h3>
+                 <p class="text-gray-500">Nenhum jogador com partidas registradas neste mês.</p>
+             </div>`;
+        }
+    }
+
+    function renderRankings(players) {
+        const container = document.getElementById('rankings-grid');
+        container.innerHTML = '';
+        const cards = [{ title: 'Pontos MVP', key: 'pontosMVP' },{ title: 'Gols', key: 'gols' },{ title: 'Assistências', key: 'assistencias' },{ title: 'Vitórias', key: 'vitorias' },{ title: 'Jogos', key: 'jogos' },{ title: 'Ranking Goleiros (Média Gols Sofridos)', key: 'mediaGolsSofridos', higherIsBetter: false },{ title: 'Aproveitamento', key: 'aproveitamento', unit: '%' },{ title: 'Nota Geral', key: 'notaGeral' }];
+        cards.forEach(card => {
+            const data = (card.key === 'mediaGolsSofridos') ? players.filter(p => p.jogosGoleiro > 0) : players;
+            container.innerHTML += createRankingCard(card.title, data, card.key, card.unit, card.higherIsBetter);
+        });
+    }
+    
+    function renderHallOfFame(players) {
+        const container = document.getElementById('hall-of-fame-container');
+        container.innerHTML = '';
+        const playersWithAchievements = players.filter(p => p.conquistas.length > 0).sort((a, b) => b.conquistas.length - a.conquistas.length);
+        playersWithAchievements.forEach(p => {
+            const photoUrl = playerPhotos[p.nome] || `https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random`;
+            const achievementsByType = p.conquistas.reduce((acc, c) => { acc[c.rarity] = (acc[c.rarity] || 0) + 1; return acc; }, {});
+            const badgeOrder = ['mitico', 'lendario', 'epico', 'raro', 'comum'];
+            let badgesHtml = '<div class="flex flex-wrap gap-2 mt-3">';
+            
+            badgeOrder.forEach(rarity => {
+                if (achievementsByType[rarity]) badgesHtml += `<span class="px-2 py-1 text-xs font-semibold rounded-full border-2 rarity-${rarity}">${achievementsByType[rarity]} ${rarity.charAt(0).toUpperCase() + rarity.slice(1)}</span>`;
+            });
+            badgesHtml += '</div>';
+            container.innerHTML += `<div class="card p-4 rounded-lg flex flex-col items-center text-center cursor-pointer hover:shadow-lg transition-shadow" data-player-name="${p.nomeOriginal}"><img src="${photoUrl}" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-gray-300 dark:border-gray-600" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random';"><h4 class="font-bold text-lg">${p.nomeOriginal}</h4><p class="text-sm text-gray-500 dark:text-gray-400">${p.conquistas.length} Conquistas</p>${badgesHtml}</div>`;
+        });
+    }
+
+    function renderPartidas() {
+        const container = document.getElementById('partidas');
+        container.innerHTML = '';
+        const groupedMatches = allMatchesData.reduce((acc, p) => {
+            (acc[p.dataJogo] = acc[p.dataJogo] || []).push(p);
+            return acc;
+        }, {});
+        const sortedDates = Object.keys(groupedMatches).sort((a, b) => new Date(b.split('/').reverse().join('-')) - new Date(a.split('/').reverse().join('-')));
+        sortedDates.forEach(date => {
+            const partidasDoDia = groupedMatches[date];
+            const jogoRealizado = partidasDoDia.some(p => p.jogoAconteceu);
+            
+            let placar;
+            if(jogoRealizado) {
+                const scoreA = partidasDoDia.filter(p => p.time.toUpperCase() === 'BOCA').reduce((sum, p) => sum + p.gols, 0);
+                const scoreB = partidasDoDia.filter(p => p.time.toUpperCase() === 'RIVER').reduce((sum, p) => sum + p.gols, 0);
+                placar = `
+                    <div class="flex items-center space-x-2 text-lg md:text-xl font-bold">
+                        <span class="hidden sm:inline text-blue-500">BOCA</span>
+                        <span class="text-blue-500">${scoreA}</span>
+                        <span>x</span>
+                        <span class="text-red-500">${scoreB}</span>
+                        <span class="hidden sm:inline text-red-500">RIVER</span>
+                    </div>
+                `;
+            } else {
+                placar = `<span class="text-lg font-semibold text-amber-500">Agendado</span>`;
+            }
+
+            container.innerHTML += `
+                <div class="card p-4 rounded-lg match-card cursor-pointer hover:shadow-lg transition-shadow" data-gamedate="${date}">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-lg md:text-xl">Partida de ${date}</h3>
+                        ${placar}
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    function showPlayerModal(playerName) {
+        const player = allPlayersData.find(p => p.nomeOriginal === playerName || p.nome === normalizaNome(playerName));
+        if (!player) return;
+        
+        modalContainer.className = 'card rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto relative animate-scale-in';
+
+        const photoUrl = playerPhotos[player.nome] || `https://ui-avatars.com/api/?name=${player.nome.replace(' ', '+')}&background=random`;
+        const ultimas3Notas = player.partidas.filter(p=>p.jogoAconteceu).slice(-3).map(p => p.notaPartida);
+        let trendIcon = '<i class="fas fa-minus stable"></i>';
+        if (ultimas3Notas.length >= 2) {
+            const diff = ultimas3Notas[ultimas3Notas.length - 1] - ultimas3Notas[ultimas3Notas.length - 2];
+            if (diff > 0.1) trendIcon = '<i class="fas fa-arrow-up up"></i>';
+            if (diff < -0.1) trendIcon = '<i class="fas fa-arrow-down down"></i>';
+        }
+
+        const groupedConquistas = player.conquistas.reduce((acc, conq) => { (acc[conq.rarity] = acc[conq.rarity] || []).push(conq); return acc; }, {});
+        const rarityOrder = ['mitico', 'lendario', 'epico', 'raro', 'comum'];
+        let conquistasHtml = '';
+        rarityOrder.forEach(rarity => {
+            if (groupedConquistas[rarity]) {
+                conquistasHtml += `<div class="mb-4"><h5 class="font-bold text-md capitalize mb-2 rarity-${rarity}">${rarity}</h5><div class="flex flex-wrap gap-2">`;
+                groupedConquistas[rarity].forEach(c => conquistasHtml += `<div class="card p-2 rounded-md flex items-center" title="${c.desc}"><i class="${c.icon} mr-2"></i><span class="text-sm">${c.nome}</span></div>`);
+                conquistasHtml += `</div></div>`;
+            }
+        });
+
+        const ultimasPartidasHtml = player.partidas.filter(p => p.jogoAconteceu).slice(-5).reverse().map(p => {
+            let resultadoHtml = '';
+            if (p.vitoria === 1) {
+                resultadoHtml = '<span class="font-bold text-green-500 w-4 text-center" title="Vitória">V</span>';
+            } else if (p.vitoria === 0.5) {
+                resultadoHtml = '<span class="font-bold text-gray-400 w-4 text-center" title="Empate">E</span>';
+            } else {
+                resultadoHtml = '<span class="font-bold text-red-500 w-4 text-center" title="Derrota">D</span>';
+            }
+
+            return `<div class="card p-3 rounded-md flex justify-between items-center text-sm">
+                        <div>
+                            <span class="font-semibold">${p.dataJogo}</span>
+                            <span class="ml-2 text-gray-500">${p.isGoleiro ? '(GOL)' : ''}</span>
+                        </div>
+                        <div class="text-right flex items-center space-x-3 sm:space-x-4">
+                            <span>G: ${p.gols}, A: ${p.assistencias}</span>
+                            ${resultadoHtml}
+                            <span class="font-bold text-blue-500 w-8 inline-block text-right">${p.notaPartida.toFixed(1)}</span>
+                        </div>
+                    </div>`;
+        }).join('') || '<p>Nenhuma partida registrada.</p>';
+
+        modalContentEl.innerHTML = `
+            <div class="flex flex-col md:flex-row items-center md:items-start mb-6">
+                <img src="${photoUrl}" class="w-32 h-32 rounded-full object-cover border-4 border-blue-500 mb-4 md:mb-0 md:mr-6" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${player.nome.replace(' ', '+')}&background=random';">
+                <div class="flex-grow text-center md:text-left">
+                    <h2 class="text-3xl font-bold">${player.nomeOriginal}</h2>
+                    <span class="badge-level badge-level-${player.nivel.toLowerCase()}">${player.nivel}</span>
+                    <div class="mt-4"><p class="text-sm font-medium">Pontos MVP (Geral)</p><div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mt-1"><div class="xp-bar-inner bg-gradient-to-r from-blue-400 to-blue-600 h-4 rounded-full" style="width: ${player.pontosMVP}%;"></div></div><p class="text-right text-sm font-bold mt-1">${player.pontosMVP} / 100</p></div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center mb-6">
+                        <div><p class="text-2xl font-bold">${player.jogos}</p><p class="text-sm text-gray-500">Jogos</p></div>
+                        <div><p class="text-2xl font-bold">${player.gols}</p><p class="text-sm text-gray-500">Gols</p></div>
+                        <div><p class="text-2xl font-bold">${player.assistencias}</p><p class="text-sm text-gray-500">Assistências</p></div>
+                        <div><p class="text-2xl font-bold">${player.vitorias}</p><p class="text-sm text-gray-500">Vitórias</p></div>
+                    </div>
+                    <h4 class="font-bold text-lg mb-3">Últimas 5 Partidas Jogadas <span class="trend-arrow ml-2">${trendIcon}</span></h4>
+                    <div class="space-y-2">${ultimasPartidasHtml}</div>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-3">Evolução da Nota</h4>
+                    <div class="h-60 card p-2 rounded-lg"><canvas id="player-evolution-chart"></canvas></div>
+                </div>
+            </div>
+            <div class="mt-6"><h4 class="font-bold text-lg mb-3">Conquistas (Geral)</h4><div class="max-h-60 overflow-y-auto pr-2">${conquistasHtml || '<p>Nenhuma conquista ainda.</p>'}</div></div>
+            <div class="mt-6 text-center"><button id="export-player-history" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">Exportar Histórico</button></div>`;
+        
+        mainModalEl.classList.add('show');
+        document.body.style.overflow = 'hidden';
+
+        setTimeout(() => {
+            const ctx = document.getElementById('player-evolution-chart')?.getContext('2d');
+            if (ctx) createPlayerEvolutionChart(ctx, player);
+        }, 100);
+
+        document.getElementById('export-player-history').addEventListener('click', () => exportPlayerHistoryToCSV(player));
+    }
+
+    function showMatchModal(date) {
+        const partidasDoDia = allMatchesData.filter(p => p.dataJogo === date);
+        const jogoRealizado = partidasDoDia.some(p => p.jogoAconteceu);
+
+        modalContainer.className = 'card rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto relative animate-scale-in';
+
+        let modalHtml = '';
+        const timeA = partidasDoDia.filter(p => p.time.toUpperCase() === 'BOCA');
+        const timeB = partidasDoDia.filter(p => p.time.toUpperCase() === 'RIVER');
+        
+        const renderTeamTable = (team, showStats) => `
+            <table class="w-full text-left">
+                <thead><tr class="border-b dark:border-gray-700">
+                    <th class="p-2">Nome</th>
+                    ${showStats ? '<th class="p-2 text-center">Gols</th><th class="p-2 text-center">Assist.</th><th class="p-2 text-right">Nota</th>' : ''}
+                </tr></thead>
+                <tbody>${team.map(p => `
+                    <tr class="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" data-player-name="${p.nomeRaw}">
+                        <td class="p-2">${p.nomeRaw} ${showStats ? `(${(p.isGoleiro ? 'Goleiro' : 'Linha')})` : ''}</td>
+                        ${showStats ? `<td class="p-2 text-center">${p.gols}</td><td class="p-2 text-center">${p.assistencias}</td><td class="p-2 text-right font-bold">${p.notaPartida.toFixed(1)}</td>` : ''}
+                    </tr>
+                `).join('')}</tbody>
+            </table>
+        `;
+
+        if (jogoRealizado) {
+            const scoreA = timeA.reduce((sum, p) => sum + p.gols, 0);
+            const scoreB = timeB.reduce((sum, p) => sum + p.gols, 0);
+            const melhorJogador = [...partidasDoDia].sort((a,b) => b.notaPartida - a.notaPartida)[0];
+            modalHtml = `
+                <div class="text-center mb-4">
+                    <h2 class="text-3xl font-bold">BOCA ${scoreA} x ${scoreB} RIVER</h2>
+                    <p class="text-amber-500 font-semibold mt-1"><i class="fas fa-star mr-1"></i> Melhor da Partida: ${melhorJogador.nomeRaw} (${melhorJogador.notaPartida.toFixed(1)})</p>
+                </div>
+                <div class="mb-4">
+                    <h3 class="font-bold text-xl text-center p-2 bg-blue-600 text-white rounded-t-md">BOCA</h3>
+                    ${renderTeamTable(timeA, true)}
+                </div>
+                <div>
+                    <h3 class="font-bold text-xl text-center p-2 bg-red-600 text-white rounded-t-md">RIVER</h3>
+                    ${renderTeamTable(timeB, true)}
+                </div>
+            `;
+        } else {
+             modalHtml = `
+                <div class="text-center mb-4">
+                    <h2 class="text-3xl font-bold">Jogo Agendado</h2>
+                    <p class="text-gray-500">${date}</p>
+                </div>
+                <div class="mb-4">
+                    <h3 class="font-bold text-xl text-center p-2 bg-blue-600 text-white rounded-t-md">BOCA (Escalação)</h3>
+                    ${renderTeamTable(timeA, false)}
+                </div>
+                <div>
+                    <h3 class="font-bold text-xl text-center p-2 bg-red-600 text-white rounded-t-md">RIVER (Escalação)</h3>
+                    ${renderTeamTable(timeB, false)}
+                </div>
+            `;
+        }
+
+        modalContentEl.innerHTML = modalHtml;
+        mainModalEl.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function createPlayerEvolutionChart(ctx, player) {
+        const chartId = 'player-evolution-chart';
+        if (chartInstances[chartId]) chartInstances[chartId].destroy();
+        const partidasJogadas = player.partidas.filter(p => p.jogoAconteceu);
+        const labels = partidasJogadas.map(p => p.dataJogo);
+        const data = partidasJogadas.map(p => p.notaPartida);
+        
+        chartInstances[chartId] = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{ label: 'Nota por Partida', data: data, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.2 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false, max: 10 } } }
+        });
+    }
+
+    function createChart(ctx, type, data, options) {
+        const chartId = ctx.canvas.id;
+        if (chartInstances[chartId]) chartInstances[chartId].destroy();
+        chartInstances[chartId] = new Chart(ctx, { type, data, options });
+    }
+
+    function renderAllCharts(players) {
+        if (!players || players.length === 0) return;
+        const commonOptions = {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: { display: true, color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#1f2937', font: { size: 16 } }
+            },
+            scales: {
+                x: { ticks: { color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#1f2937' }, grid: { color: 'rgba(128,128,128,0.2)' } },
+                y: { ticks: { color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#1f2937' }, grid: { color: 'rgba(128,128,128,0.2)' }, beginAtZero: true }
+            },
+            animation: { duration: 1000, easing: 'easeOutQuart' }
+        };
+        const top10Goleadores = [...players].sort((a,b) => b.gols - a.gols).slice(0, 10);
+        createChart(document.getElementById('topGoleadoresChart').getContext('2d'), 'bar', { labels: top10Goleadores.map(p => p.nomeOriginal), datasets: [{ label: 'Gols', data: top10Goleadores.map(p => p.gols), backgroundColor: '#3b82f6' }] }, { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Top 10 Goleadores' } } });
+        
+        const top10Assist = [...players].sort((a,b) => b.assistencias - a.assistencias).slice(0, 10);
+        createChart(document.getElementById('topAssistidoresChart').getContext('2d'), 'bar', { labels: top10Assist.map(p => p.nomeOriginal), datasets: [{ label: 'Assistências', data: top10Assist.map(p => p.assistencias), backgroundColor: '#10b981' }] }, { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Top 10 Assistidores' } } });
+        
+        const participacoes = [...players].sort((a,b) => b.jogos - a.jogos).slice(0, 10);
+        createChart(document.getElementById('participacoesChart').getContext('2d'), 'bar', { labels: participacoes.map(p => p.nomeOriginal), datasets: [{ label: 'Jogos', data: participacoes.map(p => p.jogos), backgroundColor: '#8b5cf6' }] }, { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Top 10 Participações' } } });
+        
+        const topAproveitamento = [...players].filter(p => p.jogos >= 3).sort((a,b) => b.aproveitamento - a.aproveitamento).slice(0, 10);
+        createChart(document.getElementById('aproveitamentoChart').getContext('2d'), 'bar', { labels: topAproveitamento.map(p => p.nomeOriginal), datasets: [{ label: 'Aproveitamento (%)', data: topAproveitamento.map(p => p.aproveitamento), backgroundColor: '#f59e0b' }] }, { ...commonOptions, scales: {...commonOptions.scales, y: {...commonOptions.scales.y, max: 100}}, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Top 10 Aproveitamento (min. 3 jogos)' } } });
+        
+        const topContribuicao = [...players].map(p => ({...p, contribuicao: p.gols + p.assistencias})).sort((a,b) => b.contribuicao - a.contribuicao).slice(0, 10);
+        createChart(document.getElementById('contribuicaoChart').getContext('2d'), 'bar', { labels: topContribuicao.map(p => p.nomeOriginal), datasets: [{ label: 'Gols + Assistências', data: topContribuicao.map(p => p.contribuicao), backgroundColor: '#ef4444' }] }, { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Top 10 Contribuição (Gols + Assist.)' } } });
+        
+        const monthlyGoals = allMatchesData.filter(p => p.jogoAconteceu).reduce((acc, p) => {
+            const monthYear = p.dataJogo.slice(3);
+            acc[monthYear] = (acc[monthYear] || 0) + p.gols;
+            return acc;
+        }, {});
+        const sortedLabels = Object.keys(monthlyGoals).sort((a, b) => { const [ma, ya] = a.split('/'); const [mb, yb] = b.split('/'); return new Date(ya, ma - 1) - new Date(yb, mb - 1); });
+        const evolutionData = sortedLabels.map(label => monthlyGoals[label]);
+        createChart(document.getElementById('evolucaoGolsChart').getContext('2d'), 'line', { labels: sortedLabels, datasets: [{ label: 'Gols por Mês', data: evolutionData, borderColor: '#ec4899', tension: 0.1, fill: false }] }, { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Evolução de Gols por Mês' } } });
+        
+        const playersComEvolucao = players.map(p => {
+            const partidasJogadas = p.partidas.filter(match => match.jogoAconteceu);
+            if (partidasJogadas.length < 3) return {...p, evolucao: -Infinity };
+            const ultimas3Notas = partidasJogadas.slice(-3).map(match => match.notaPartida);
+            const evolucao = ultimas3Notas[2] - ultimas3Notas[0]; 
+            return {...p, evolucao };
+        }).filter(p => p.evolucao > -Infinity).sort((a,b) => b.evolucao - a.evolucao).slice(0, 10);
+        createChart(document.getElementById('topEvolucoesChart').getContext('2d'), 'bar', { labels: playersComEvolucao.map(p => p.nomeOriginal), datasets: [{ label: 'Evolução de Nota', data: playersComEvolucao.map(p => p.evolucao.toFixed(2)), backgroundColor: '#6366f1' }] }, { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Top Evoluções (Últimos 3 Jogos)' } } });
+    }
+
+    function setupComparisonTool(players) {
+        const select1 = document.getElementById('player1-select');
+        const select2 = document.getElementById('player2-select');
+        const sortedPlayers = [...players].sort((a, b) => a.nomeOriginal.localeCompare(b.nomeOriginal));
+        let optionsHtml = '<option value="">Selecione...</option>';
+        sortedPlayers.forEach(p => { optionsHtml += `<option value="${p.nomeOriginal}">${p.nomeOriginal}</option>`; });
+        select1.innerHTML = optionsHtml;
+        select2.innerHTML = optionsHtml;
+        const updateComparison = () => {
+            const player1Name = select1.value;
+            const player2Name = select2.value;
+            renderComparison(player1Name, player2Name, players);
+        };
+        select1.addEventListener('change', updateComparison);
+        select2.addEventListener('change', updateComparison);
+    }
+
+    function renderComparison(player1Name, player2Name, players) {
+        const container = document.getElementById('comparison-result');
+        if (!player1Name || !player2Name || player1Name === player2Name) {
+            container.innerHTML = '<p class="text-center text-gray-500">Selecione dois jogadores diferentes para comparar.</p>';
+            return;
+        }
+
+        const p1 = players.find(p => p.nomeOriginal === player1Name);
+        const p2 = players.find(p => p.nomeOriginal === player2Name);
+
+        const stats = [
+            { label: 'Pontos MVP', key: 'pontosMVP', higherIsBetter: true }, { label: 'Nível', key: 'nivel' }, { label: 'Nota Geral', key: 'notaGeral', higherIsBetter: true, fixed: 1 }, { label: 'Jogos', key: 'jogos', higherIsBetter: true }, { label: 'Aproveitamento', key: 'aproveitamento', higherIsBetter: true, unit: '%' }, { label: 'Vitórias', key: 'vitorias', higherIsBetter: true }, { label: 'Empates', key: 'empates' }, { label: 'Derrotas', key: 'derrotas', higherIsBetter: false }, { label: 'Gols', key: 'gols', higherIsBetter: true }, { label: 'Assistências', key: 'assistencias', higherIsBetter: true }, { label: 'Gols Contra', key: 'golsContra', higherIsBetter: false },
+        ];
+        
+        let tableHtml = '<table class="w-full">';
+        stats.forEach(stat => {
+            const val1 = stat.fixed ? p1[stat.key].toFixed(stat.fixed) : p1[stat.key];
+            const val2 = stat.fixed ? p2[stat.key].toFixed(stat.fixed) : p2[stat.key];
+            
+            let p1Class = '', p2Class = '';
+            if(typeof p1[stat.key] === 'number' && typeof p2[stat.key] === 'number') {
+                if (stat.higherIsBetter !== undefined) {
+                     if (stat.higherIsBetter) {
+                          if(p1[stat.key] > p2[stat.key]) p1Class = 'font-bold text-green-500';
+                          if(p2[stat.key] > p1[stat.key]) p2Class = 'font-bold text-green-500';
+                     } else {
+                          if(p1[stat.key] < p2[stat.key]) p1Class = 'font-bold text-green-500';
+                          if(p2[stat.key] < p1[stat.key]) p2Class = 'font-bold text-green-500';
+                     }
+                }
+            }
+
+            tableHtml += `
+                <tr class="border-b dark:border-gray-700">
+                    <td class="p-2 text-left ${p1Class}">${val1}${stat.unit || ''}</td>
+                    <th class="p-2 font-normal text-gray-500 dark:text-gray-400">${stat.label}</th>
+                    <td class="p-2 text-right ${p2Class}">${val2}${stat.unit || ''}</td>
+                </tr>
+            `;
+        });
+        tableHtml += '</table>';
+        container.innerHTML = tableHtml;
+    }
+    
+    function setupFiltersAndSearch() {
+        const filter = document.getElementById('month-filter');
+        const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        const uniqueMonths = [...new Set(allMatchesData.map(p => p.dataJogo.slice(3)))].sort((a, b) => {
+            const [ma, ya] = a.split('/'); const [mb, yb] = b.split('/');
+            return new Date(yb, mb - 1) - new Date(ya, ma - 1);
+        });
+        filter.innerHTML = '<option value="Geral">Geral</option>';
+        uniqueMonths.forEach(monthYear => {
+            const [month, year] = monthYear.split('/');
+            const monthName = monthNames[parseInt(month, 10) - 1];
+            filter.innerHTML += `<option value="${monthYear}">${monthName} de ${year}</option>`;
+        });
+        
+        filter.addEventListener('change', updateFilteredView);
+        document.getElementById('player-search').addEventListener('input', updateFilteredView);
+    }
+
+    function updateFilteredView() {
+        const selectedMonth = document.getElementById('month-filter').value;
+        const searchTerm = document.getElementById('player-search').value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+        let playersForPeriod;
+        let monthLabel;
+
+        if (selectedMonth === 'Geral') {
+            playersForPeriod = allPlayersData;
+            const date = new Date();
+            const currentMonthName = date.toLocaleString('default', { month: 'long' });
+            monthLabel = currentMonthName.charAt(0).toUpperCase() + currentMonthName.slice(1);
+        } else {
+            const periodMatches = allMatchesData.filter(p => p.dataJogo.slice(3) === selectedMonth);
+            playersForPeriod = recalculateStatsForPeriod(allPlayersData, periodMatches);
+            const [m, y] = selectedMonth.split('/');
+            monthLabel = new Date(y, m - 1).toLocaleString('default', { month: 'long', year: 'numeric'});
+            monthLabel = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
+        }
+
+        let finalFilteredPlayers = playersForPeriod;
+        if (searchTerm.trim() !== '') {
+            finalFilteredPlayers = playersForPeriod.filter(player => 
+                player.nomeOriginal.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(searchTerm)
+            );
+        }
+        
+        const destaqueContainer = document.getElementById('destaque-mes-container');
+        if (searchTerm.trim() !== '') {
+            destaqueContainer.style.display = 'none';
+        } else {
+            destaqueContainer.style.display = 'block';
+            renderDestaqueDoMes(playersForPeriod, monthLabel);
+        }
+        
+        renderRankings(finalFilteredPlayers);
+    }
+    
+    function renderCuriosidades() {
+        const container = document.getElementById('curiosidades-container');
+        container.innerHTML = ''; // Limpa curiosidades antigas
+        const facts = generateFunFacts(allPlayersData, allMatchesData);
+
+        if(facts.length === 0){
+            container.innerHTML = `<p class="text-gray-500 col-span-full text-center">Não foi possível gerar curiosidades. Tente novamente mais tarde.</p>`;
+            return;
+        }
+
+        facts.forEach(fact => {
+            const card = `
                 <div class="card p-4 rounded-lg flex flex-col items-center justify-center text-center fade-in">
                     <div class="text-3xl mb-3">${fact.icon}</div>
                     <p class="text-base">${fact.text}</p>
                 </div>
-            `).join('');
-        },
-        showPlayerModal: (playerName) => {
-            const player = state.allPlayers.find(p => p.nomeOriginal === playerName);
-            if (!player) return;
-            
-            const photoUrl = config.playerPhotos[player.nome] || `https://ui-avatars.com/api/?name=${player.nome.replace(' ', '+')}&background=random`;
-            const getStatusClass = (vitoria) => vitoria === 1 ? 'status-vitoria' : vitoria === 0.5 ? 'status-empate' : 'status-derrota';
-            const getStatusText = (vitoria) => vitoria === 1 ? 'Vitória' : vitoria === 0.5 ? 'Empate' : 'Derrota';
-            
-            const partidasHtml = player.partidas.filter(p => p.jogoAconteceu).slice(-5).reverse().map(p => `
-                <div class="card p-3 rounded-md flex justify-between items-center text-sm">
-                    <div>
-                        <span class="font-semibold">${p.dataJogo}</span>
-                        <span class="ml-2 ${getStatusClass(p.vitoria)}">${getStatusText(p.vitoria)}</span>
-                    </div>
-                    <div class="text-right">
-                        <span>G: ${p.gols}, A: ${p.assistencias}</span>
-                        <span class="ml-4 font-bold text-blue-500 w-8 inline-block">${p.notaPartida.toFixed(1)}</span>
-                    </div>
-                </div>
-            `).join('') || '<p>Nenhuma partida registrada.</p>';
-            
-            DOMElements.modalContent.innerHTML = `
-                <div class="flex flex-col md:flex-row items-center md:items-start mb-6">
-                    <img src="${photoUrl}" class="w-32 h-32 rounded-full object-cover border-4 border-blue-500 mb-4 md:mb-0 md:mr-6" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${player.nome.replace(' ', '+')}&background=random';">
-                    <div class="flex-grow text-center md:text-left">
-                        <h2 class="text-3xl font-bold">${player.nomeOriginal}</h2>
-                        <span class="badge-level badge-level-${player.nivel.toLowerCase()}">${player.nivel}</span>
-                        <div class="mt-4"><p class="text-sm font-medium">Pontos MVP (Geral)</p><div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mt-1"><div class="xp-bar-inner bg-gradient-to-r from-blue-400 to-blue-600 h-4 rounded-full" style="width: ${player.pontosMVP}%;"></div></div><p class="text-right text-sm font-bold mt-1">${player.pontosMVP} / 100</p></div>
-                    </div>
-                </div>
-                <h4 class="font-bold text-lg mb-3">Últimas 5 Partidas</h4>
-                <div class="space-y-2">${partidasHtml}</div>`;
-                
-            DOMElements.mainModal.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        },
-        renderInitialDashboard: () => {
-            ui.setupFilters();
-            ui.updateFilteredView();
-            DOMElements.loading.style.display = 'none';
-            DOMElements.appContainer.classList.remove('hidden');
-        },
-        updateFilteredView: () => {
-            const selectedMonth = DOMElements.monthFilter.value;
-            const searchTerm = DOMElements.playerSearch.value.toLowerCase();
-            let playersForPeriod = selectedMonth === 'Geral'
-                ? state.allPlayers
-                : logic.recalculateStatsForPeriod(state.allPlayers, state.allMatches.filter(p => p.dataJogo.slice(3) === selectedMonth));
-            
-            if (searchTerm) {
-                playersForPeriod = playersForPeriod.filter(p => p.nomeOriginal.toLowerCase().includes(searchTerm));
-            }
-            ui.renderRankings(playersForPeriod);
-        },
-        setupFilters: () => {
-            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-            const uniqueMonths = [...new Set(state.allMatches.map(p => p.dataJogo.slice(3)))].sort((a, b) => {
-                const [ma, ya] = a.split('/'); const [mb, yb] = b.split('/');
-                return new Date(yb, mb - 1) - new Date(ya, ma - 1);
+            `;
+            container.innerHTML += card;
+        });
+    }
+
+    function getStandardDeviation(array) {
+        const n = array.length;
+        if (n < 2) return 0;
+        const mean = array.reduce((a, b) => a + b) / n;
+        return Math.sqrt(array.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
+    }
+
+    // --- FUNÇÃO DE CURIOSIDADES ATUALIZADA ---
+    function generateFunFacts(players, matches) {
+        let selectedFacts = [];
+
+        // 1. FATO DE PRIORIDADE: Feitos de Goleiros
+        const parseDateString = (ds) => {
+            if (!ds) return null;
+            const parts = ds.split('/');
+            if (parts.length !== 3) return null;
+            return new Date(parts[2], parts[1] - 1, parts[0]);
+        };
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const twoWeeksAgo = new Date(today);
+        twoWeeksAgo.setDate(today.getDate() - 14);
+
+        const recentMatches = matches.filter(m => {
+            const matchDate = parseDateString(m.dataJogo);
+            return matchDate && m.jogoAconteceu && matchDate >= twoWeeksAgo && matchDate <= today;
+        });
+
+        const goalkeeperFeats = recentMatches.filter(m => m.isGoleiro && (m.gols > 0 || m.assistencias > 0));
+
+        if (goalkeeperFeats.length > 0) {
+            const featsByGoalkeeper = {};
+            goalkeeperFeats.forEach(feat => {
+                if (!featsByGoalkeeper[feat.nome]) {
+                    featsByGoalkeeper[feat.nome] = { nome: feat.nome, gols: 0, assistencias: 0 };
+                }
+                featsByGoalkeeper[feat.nome].gols += feat.gols;
+                featsByGoalkeeper[feat.nome].assistencias += feat.assistencias;
             });
-            DOMElements.monthFilter.innerHTML = '<option value="Geral">Geral</option>' + uniqueMonths.map(monthYear => {
-                const [month, year] = monthYear.split('/');
-                return `<option value="${monthYear}">${monthNames[parseInt(month, 10) - 1]} de ${year}</option>`;
-            }).join('');
-        },
-        applyTheme: () => {
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            document.documentElement.className = savedTheme;
-            DOMElements.themeToggle.innerHTML = savedTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-        },
-        applyMobileMode: () => {
-            const mobileMode = localStorage.getItem('mobileMode') === 'true';
-            DOMElements.mobileModeToggle.checked = mobileMode;
-            DOMElements.appContainer.classList.toggle('mobile-mode', mobileMode);
-        },
-    };
 
-    const handlers = {
-        handleInteraction: () => {
-            state.userInteracted = true;
-            document.removeEventListener('click', handlers.handleInteraction, true);
-            document.removeEventListener('keydown', handlers.handleInteraction, true);
-        },
-        playSound: (sound) => {
-            if (state.userInteracted) {
-                sound.currentTime = 0;
-                sound.play().catch(() => {});
+            for (const gkNome in featsByGoalkeeper) {
+                const gkData = featsByGoalkeeper[gkNome];
+                const playerInfo = players.find(p => p.nome === gkNome);
+                const originalName = playerInfo ? playerInfo.nomeOriginal : gkNome;
+                
+                let text = `Feito incrível! O goleiro <b>${originalName}</b> `;
+                if (gkData.gols > 0 && gkData.assistencias > 0) {
+                    text += `marcou ${gkData.gols} gol(s) e deu ${gkData.assistencias} assistência(s)`;
+                } else if (gkData.gols > 0) {
+                    text += `marcou ${gkData.gols} gol(s)`;
+                } else {
+                    text += `deu ${gkData.assistencias} assistência(s)`;
+                }
+                text += ` nas últimas duas semanas!`;
+
+                selectedFacts.push({ icon: '🧤', text: text, type: 'goalkeeper_feat' });
             }
-        },
-        handleTabClick: (e) => {
+        }
+        
+        // 2. FATOS ALEATÓRIOS
+        const factFunctions = [
+            (p, m) => {
+                const bocaMatches = m.filter(match => match.time.toUpperCase() === 'BOCA' && match.jogoAconteceu);
+                if (bocaMatches.length === 0) return null;
+                const goalsByPlayer = bocaMatches.reduce((acc, match) => { acc[match.nome] = (acc[match.nome] || 0) + match.gols; return acc; }, {});
+                const topScorerNome = Object.keys(goalsByPlayer).sort((a, b) => goalsByPlayer[b] - goalsByPlayer[a])[0];
+                if (!topScorerNome || goalsByPlayer[topScorerNome] === 0) return null;
+                const topScorerOriginal = p.find(player => player.nome === topScorerNome)?.nomeOriginal || topScorerNome;
+                return { icon: '⚽', text: `O maior artilheiro jogando pelo <span class="font-bold text-blue-500">Boca</span> é <b>${topScorerOriginal}</b>, com <b>${goalsByPlayer[topScorerNome]}</b> gols.`};
+            },
+            (p, m) => {
+                const riverMatches = m.filter(match => match.time.toUpperCase() === 'RIVER' && match.jogoAconteceu);
+                if (riverMatches.length === 0) return null;
+                const goalsByPlayer = riverMatches.reduce((acc, match) => { acc[match.nome] = (acc[match.nome] || 0) + match.gols; return acc; }, {});
+                const topScorerNome = Object.keys(goalsByPlayer).sort((a, b) => goalsByPlayer[b] - goalsByPlayer[a])[0];
+                if (!topScorerNome || goalsByPlayer[topScorerNome] === 0) return null;
+                const topScorerOriginal = p.find(player => player.nome === topScorerNome)?.nomeOriginal || topScorerNome;
+                return { icon: '⚽', text: `O maior artilheiro jogando pelo <span class="font-bold text-red-500">River</span> é <b>${topScorerOriginal}</b>, com <b>${goalsByPlayer[topScorerNome]}</b> gols.`};
+            },
+            (p, m) => {
+                const mostWinsPlayer = [...p].sort((a,b) => b.vitorias - a.vitorias)[0];
+                if (!mostWinsPlayer) return null;
+                return { icon: '🏆', text: `O jogador mais vitorioso é <b>${mostWinsPlayer.nomeOriginal}</b>, com um total de <b>${mostWinsPlayer.vitorias}</b> vitórias.` };
+            },
+            (p, m) => {
+                const minGames = 5;
+                const eligiblePlayers = p.filter(player => player.jogos >= minGames);
+                if (eligiblePlayers.length < 1) return null;
+                const peFrio = eligiblePlayers.sort((a,b) => (b.jogos - b.vitorias - b.empates) - (a.jogos - a.vitorias - a.empates))[0];
+                const derrotas = peFrio.jogos - peFrio.vitorias - peFrio.empates;
+                if (derrotas === 0) return null;
+                return { icon: '😢', text: `O jogador "pé-frio", com mais derrotas (mínimo ${minGames} jogos), é <b>${peFrio.nomeOriginal}</b> com <b>${derrotas}</b> no total.`};
+            },
+            (p, m) => {
+                let hatTricks = {};
+                m.forEach(match => { if(match.gols >= 3) { hatTricks[match.nome] = (hatTricks[match.nome] || 0) + 1; } });
+                const topPlayer = Object.keys(hatTricks).sort((a,b) => hatTricks[b] - hatTricks[a])[0];
+                if(!topPlayer) return null;
+                const topPlayerOriginal = p.find(player => player.nome === topPlayer)?.nomeOriginal || topPlayer;
+                return { icon: '🎩', text: `O "Senhor Hat-Trick" é <b>${topPlayerOriginal}</b>, com <b>${hatTricks[topPlayer]}</b> jogos marcando 3+ gols.`};
+            },
+            (p, m) => {
+                const bestMatch = [...m].filter(match => match.jogoAconteceu).sort((a,b) => b.notaPartida - a.notaPartida)[0];
+                if(!bestMatch) return null;
+                const player = p.find(pl => pl.nome === bestMatch.nome);
+                return { icon: '⭐', text: `A maior nota já registrada foi de <b>${bestMatch.notaPartida.toFixed(1)}</b>, por <b>${player?.nomeOriginal || bestMatch.nome}</b> em ${bestMatch.dataJogo}.`};
+            },
+            (p, m) => {
+                const minGames = 5;
+                const eligiblePlayers = p.filter(player => player.jogos >= minGames);
+                if (eligiblePlayers.length < 1) return null;
+                const luckyCharm = eligiblePlayers.sort((a,b) => (b.vitorias / b.jogos) - (a.vitorias / a.jogos))[0];
+                const winRate = ((luckyCharm.vitorias / luckyCharm.jogos) * 100).toFixed(0);
+                return { icon: '🍀', text: `O "Amuleto da Sorte" (maior % de vitória com min. ${minGames} jogos) é <b>${luckyCharm.nomeOriginal}</b>, vencendo <b>${winRate}%</b> das partidas.` };
+            },
+            (p, m) => {
+                const minGames = 5;
+                const eligiblePlayers = p.filter(player => player.jogos >= minGames);
+                if (eligiblePlayers.length < 1) return null;
+                const goalMachine = eligiblePlayers.sort((a,b) => (b.gols / b.jogos) - (a.gols / a.jogos))[0];
+                const gpg = (goalMachine.gols / goalMachine.jogos).toFixed(2);
+                return { icon: '🤖', text: `A "Máquina de Gols" (melhor média com min. ${minGames} jogos) é <b>${goalMachine.nomeOriginal}</b>, com <b>${gpg}</b> gols por partida.` };
+            },
+            (p, m) => {
+                const goalsByDate = m.reduce((acc, match) => { if(match.jogoAconteceu) { acc[match.dataJogo] = (acc[match.dataJogo] || 0) + match.gols; } return acc; }, {});
+                const topDate = Object.keys(goalsByDate).sort((a,b) => goalsByDate[b] - goalsByDate[a])[0];
+                if (!topDate) return null;
+                return { icon: '🔥', text: `A partida com mais gols foi em <b>${topDate}</b>, com um total de <b>${goalsByDate[topDate]}</b> gols.`};
+            },
+            (p, m) => {
+                const minGames = 5;
+                const eligiblePlayers = p.filter(player => player.jogos >= minGames && player.partidas.filter(partida => partida.jogoAconteceu).length > 1);
+                if (eligiblePlayers.length < 1) return null;
+                eligiblePlayers.forEach(player => {
+                    const notes = player.partidas.filter(partida => partida.jogoAconteceu).map(partida => partida.notaPartida);
+                    player.stdDev = getStandardDeviation(notes);
+                });
+                const mrConsistency = eligiblePlayers.sort((a,b) => a.stdDev - b.stdDev)[0];
+                return { icon: '⚖️', text: `O "Sr. Consistência" (performance mais regular, min. ${minGames} jogos) é <b>${mrConsistency.nomeOriginal}</b>, com um desvio padrão de apenas <b>${mrConsistency.stdDev.toFixed(2)}</b> em suas notas.`};
+            },
+        ];
+        
+        const shuffled = factFunctions.sort(() => 0.5 - Math.random());
+        
+        let i = 0;
+        while(selectedFacts.length < 3 && i < shuffled.length) {
+            const func = shuffled[i];
+            const fact = func(players, matches);
+            if (fact && !selectedFacts.some(existingFact => existingFact.text === fact.text)) {
+                selectedFacts.push(fact);
+            }
+            i++;
+        }
+        
+        return selectedFacts;
+    }
+    
+    function clearCacheAndReload() {
+        loadingEl.style.display = 'flex';
+        localStorage.removeItem('partidasCache');
+        localStorage.removeItem('partidasCacheTime');
+        localStorage.removeItem('jogadoresCache');
+        localStorage.removeItem('jogadoresCacheTime');
+        setTimeout(() => {
+            location.reload();
+        }, 250);
+    }
+
+    function setupEventListeners() {
+        tabsContainer.addEventListener('click', e => {
             const button = e.target.closest('button');
-            if (!button || !button.dataset.tab) return;
-            
-            handlers.playSound(config.sounds.click);
-            DOMElements.tabs.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            DOMElements.tabContent.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
-            document.getElementById(button.dataset.tab).classList.remove('hidden');
+            if (button && button.dataset.tab) {
+                tabsContainer.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                tabContent.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
+                const activeTab = document.getElementById(button.dataset.tab);
+                activeTab.classList.remove('hidden');
+                
+                if (button.dataset.tab === 'graficos') {
+                    renderAllCharts(allPlayersData);
+                }
+                if (button.dataset.tab === 'curiosidades') {
+                    renderCuriosidades();
+                }
+            }
+        });
+        
+        document.getElementById('new-facts-button').addEventListener('click', renderCuriosidades);
+        document.getElementById('update-data-button').addEventListener('click', clearCacheAndReload);
 
-            if(button.dataset.tab === 'curiosidades') ui.renderCuriosidades();
-        },
-        handleGeneralClick: (e) => {
-             if (e.target.closest('button, select, label, input[type="checkbox"]')) {
-                handlers.playSound(config.sounds.click);
+        document.body.addEventListener('click', e => {
+            const card = e.target.closest('[data-player-name]');
+            if(card) showPlayerModal(card.dataset.playerName);
+        });
+
+        document.getElementById('partidas').addEventListener('click', e => {
+            const card = e.target.closest('.match-card');
+            if(card) showMatchModal(card.dataset.gamedate);
+        });
+
+        modalCloseBtn.addEventListener('click', () => { mainModalEl.classList.remove('show'); document.body.style.overflow = ''; });
+        mainModalEl.addEventListener('click', e => { if(e.target === mainModalEl) { mainModalEl.classList.remove('show'); document.body.style.overflow = ''; } });
+        
+        document.getElementById('rankings').addEventListener('click', (e) => {
+            if(e.target.classList.contains('ver-mais-btn')){
+                const { key, title, unit, hib } = e.target.dataset;
+                const selectedMonth = document.getElementById('month-filter').value;
+                let playersForRanking;
+                if (selectedMonth === 'Geral') {
+                    playersForRanking = allPlayersData;
+                } else {
+                    const periodMatches = allMatchesData.filter(p => p.dataJogo.slice(3) === selectedMonth);
+                    playersForRanking = recalculateStatsForPeriod(allPlayersData, periodMatches);
+                }
+                const data = (key === 'mediaGolsSofridos') ? playersForRanking.filter(p => p.jogosGoleiro > 0) : playersForRanking;
+                const sortedData = [...data].sort((a,b) => (hib === 'true') ? b[key] - a[key] : a[key] - b[key]);
+                showFullRankingInModal(title, sortedData, key, unit);
             }
-            const playerCard = e.target.closest('[data-player-name]');
-            if (playerCard) {
-                ui.showPlayerModal(playerCard.dataset.playerName);
-            }
-        },
-        toggleTheme: () => {
+        });
+
+        themeToggleBtn.addEventListener('click', () => {
             const html = document.documentElement;
             html.classList.toggle('dark');
-            const newTheme = html.classList.contains('dark') ? 'dark' : 'light';
-            localStorage.setItem('theme', newTheme);
-            ui.applyTheme();
-        },
-        toggleMobileMode: (e) => {
-            const isMobile = e.target.checked;
-            localStorage.setItem('mobileMode', isMobile);
-            ui.applyMobileMode();
-        },
-        closeModal: (e) => {
-            if (e.target === DOMElements.mainModal || e.target === DOMElements.modalCloseBtn) {
-                DOMElements.mainModal.classList.remove('show');
-                document.body.style.overflow = '';
-            }
-        },
-        clearCacheAndReload: () => {
-            DOMElements.loading.style.display = 'flex';
-            localStorage.removeItem('partidasCache');
-            localStorage.removeItem('partidasCacheTime');
-            localStorage.removeItem('jogadoresCache');
-            localStorage.removeItem('jogadoresCacheTime');
-            setTimeout(() => location.reload(), 250);
-        }
-    };
+            html.classList.toggle('light');
+            themeToggleBtn.innerHTML = html.classList.contains('dark') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+            if(Object.keys(chartInstances).length > 0) renderAllCharts(allPlayersData);
+        });
 
-    const bindEvents = () => {
-        document.addEventListener('click', handlers.handleInteraction, true);
-        document.addEventListener('keydown', handlers.handleInteraction, true);
-        DOMElements.tabs.addEventListener('click', handlers.handleTabClick);
-        DOMElements.themeToggle.addEventListener('click', handlers.toggleTheme);
-        DOMElements.mobileModeToggle.addEventListener('change', handlers.toggleMobileMode);
-        DOMElements.monthFilter.addEventListener('change', ui.updateFilteredView);
-        DOMElements.playerSearch.addEventListener('input', ui.updateFilteredView);
-        DOMElements.mainModal.addEventListener('click', handlers.closeModal);
-        DOMElements.modalCloseBtn.addEventListener('click', handlers.closeModal);
-        document.body.addEventListener('click', handlers.handleGeneralClick);
-        document.getElementById('update-data-button').addEventListener('click', handlers.clearCacheAndReload);
-        document.getElementById('new-facts-button').addEventListener('click', ui.renderCuriosidades);
-    };
+        document.getElementById('mobile-mode-toggle').addEventListener('change', (e) => { 
+            document.getElementById('app-container').classList.toggle('mobile-mode', e.target.checked); 
+            localStorage.setItem('mobileMode', e.target.checked); 
+        });
 
-    const init = async () => {
-        ui.applyTheme();
-        ui.applyMobileMode();
-        bindEvents();
+        document.getElementById('export-csv-button').addEventListener('click', exportVisibleDataToCSV);
+        document.getElementById('share-button').addEventListener('click', shareDashboard);
+    }
 
+    function showFullRankingInModal(title, sortedData, key, unit) {
+        let tableRows = sortedData.map((p, index) => {
+            const photoUrl = playerPhotos[p.nome] || `https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random`;
+            const borderColor = levelBorderColors[p.nivel] || '#6b7280'; // Fallback para cor de 'Iniciante'
+
+            return `
+                <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer" data-player-name="${p.nomeOriginal}">
+                    <td class="p-3 font-bold text-center">${index + 1}</td>
+                    <td class="p-3">
+                        <div class="flex items-center">
+                            <img src="${photoUrl}" 
+                                 class="w-10 h-10 rounded-full object-cover mr-4" 
+                                 style="border: 3px solid ${borderColor};"
+                                 onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random';">
+                            <span>${p.nomeOriginal}</span>
+                        </div>
+                    </td>
+                    <td class="p-3 font-semibold text-right">${formatValue(p[key], key)}${unit || ''}</td>
+                </tr>
+            `;
+        }).join('');
+
+        modalContainer.className = 'card rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto relative animate-scale-in';
+        modalContentEl.innerHTML = `
+            <h2 class="text-2xl font-bold mb-4">${title}</h2>
+            <div class="max-h-[60vh] overflow-y-auto">
+                <table class="w-full text-left">
+                    <thead class="sticky top-0 bg-gray-100 dark:bg-gray-800">
+                        <tr>
+                            <th class="p-3 w-16 text-center">Pos.</th>
+                            <th class="p-3">Jogador</th>
+                            <th class="p-3 text-right">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                    </tbody>
+                </table>
+            </div>`;
+        mainModalEl.classList.add('show');
+    }
+
+    function exportToCSV(data, filename) {
+        if (data.length === 0) return;
+        const headers = Object.keys(data[0]).join(',');
+        const rows = data.map(row => Object.values(row).map(value => `"${String(value).replace(/"/g, '""')}"`).join(','));
+        const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join('\n');
+        const link = document.createElement("a");
+        link.setAttribute("href", encodeURI(csvContent));
+        link.setAttribute("download", filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function exportVisibleDataToCSV() {
+        // Implementar lógica se necessário
+    }
+
+    function exportPlayerHistoryToCSV(player) {
+        const data = player.partidas.filter(p=>p.jogoAconteceu).map(p => ({ data: p.dataJogo, gols: p.gols, assistencias: p.assistencias, vitoria: p.vitoria, nota_final: p.notaPartida }));
+        exportToCSV(data, `historico_${player.nome.replace(/\s/g, '_')}.csv`);
+    }
+
+    async function shareDashboard() {
+        const shareData = { title: 'Dashboard Competitivo', text: 'Confira as estatísticas!', url: window.location.href };
         try {
-            const { partidas, jogadores } = await api.fetchAllData();
-            const processed = logic.processData(partidas, jogadores);
-            state.allPlayers = processed.players;
-            state.allMatches = processed.matches;
-            ui.renderInitialDashboard();
-        } catch (error) {
-            console.error("Falha ao inicializar o dashboard:", error);
-            DOMElements.loading.style.display = 'none';
+            if (navigator.share) await navigator.share(shareData);
+            else { await navigator.clipboard.writeText(window.location.href); alert("Link copiado!"); }
+        } catch (err) { console.error("Erro ao compartilhar: ", err); }
+    }
+
+    const levelUpSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"+Array(300).join("123"));
+    const conquistaSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"+Array(300).join("321"));
+    
+    function showNotification(message, icon, type) {
+        const container = document.getElementById('notification-popup');
+        const notif = document.createElement('div');
+        notif.className = `${type === 'level' ? 'bg-green-500' : 'bg-amber-500'} text-white p-4 rounded-lg shadow-lg flex items-center mb-2`;
+        notif.innerHTML = `<i class="fas ${icon} text-2xl mr-4"></i><div>${message}</div>`;
+        container.appendChild(notif);
+        setTimeout(() => {
+            notif.classList.add('show');
+            if (userInteracted) (type === 'level' ? levelUpSound : conquistaSound).play().catch(e => console.warn("Audio play failed"));
+        }, 10);
+        setTimeout(() => { notif.classList.remove('show'); setTimeout(() => notif.remove(), 500); }, 5000);
+    }
+
+    function checkNotifications(player) {
+        const prevLevel = localStorage.getItem(`nivel_${player.nome}`);
+        const prevConquistasCount = parseInt(localStorage.getItem(`conq_${player.nome}`), 10) || 0;
+        if (prevLevel && prevLevel !== player.nivel) showNotification(`<b>${player.nomeOriginal}</b> subiu para o nível <b>${player.nivel}</b>!`, 'fa-arrow-up', 'level');
+        if (player.conquistas.length > prevConquistasCount) {
+            const fullPlayer = allPlayersData.find(p => p.nome === player.nome) || player;
+            fullPlayer.conquistas.slice(prevConquistasCount).forEach(c => showNotification(`<b>${player.nomeOriginal}</b> desbloqueou: <b>${c.nome}</b>!`, c.icon, 'conquista'));
         }
-    };
+        const fullPlayer = allPlayersData.find(p => p.nome === player.nome) || player;
+        localStorage.setItem(`nivel_${player.nome}`, fullPlayer.nivel);
+        localStorage.setItem(`conq_${player.nome}`, fullPlayer.conquistas.length);
+    }
+    
+    async function init() {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.className = savedTheme;
+        themeToggleBtn.innerHTML = savedTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        const mobileMode = localStorage.getItem('mobileMode') === 'true';
+        document.getElementById('mobile-mode-toggle').checked = mobileMode;
+        if (mobileMode) document.getElementById('app-container').classList.add('mobile-mode');
 
-    return { init };
-})();
+        setupEventListeners();
+        
+        try {
+            const { partidas, jogadores } = await fetchAllData();
+            const processedPlayers = processarDados(partidas, jogadores);
+            processedPlayers.forEach(p => checkNotifications(p));
+            renderDashboard(processedPlayers);
+        } catch (error) {
+            console.error(error);
+            loadingEl.style.display = 'none';
+            uploadFallbackEl.classList.remove('hidden');
+        }
+    }
 
-document.addEventListener('DOMContentLoaded', DashboardApp.init);
+    init();
+});
 </script>
-
 </body>
 </html>
