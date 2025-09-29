@@ -423,6 +423,41 @@ document.addEventListener('DOMContentLoaded', () => {
         if (jogador.jogos >= 25) conquistas.push({ nome: "Veterano", desc: "Disputou 25 partidas", icon: "fa-solid fa-shield-halved", rarity: "raro" });
         if (jogador.vitorias >= 10) conquistas.push({ nome: "Campeão", desc: "Alcançou 10 vitórias", icon: "fa-solid fa-trophy", rarity: "raro" });
 
+        
+        // --- Conquista Jogador do Mês ---
+        if (todasAsPartidas && todasAsPartidas.length > 0) {
+            const partidasPorMes = {};
+            todasAsPartidas.forEach(p => {
+                if(p.jogoAconteceu){
+                    const [dia, mes, ano] = p.dataJogo.split("/");
+                    const chave = mes + "/" + ano;
+                    if(!partidasPorMes[chave]) partidasPorMes[chave] = [];
+                    partidasPorMes[chave].push(p);
+                }
+            });
+            Object.keys(partidasPorMes).forEach(mesAno => {
+                const jogadoresMes = {};
+                partidasPorMes[mesAno].forEach(p => {
+                    const nome = p.nome;
+                    if(!jogadoresMes[nome]) jogadoresMes[nome] = { notas: [] };
+                    jogadoresMes[nome].notas.push(p.notaPartida);
+                });
+                let melhor = null, melhorMedia = -1;
+                Object.keys(jogadoresMes).forEach(nome => {
+                    const media = jogadoresMes[nome].notas.reduce((a,b)=>a+b,0)/jogadoresMes[nome].notas.length;
+                    if(media > melhorMedia) { melhorMedia = media; melhor = nome; }
+                });
+                if(melhor === jogador.nome) {
+                    conquistas.push({
+                        nome: "Jogador do Mês",
+                        desc: `Jogador do Mês de ${mesAno}`,
+                        icon: "fa-solid fa-crown",
+                        rarity: "lendario"
+                    });
+                }
+            });
+        }
+
         return conquistas;
     }
 
