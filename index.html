@@ -93,23 +93,28 @@
 
     <div id="app-container" class="container mx-auto p-4 md:p-6 hidden">
         <header class="flex flex-wrap justify-between items-center mb-6">
+   
             <div class="flex items-center space-x-4">
                 <img src="https://raw.githubusercontent.com/ittokki/Futebol/ba59ab86cf2095d4e9214bd5e24e21ac8aeaf33a/inimigos%20da%20bola.jpg" alt="Logo Inimigos da Bola" class="w-12 h-12 object-contain rounded-md">
                 <h1 class="text-3xl font-bold text-blue-500">Inimigos da Bola</h1>
             </div>
             <div class="flex items-center space-x-3 mt-4 sm:mt-0">
+             
                 <button id="update-data-button" class="px-3 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-sync-alt mr-2"></i>Atualizar</button>
                 <button id="export-csv-button" class="px-3 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-file-csv mr-2"></i>Exportar CSV</button>
                 <button id="share-button" class="px-3 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-share-alt mr-2"></i>Compartilhar</button>
                 <label for="mobile-mode-toggle" class="flex items-center cursor-pointer text-sm">
+    
                     <span class="mr-2">Mobile</span>
                     <div class="relative">
                         <input type="checkbox" id="mobile-mode-toggle" class="sr-only">
                         <div class="block bg-gray-600 w-10 h-6 rounded-full"></div>
+      
                         <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
                     </div>
                 </label>
                 <button id="theme-toggle" class="w-10 h-10 card rounded-full flex items-center justify-center text-xl">
+            
                     <i class="fas fa-sun"></i>
                 </button>
             </div>
@@ -117,15 +122,18 @@
 
         <div id="upload-fallback" class="hidden card p-6 mb-6">
             <h2 class="text-xl font-bold mb-2 text-amber-500"><i class="fas fa-exclamation-triangle mr-2"></i>Falha ao carregar dados do Google Sheets</h2>
-            <p class="mb-4">Por favor, faça o upload dos arquivos CSV ou Excel correspondentes às abas da planilha.</p>
+            <p class="mb-4">Por favor, faça 
+o upload dos arquivos CSV ou Excel correspondentes às abas da planilha.</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="file-pagina1" class="block text-sm font-medium mb-1">Arquivo da Página 1 (Jogadores)</label>
-                    <input type="file" id="file-pagina1" class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                    <input type="file" id="file-pagina1" class="block w-full text-sm file:mr-4 file:py-2 
+file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
                 </div>
                 <div>
                     <label for="file-pagina2" class="block text-sm font-medium mb-1">Arquivo da Página 2 (Partidas)</label>
-                    <input type="file" id="file-pagina2" class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                    <input type="file" id="file-pagina2" class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm 
+file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
                 </div>
             </div>
             <div id="column-mapping-container" class="hidden mt-6"></div>
@@ -133,13 +141,16 @@
         </div>
 
         <nav class="mb-6">
-            <div class="border-b border-gray-200 dark:border-gray-700">
+            <div 
+class="border-b border-gray-200 dark:border-gray-700">
                 <div class="flex -mb-px space-x-2 sm:space-x-6" id="tabs">
                     <button data-tab="rankings" class="tab-button active text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-trophy mr-2"></i>Rankings</button>
                     <button data-tab="graficos" class="tab-button text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-chart-line mr-2"></i>Gráficos</button>
+            
                     <button data-tab="hall-da-fama" class="tab-button text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-star mr-2"></i>Hall da Fama</button>
                     <button data-tab="partidas" class="tab-button text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-history mr-2"></i>Partidas</button>
                     <button data-tab="curiosidades" class="tab-button text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-lightbulb mr-2"></i>Curiosidades</button>
+              
                     <button data-tab="admins" class="tab-button text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-shield-alt mr-2"></i>Admins</button>
                 </div>
             </div>
@@ -147,48 +158,59 @@
 
         <main id="tab-content">
             <div id="rankings" class="tab-pane active">
-                <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+                <div class="flex flex-wrap justify-between items-center gap-4 
+mb-4">
                     <div class="relative w-full sm:w-64">
                         <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                         <input type="text" id="player-search" placeholder="Buscar jogador..." class="w-full p-2 pl-10 rounded-md card focus:outline-none focus:ring-2 focus:ring-blue-500">
+          
                     </div>
                     <div class="w-full sm:w-auto">
                         <label for="month-filter" class="sr-only">Filtrar por Mês</label>
                         <select id="month-filter" class="w-full p-2 rounded-md card">
+           
                         </select>
                     </div>
                 </div>
                 <div id="destaque-mes-container" class="mb-6"></div>
                 <div id="rankings-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          
                 </div>
             </div>
 
             <div id="graficos" class="tab-pane hidden">
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     <div class="card p-4 rounded-lg chart-container h-96"><canvas id="topGoleadoresChart"></canvas></div>
+                    
                     <div class="card p-4 rounded-lg chart-container h-96"><canvas id="topAssistidoresChart"></canvas></div>
                     <div class="card p-4 rounded-lg chart-container h-96"><canvas id="participacoesChart"></canvas></div>
                     <div class="card p-4 rounded-lg chart-container h-96"><canvas id="aproveitamentoChart"></canvas></div>
                     <div class="card p-4 rounded-lg chart-container h-96"><canvas id="contribuicaoChart"></canvas></div>
+                
                     <div class="card p-4 rounded-lg chart-container h-96"><canvas id="evolucaoGolsChart"></canvas></div>
                     <div class="card p-4 rounded-lg chart-container h-96 xl:col-span-1"><canvas id="topEvolucoesChart"></canvas></div>
                 </div>
                 <div id="compare-section" class="mt-8 card p-6 rounded-lg">
                     <h2 class="text-2xl font-bold mb-4">Comparar Jogadores</h2>
+  
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                         <div class="w-full">
                             <label for="player1-select" class="block text-sm font-medium mb-1">Jogador 1</label>
+                  
                             <select id="player1-select" class="w-full p-2 rounded-md bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600"></select>
                         </div>
                         <div class="hidden text-center text-4xl font-bold md:flex items-center justify-center pb-2">VS</div>
-                        <div class="w-full">
+                        <div 
+class="w-full">
                             <label for="player2-select" class="block text-sm font-medium mb-1">Jogador 2</label>
                             <select id="player2-select" class="w-full p-2 rounded-md bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600"></select>
                         </div>
+     
                     </div>
                     <div id="comparison-result" class="mt-6">
                         <p class="text-center text-gray-500">Selecione dois jogadores para comparar.</p>
                     </div>
+             
                 </div>
             </div>
 
@@ -198,41 +220,50 @@
             </div>
 
             <div id="partidas" class="tab-pane hidden space-y-6">
+    
             </div>
 
             <div id="admins" class="tab-pane hidden">
                 <h2 class="text-2xl font-bold mb-6">Administradores & Créditos</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div class="card p-4 rounded-lg flex flex-col items-center text-center fade-in">
+       
                         <img src="https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Henrique.jpg" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-blue-500" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Henrique+Amaral&background=random';">
                         <h4 class="font-bold text-lg">Henrique Amaral</h4>
                         <p class="text-sm text-blue-500 font-semibold">Administrador</p>
+                    
                     </div>
                     <div class="card p-4 rounded-lg flex flex-col items-center text-center fade-in">
                         <img src="https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Douglas.jpg" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-blue-500" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Douglas+Daitx&background=random';">
                         <h4 class="font-bold text-lg">Douglas Daitx</h4>
+            
                         <p class="text-sm text-blue-500 font-semibold">Administrador</p>
                     </div>
                     <div class="card p-4 rounded-lg flex flex-col items-center text-center fade-in">
                         <img src="https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/WILLY.jpg" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-blue-500" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Willy+Grafumbek&background=random';">
+    
                         <h4 class="font-bold text-lg">Willy Grafumbek</h4>
                         <p class="text-sm text-blue-500 font-semibold">Administrador</p>
                     </div>
-                    <div class="card p-4 rounded-lg flex flex-col items-center text-center fade-in bg-gradient-to-tr from-gray-700 to-gray-800 text-white">
+                    <div class="card p-4 rounded-lg flex flex-col items-center text-center fade-in bg-gradient-to-tr 
+from-gray-700 to-gray-800 text-white">
                          <img src="https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Iago%20Nunes.jpg" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-green-400" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Iago+Nunes&background=random&color=fff';">
                         <h4 class="font-bold text-lg">Iago Nunes</h4>
                         <p class="text-sm text-green-400 font-semibold">Programador</p>
+          
                     </div>
                 </div>
             </div>
 
             <div id="curiosidades" class="tab-pane hidden">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold">Fatos Curiosos</h2>
+                      <h2 class="text-2xl font-bold">Fatos Curiosos</h2>
+  
                     <button id="new-facts-button" class="px-4 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors">
-                        <i class="fas fa-sync-alt mr-2"></i>Gerar Novas
-                    </button>
+                          <i class="fas fa-sync-alt mr-2"></i>Gerar Novas
+                      </button>
                 </div>
+  
                 <div id="curiosidades-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 </div>
             </div>
@@ -241,6 +272,7 @@
 
     <div id="main-modal" class="modal fixed inset-0 bg-black bg-opacity-70 items-center justify-center p-4 z-40">
         <div id="modal-container" class="card rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto relative animate-scale-in">
+         
             <button id="modal-close-button" class="absolute top-4 right-4 text-2xl hover:text-red-500 transition-colors z-10">&times;</button>
             <div id="modal-content" class="p-6">
             </div>
@@ -376,8 +408,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function calcularConquistas(jogador, partidasJogador, todasAsPartidas) {
         const conquistas = [];
-        if(!partidasJogador) return [];
-        
+        if (!partidasJogador) return [];
+
+        // --- Conquistas de desempenho em partida (Gols, Assistências, etc.) ---
         partidasJogador.forEach(p => {
             if (p.gols >= 6) {
                 conquistas.push({ nome: "Exterminador", desc: `Marcou 6+ gols em ${p.dataJogo}`, icon: "fa-solid fa-skull-crossbones", rarity: "mitico" });
@@ -409,30 +442,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 conquistas.push({ nome: "Partida Épica", desc: `Nota ${p.notaPartida} em ${p.dataJogo}`, icon: "fa-solid fa-meteor", rarity: "epico" });
             }
         });
-        
-        // --- NOVA LÓGICA PARA JOGADOR DO MÊS ---
+
+        // --- LÓGICA PARA JOGADOR DO MÊS ---
         const uniqueMonths = [...new Set(todasAsPartidas.map(p => p.dataJogo.slice(3)))];
+
         uniqueMonths.forEach(monthYear => {
             const periodMatches = todasAsPartidas.filter(p => p.dataJogo.slice(3) === monthYear);
             const playersForPeriod = recalculateStatsForPeriod(allPlayersData, periodMatches);
-            const bestPlayerOfMonth = [...playersForPeriod]
-                .filter(p => p.jogos > 0)
-                .sort((a, b) => b.notaGeral - a.notaGeral)[0];
 
-            if (bestPlayerOfMonth && bestPlayerOfMonth.nome === jogador.nome) {
-                const [month, year] = monthYear.split('/');
-                const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-                const monthName = monthNames[parseInt(month, 10) - 1];
+            if (playersForPeriod.length > 0) {
+                 const bestPlayerOfMonth = [...playersForPeriod]
+                    .filter(p => p.jogos > 0)
+                    .sort((a, b) => b.notaGeral - a.notaGeral)[0];
 
-                conquistas.push({
-                    nome: "Jogador do Mês",
-                    desc: `Melhor jogador de ${monthName} de ${year}`,
-                    icon: "fa-solid fa-award",
-                    rarity: "epico"
-                });
+                if (bestPlayerOfMonth && bestPlayerOfMonth.nome === jogador.nome) {
+                    const [month, year] = monthYear.split('/');
+                    const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+                    const monthName = monthNames[parseInt(month, 10) - 1];
+
+                    conquistas.push({
+                        nome: "Jogador do Mês",
+                        desc: `Melhor jogador de ${monthName} de ${year}`,
+                        icon: "fa-solid fa-award",
+                        rarity: "epico"
+                    });
+                }
             }
         });
-
+        
+        // --- Conquistas de Carreira (Veterano, Campeão) ---
         if (jogador.jogos >= 25) conquistas.push({ nome: "Veterano", desc: "Disputou 25 partidas", icon: "fa-solid fa-shield-halved", rarity: "raro" });
         if (jogador.vitorias >= 10) conquistas.push({ nome: "Campeão", desc: "Alcançou 10 vitórias", icon: "fa-solid fa-trophy", rarity: "raro" });
 
@@ -630,7 +668,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (achievementsByType[rarity]) badgesHtml += `<span class="px-2 py-1 text-xs font-semibold rounded-full border-2 rarity-${rarity}">${achievementsByType[rarity]} ${rarity.charAt(0).toUpperCase() + rarity.slice(1)}</span>`;
             });
             badgesHtml += '</div>';
-            container.innerHTML += `<div class="card p-4 rounded-lg flex flex-col items-center text-center cursor-pointer hover:shadow-lg transition-shadow" data-player-name="${p.nomeOriginal}"><img src="${photoUrl}" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-gray-300 dark:border-gray-600" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random';"><h4 class="font-bold text-lg">${p.nomeOriginal}</h4><p class="text-sm text-gray-500 dark:text-gray-400">${p.conquistas.length} Conquistas</p>${badgesHtml}</div>`;
+            container.innerHTML += `<div class="card p-4 rounded-lg flex flex-col items-center text-center cursor-pointer hover:shadow-lg transition-shadow" data-player-name="${p.nomeOriginal}"><img src="${photoUrl}" class="w-24 h-24 rounded-full 
+object-cover mb-4 border-4 border-gray-300 dark:border-gray-600" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random';"><h4 class="font-bold text-lg">${p.nomeOriginal}</h4><p class="text-sm text-gray-500 dark:text-gray-400">${p.conquistas.length} Conquistas</p>${badgesHtml}</div>`;
         });
     }
 
@@ -648,15 +687,18 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let placar;
             if(jogoRealizado) {
-                const scoreA = partidasDoDia.filter(p => p.time.toUpperCase() === 'BOCA').reduce((sum, p) => sum + p.gols, 0);
+                const scoreA = partidasDoDia.filter(p => p.time.toUpperCase() === 'BOCA').reduce((sum, p) => sum + 
+p.gols, 0);
                 const scoreB = partidasDoDia.filter(p => p.time.toUpperCase() === 'RIVER').reduce((sum, p) => sum + p.gols, 0);
                 placar = `
                     <div class="flex items-center space-x-2 text-lg md:text-xl font-bold">
-                        <span class="hidden sm:inline text-blue-500">BOCA</span>
+                        <span class="hidden 
+sm:inline text-blue-500">BOCA</span>
                         <span class="text-blue-500">${scoreA}</span>
                         <span>x</span>
                         <span class="text-red-500">${scoreB}</span>
-                        <span class="hidden sm:inline text-red-500">RIVER</span>
+                        <span 
+class="hidden sm:inline text-red-500">RIVER</span>
                     </div>
                 `;
             } else {
@@ -667,6 +709,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="card p-4 rounded-lg match-card cursor-pointer hover:shadow-lg transition-shadow" data-gamedate="${date}">
                     <div class="flex justify-between items-center">
                         <h3 class="font-bold text-lg md:text-xl">Partida de ${date}</h3>
+          
                         ${placar}
                     </div>
                 </div>
@@ -697,6 +740,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 conquistasHtml += `<div class="mb-4"><h5 class="font-bold text-md capitalize mb-2 rarity-${rarity}">${rarity}</h5><div class="flex flex-wrap gap-2">`;
                 groupedConquistas[rarity].forEach(c => conquistasHtml += `<div class="card p-2 rounded-md flex items-center" title="${c.desc}"><i class="${c.icon} mr-2"></i><span class="text-sm">${c.nome}</span></div>`);
                 conquistasHtml += `</div></div>`;
+          
             }
         });
         const ultimasPartidasHtml = player.partidas.filter(p => p.jogoAconteceu).slice(-5).reverse().map(p => {
@@ -704,20 +748,24 @@ document.addEventListener('DOMContentLoaded', () => {
             if (p.vitoria === 1) {
                 resultadoHtml = '<span class="font-bold text-green-500 w-4 text-center" title="Vitória">V</span>';
             } else if (p.vitoria === 0.5) {
-                resultadoHtml = '<span class="font-bold text-gray-400 w-4 text-center" title="Empate">E</span>';
+                resultadoHtml = '<span class="font-bold text-gray-400 
+w-4 text-center" title="Empate">E</span>';
             } else {
                 resultadoHtml = '<span class="font-bold text-red-500 w-4 text-center" title="Derrota">D</span>';
             }
 
             return `<div class="card p-3 rounded-md flex justify-between items-center text-sm">
                         <div>
+     
                             <span class="font-semibold">${p.dataJogo}</span>
                             <span class="ml-2 text-gray-500">${p.isGoleiro ? '(GOL)' : ''}</span>
                         </div>
+                  
                         <div class="text-right flex items-center space-x-3 sm:space-x-4">
                             <span>G: ${p.gols}, A: ${p.assistencias}</span>
                             ${resultadoHtml}
-                            <span class="font-bold text-blue-500 w-8 inline-block text-right">${p.notaPartida.toFixed(1)}</span>
+                            <span class="font-bold 
+text-blue-500 w-8 inline-block text-right">${p.notaPartida.toFixed(1)}</span>
                         </div>
                     </div>`;
         }).join('') || '<p>Nenhuma partida registrada.</p>';
@@ -727,23 +775,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 <img src="${photoUrl}" class="w-32 h-32 rounded-full object-cover border-4 border-blue-500 mb-4 md:mb-0 md:mr-6" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${player.nome.replace(' ', '+')}&background=random';">
                 <div class="flex-grow text-center md:text-left">
                     <h2 class="text-3xl font-bold">${player.nomeOriginal}</h2>
+     
                     <span class="badge-level badge-level-${player.nivel.toLowerCase()}">${player.nivel}</span>
                     <div class="mt-4"><p class="text-sm font-medium">Pontos MVP (Geral)</p><div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mt-1"><div class="xp-bar-inner bg-gradient-to-r from-blue-400 to-blue-600 h-4 rounded-full" style="width: ${player.pontosMVP}%;"></div></div><p class="text-right text-sm font-bold mt-1">${player.pontosMVP} / 100</p></div>
                 </div>
             </div>
+          
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center mb-6">
                         <div><p class="text-2xl font-bold">${player.jogos}</p><p class="text-sm text-gray-500">Jogos</p></div>
+                        
                         <div><p class="text-2xl font-bold">${player.gols}</p><p class="text-sm text-gray-500">Gols</p></div>
                         <div><p class="text-2xl font-bold">${player.assistencias}</p><p class="text-sm text-gray-500">Assistências</p></div>
                         <div><p class="text-2xl font-bold">${player.vitorias}</p><p class="text-sm text-gray-500">Vitórias</p></div>
                     </div>
+                    
                     <h4 class="font-bold text-lg mb-3">Últimas 5 Partidas Jogadas <span class="trend-arrow ml-2">${trendIcon}</span></h4>
                     <div class="space-y-2">${ultimasPartidasHtml}</div>
                 </div>
                 <div>
                     <h4 class="font-bold text-lg mb-3">Evolução da Nota</h4>
+             
                     <div class="h-60 card p-2 rounded-lg"><canvas id="player-evolution-chart"></canvas></div>
                 </div>
             </div>
@@ -791,11 +844,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h2 class="text-3xl font-bold">BOCA ${scoreA} x ${scoreB} RIVER</h2>
                     <p class="text-amber-500 font-semibold mt-1"><i class="fas fa-star mr-1"></i> Melhor da Partida: ${melhorJogador.nomeRaw} (${melhorJogador.notaPartida.toFixed(1)})</p>
                 </div>
+       
                 <div class="mb-4">
                     <h3 class="font-bold text-xl text-center p-2 bg-blue-600 text-white rounded-t-md">BOCA</h3>
                     ${renderTeamTable(timeA, true)}
                 </div>
                 <div>
+          
                     <h3 class="font-bold text-xl text-center p-2 bg-red-600 text-white rounded-t-md">RIVER</h3>
                     ${renderTeamTable(timeB, true)}
                 </div>
@@ -806,11 +861,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h2 class="text-3xl font-bold">Jogo Agendado</h2>
                     <p class="text-gray-500">${date}</p>
                 </div>
+     
                 <div class="mb-4">
                     <h3 class="font-bold text-xl text-center p-2 bg-blue-600 text-white rounded-t-md">BOCA (Escalação)</h3>
                     ${renderTeamTable(timeA, false)}
                 </div>
                 <div>
+       
                     <h3 class="font-bold text-xl text-center p-2 bg-red-600 text-white rounded-t-md">RIVER (Escalação)</h3>
                     ${renderTeamTable(timeB, false)}
                 </div>
@@ -835,6 +892,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 labels,
                 datasets: [{ label: 'Nota por Partida', data: data, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.2 }]
             },
+ 
             options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false, max: 10 } } }
         });
     }
@@ -851,11 +909,14 @@ document.addEventListener('DOMContentLoaded', () => {
             responsive: true, maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: { display: true, color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#1f2937', font: { size: 16 } }
+                title: { display: true, color: document.documentElement.classList.contains('dark') ?
+'#d1d5db' : '#1f2937', font: { size: 16 } }
             },
             scales: {
-                x: { ticks: { color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#1f2937' }, grid: { color: 'rgba(128,128,128,0.2)' } },
-                y: { ticks: { color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#1f2937' }, grid: { color: 'rgba(128,128,128,0.2)' }, beginAtZero: true }
+                x: { ticks: { color: document.documentElement.classList.contains('dark') ?
+'#d1d5db' : '#1f2937' }, grid: { color: 'rgba(128,128,128,0.2)' } },
+                y: { ticks: { color: document.documentElement.classList.contains('dark') ?
+'#d1d5db' : '#1f2937' }, grid: { color: 'rgba(128,128,128,0.2)' }, beginAtZero: true }
             },
             animation: { duration: 1000, easing: 'easeOutQuart' }
         };
@@ -883,6 +944,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const ultimas3Notas = partidasJogadas.slice(-3).map(match => match.notaPartida);
             const evolucao = ultimas3Notas[2] - ultimas3Notas[0]; 
             return {...p, evolucao };
+        
         }).filter(p => p.evolucao > -Infinity).sort((a,b) => b.evolucao - a.evolucao).slice(0, 10);
         createChart(document.getElementById('topEvolucoesChart').getContext('2d'), 'bar', { labels: playersComEvolucao.map(p => p.nomeOriginal), datasets: [{ label: 'Evolução de Nota', data: playersComEvolucao.map(p => p.evolucao.toFixed(2)), backgroundColor: '#6366f1' }] }, { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Top Evoluções (Últimos 3 Jogos)' } } });
     }
@@ -915,7 +977,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const p2 = players.find(p => p.nomeOriginal === player2Name);
 
         const stats = [
-            { label: 'Pontos MVP', key: 'pontosMVP', higherIsBetter: true }, { label: 'Nível', key: 'nivel' }, { label: 'Nota Geral', key: 'notaGeral', higherIsBetter: true, fixed: 1 }, { label: 'Jogos', key: 'jogos', higherIsBetter: true }, { label: 'Aproveitamento', key: 'aproveitamento', higherIsBetter: true, unit: '%' }, { label: 'Vitórias', key: 'vitorias', higherIsBetter: true }, { label: 'Empates', key: 'empates' }, { label: 'Derrotas', key: 'derrotas', higherIsBetter: false }, { label: 'Gols', key: 'gols', higherIsBetter: true }, { label: 'Assistências', key: 'assistencias', higherIsBetter: true }, { label: 'Gols Contra', key: 'golsContra', higherIsBetter: false },
+            { label: 'Pontos MVP', key: 'pontosMVP', higherIsBetter: true }, { label: 'Nível', key: 'nivel' }, { label: 'Nota Geral', key: 'notaGeral', higherIsBetter: true, fixed: 1 }, { label: 'Jogos', key: 'jogos', higherIsBetter: true }, { label: 'Aproveitamento', key: 'aproveitamento', higherIsBetter: true, unit: '%' }, { label: 'Vitórias', key: 'vitorias', higherIsBetter: true }, { label: 'Empates', key: 'empates' }, { label: 'Derrotas', key: 'derrotas', higherIsBetter: false }, { label: 'Gols', key: 'gols', higherIsBetter: true }, { label: 'Assistências', 
+key: 'assistencias', higherIsBetter: true }, { label: 'Gols Contra', key: 'golsContra', higherIsBetter: false },
         ];
         let tableHtml = '<table class="w-full">';
         stats.forEach(stat => {
@@ -924,22 +987,27 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let p1Class = '', p2Class = '';
             if(typeof p1[stat.key] === 'number' && typeof p2[stat.key] === 'number') {
+    
                 if (stat.higherIsBetter !== undefined) {
                      if (stat.higherIsBetter) {
                           if(p1[stat.key] > p2[stat.key]) p1Class = 'font-bold text-green-500';
-                          if(p2[stat.key] > p1[stat.key]) p2Class = 'font-bold text-green-500';
+                          if(p2[stat.key] > p1[stat.key]) 
+p2Class = 'font-bold text-green-500';
                      } else {
                           if(p1[stat.key] < p2[stat.key]) p1Class = 'font-bold text-green-500';
                           if(p2[stat.key] < p1[stat.key]) p2Class = 'font-bold text-green-500';
-                     }
+          
+                    }
                 }
             }
 
             tableHtml += `
                 <tr class="border-b dark:border-gray-700">
-                    <td class="p-2 text-left ${p1Class}">${val1}${stat.unit || ''}</td>
+                    <td class="p-2 text-left ${p1Class}">${val1}${stat.unit ||
+''}</td>
                     <th class="p-2 font-normal text-gray-500 dark:text-gray-400">${stat.label}</th>
-                    <td class="p-2 text-right ${p2Class}">${val2}${stat.unit || ''}</td>
+                    <td class="p-2 text-right ${p2Class}">${val2}${stat.unit ||
+''}</td>
                 </tr>
             `;
         });
@@ -1007,7 +1075,8 @@ document.addEventListener('DOMContentLoaded', () => {
         container.innerHTML = ''; // Limpa curiosidades antigas
         const facts = generateFunFacts(allPlayersData, allMatchesData);
         if(facts.length === 0){
-            container.innerHTML = `<p class="text-gray-500 col-span-full text-center">Não foi possível gerar curiosidades. Tente novamente mais tarde.</p>`;
+            container.innerHTML = `<p class="text-gray-500 col-span-full text-center">Não foi possível gerar curiosidades.
+Tente novamente mais tarde.</p>`;
             return;
         }
 
@@ -1016,6 +1085,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="card p-4 rounded-lg flex flex-col items-center justify-center text-center fade-in">
                     <div class="text-3xl mb-3">${fact.icon}</div>
                     <p class="text-base">${fact.text}</p>
+  
                 </div>
             `;
             container.innerHTML += card;
@@ -1054,7 +1124,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     featsByGoalkeeper[feat.nome] = { nome: feat.nome, gols: 0, assistencias: 0 };
                 }
                 featsByGoalkeeper[feat.nome].gols += feat.gols;
-                featsByGoalkeeper[feat.nome].assistencias += feat.assistencias;
+                featsByGoalkeeper[feat.nome].assistencias 
++= feat.assistencias;
             });
             for (const gkNome in featsByGoalkeeper) {
                 const gkData = featsByGoalkeeper[gkNome];
@@ -1187,12 +1258,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (button && button.dataset.tab) {
                 tabsContainer.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
-                tabContent.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
+                tabContent.querySelectorAll('.tab-pane').forEach(pane => 
+pane.classList.add('hidden'));
                 const activeTab = document.getElementById(button.dataset.tab);
                 activeTab.classList.remove('hidden');
                 
                 if (button.dataset.tab === 'graficos') {
                     renderAllCharts(allPlayersData);
+         
                 }
                 if (button.dataset.tab === 'curiosidades') {
                     renderCuriosidades();
@@ -1218,10 +1291,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const selectedMonth = document.getElementById('month-filter').value;
                 let playersForRanking;
                 if (selectedMonth === 'Geral') {
+     
                     playersForRanking = allPlayersData;
                 } else {
                     const periodMatches = allMatchesData.filter(p => p.dataJogo.slice(3) === selectedMonth);
                     playersForRanking = recalculateStatsForPeriod(allPlayersData, periodMatches);
+               
                 }
                 const data = (key === 'mediaGolsSofridos') ? playersForRanking.filter(p => p.jogosGoleiro > 0) : playersForRanking;
                 const sortedData = [...data].sort((a,b) => (hib === 'true') ? b[key] - a[key] : a[key] - b[key]);
@@ -1235,6 +1310,7 @@ document.addEventListener('DOMContentLoaded', () => {
             html.classList.toggle('light');
             themeToggleBtn.innerHTML = html.classList.contains('dark') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
             localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+          
             if(Object.keys(chartInstances).length > 0) renderAllCharts(allPlayersData);
         });
         document.getElementById('mobile-mode-toggle').addEventListener('change', (e) => { 
@@ -1251,18 +1327,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const borderColor = levelBorderColors[p.nivel] || '#6b7280'; // Fallback para cor de 'Iniciante'
 
             return `
-                <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer" data-player-name="${p.nomeOriginal}">
+                <tr class="border-b 
+dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer" data-player-name="${p.nomeOriginal}">
                     <td class="p-3 font-bold text-center">${index + 1}</td>
                     <td class="p-3">
                         <div class="flex items-center">
+                        
                             <img src="${photoUrl}" 
                                  class="w-10 h-10 rounded-full object-cover mr-4" 
                                  style="border: 3px solid ${borderColor};"
+                    
                                  onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random';">
                             <span>${p.nomeOriginal}</span>
                         </div>
                     </td>
-                    <td class="p-3 font-semibold text-right">${formatValue(p[key], key)}${unit || ''}</td>
+             
+                    <td class="p-3 font-semibold text-right">${formatValue(p[key], key)}${unit ||
+''}</td>
                 </tr>
             `;
         }).join('');
@@ -1274,14 +1355,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 <table class="w-full text-left">
                     <thead class="sticky top-0 bg-gray-100 dark:bg-gray-800">
                         <tr>
+   
                             <th class="p-3 w-16 text-center">Pos.</th>
                             <th class="p-3">Jogador</th>
                             <th class="p-3 text-right">Valor</th>
+             
                         </tr>
                     </thead>
                     <tbody>
                         ${tableRows}
                     </tbody>
+     
                 </table>
             </div>`;
         mainModalEl.classList.add('show');
@@ -1301,7 +1385,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function exportVisibleDataToCSV() {
-        // Implementar lógica se necessário
+        // Implementar lógica 
+se necessário
     }
 
     function exportPlayerHistoryToCSV(player) {
@@ -1314,7 +1399,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             if (navigator.share) await navigator.share(shareData);
             else { await navigator.clipboard.writeText(window.location.href); alert("Link copiado!"); }
-        } catch (err) { console.error("Erro ao compartilhar: ", err); }
+        } catch (err) { console.error("Erro ao compartilhar: ", err);
+        }
     }
 
     const levelUpSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"+Array(300).join("123"));
@@ -1337,16 +1423,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const prevConquistasCount = parseInt(localStorage.getItem(`conq_${player.nome}`), 10) || 0;
         if (prevLevel && prevLevel !== player.nivel) showNotification(`<b>${player.nomeOriginal}</b> subiu para o nível <b>${player.nivel}</b>!`, 'fa-arrow-up', 'level');
         if (player.conquistas.length > prevConquistasCount) {
-            const fullPlayer = allPlayersData.find(p => p.nome === player.nome) || player;
+            const fullPlayer = allPlayersData.find(p => p.nome === player.nome) ||
+player;
             fullPlayer.conquistas.slice(prevConquistasCount).forEach(c => showNotification(`<b>${player.nomeOriginal}</b> desbloqueou: <b>${c.nome}</b>!`, c.icon, 'conquista'));
         }
-        const fullPlayer = allPlayersData.find(p => p.nome === player.nome) || player;
+        const fullPlayer = allPlayersData.find(p => p.nome === player.nome) ||
+player;
         localStorage.setItem(`nivel_${player.nome}`, fullPlayer.nivel);
         localStorage.setItem(`conq_${player.nome}`, fullPlayer.conquistas.length);
     }
     
     async function init() {
-        const savedTheme = localStorage.getItem('theme') || 'dark';
+        const savedTheme = localStorage.getItem('theme') ||
+'dark';
         document.documentElement.className = savedTheme;
         themeToggleBtn.innerHTML = savedTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
         const mobileMode = localStorage.getItem('mobileMode') === 'true';
