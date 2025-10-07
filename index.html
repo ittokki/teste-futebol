@@ -1603,11 +1603,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const team = {
             ata: getBestMonthlyPlayers(['ata'], 2),
             mei: getBestMonthlyPlayers(['mei'], 2),
-            def: getBestMonthlyPlayers(['zag', 'ala'], 3),
+            ala: getBestMonthlyPlayers(['ala'], 2),
+            zag: getBestMonthlyPlayers(['zag'], 1),
             gol: getBestMonthlyPlayers(['gol'], 1),
         };
 
-        const totalPlayersInTeam = Object.values(team).reduce((sum, players) => sum + players.length, 0);
+        const totalPlayersInTeam = Object.values(team).flat().length;
         if (totalPlayersInTeam === 0) {
             container.innerHTML = `<div class="card p-4 rounded-lg text-center text-gray-500">Nenhum jogador encontrado com dados suficientes para a Seleção de ${monthLabel}.</div>`;
             return;
@@ -1627,7 +1628,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         while(team.ata.length < 2) team.ata.push(null);
         while(team.mei.length < 2) team.mei.push(null);
-        while(team.def.length < 3) team.def.push(null);
+        while(team.ala.length < 2) team.ala.push(null);
+        while(team.zag.length < 1) team.zag.push(null);
         while(team.gol.length < 1) team.gol.push(null);
 
         container.innerHTML = `
@@ -1647,7 +1649,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="relative z-10 flex flex-col justify-between h-full space-y-4 py-4 min-h-[500px]">
                     <div class="flex justify-center w-full space-x-8">${team.ata.map(renderPlayer).join('')}</div>
                     <div class="flex justify-center w-full space-x-8">${team.mei.map(renderPlayer).join('')}</div>
-                    <div class="flex justify-center w-full space-x-4">${team.def.map(renderPlayer).join('')}</div>
+                    <div class="flex justify-center w-full items-center space-x-4">
+                        ${renderPlayer(team.ala[0])}
+                        ${renderPlayer(team.zag[0])}
+                        ${renderPlayer(team.ala[1])}
+                    </div>
                     <div class="flex justify-center w-full">${team.gol.map(renderPlayer).join('')}</div>
                 </div>
             </div>
