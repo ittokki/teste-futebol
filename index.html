@@ -93,28 +93,23 @@
 
     <div id="app-container" class="container mx-auto p-4 md:p-6 hidden">
         <header class="flex flex-wrap justify-between items-center mb-6">
-   
             <div class="flex items-center space-x-4">
                 <img src="https://raw.githubusercontent.com/ittokki/Futebol/ba59ab86cf2095d4e9214bd5e24e21ac8aeaf33a/inimigos%20da%20bola.jpg" alt="Logo Inimigos da Bola" class="w-12 h-12 object-contain rounded-md">
                 <h1 class="text-3xl font-bold text-blue-500">Inimigos da Bola</h1>
             </div>
             <div class="flex items-center space-x-3 mt-4 sm:mt-0">
-             
                 <button id="update-data-button" class="px-3 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-sync-alt mr-2"></i>Atualizar</button>
                 <button id="export-csv-button" class="px-3 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-file-csv mr-2"></i>Exportar CSV</button>
                 <button id="share-button" class="px-3 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors"><i class="fas fa-share-alt mr-2"></i>Compartilhar</button>
                 <label for="mobile-mode-toggle" class="flex items-center cursor-pointer text-sm">
-    
                     <span class="mr-2">Mobile</span>
                     <div class="relative">
                         <input type="checkbox" id="mobile-mode-toggle" class="sr-only">
                         <div class="block bg-gray-600 w-10 h-6 rounded-full"></div>
-      
                         <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
                     </div>
                 </label>
                 <button id="theme-toggle" class="w-10 h-10 card rounded-full flex items-center justify-center text-xl">
-            
                     <i class="fas fa-sun"></i>
                 </button>
             </div>
@@ -122,18 +117,15 @@
 
         <div id="upload-fallback" class="hidden card p-6 mb-6">
             <h2 class="text-xl font-bold mb-2 text-amber-500"><i class="fas fa-exclamation-triangle mr-2"></i>Falha ao carregar dados do Google Sheets</h2>
-            <p class="mb-4">Por favor, faça 
-o upload dos arquivos CSV ou Excel correspondentes às abas da planilha.</p>
+            <p class="mb-4">Por favor, faça o upload dos arquivos CSV ou Excel correspondentes às abas da planilha.</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="file-pagina1" class="block text-sm font-medium mb-1">Arquivo da Página 1 (Jogadores)</label>
-                    <input type="file" id="file-pagina1" class="block w-full text-sm file:mr-4 file:py-2 
-file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                    <input type="file" id="file-pagina1" class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
                 </div>
                 <div>
                     <label for="file-pagina2" class="block text-sm font-medium mb-1">Arquivo da Página 2 (Partidas)</label>
-                    <input type="file" id="file-pagina2" class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm 
-file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                    <input type="file" id="file-pagina2" class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
                 </div>
             </div>
             <div id="column-mapping-container" class="hidden mt-6"></div>
@@ -141,16 +133,14 @@ file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
         </div>
 
         <nav class="mb-6">
-            <div 
-class="border-b border-gray-200 dark:border-gray-700">
+            <div class="border-b border-gray-200 dark:border-gray-700">
                 <div class="flex -mb-px space-x-2 sm:space-x-6" id="tabs">
                     <button data-tab="rankings" class="tab-button active text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-trophy mr-2"></i>Rankings</button>
+                    <button data-tab="selecao-mes" class="tab-button text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-calendar-alt mr-2"></i>Seleção do Mês</button>
                     <button data-tab="graficos" class="tab-button text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-chart-line mr-2"></i>Gráficos</button>
-            
                     <button data-tab="hall-da-fama" class="tab-button text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-star mr-2"></i>Hall da Fama</button>
                     <button data-tab="partidas" class="tab-button text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-history mr-2"></i>Partidas</button>
                     <button data-tab="curiosidades" class="tab-button text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-lightbulb mr-2"></i>Curiosidades</button>
-              
                     <button data-tab="admins" class="tab-button text-sm sm:text-base whitespace-nowrap py-4 px-1 border-b-2 font-medium"><i class="fas fa-shield-alt mr-2"></i>Admins</button>
                 </div>
             </div>
@@ -158,59 +148,58 @@ class="border-b border-gray-200 dark:border-gray-700">
 
         <main id="tab-content">
             <div id="rankings" class="tab-pane active">
-                <div class="flex flex-wrap justify-between items-center gap-4 
-mb-4">
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
                     <div class="relative w-full sm:w-64">
                         <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                         <input type="text" id="player-search" placeholder="Buscar jogador..." class="w-full p-2 pl-10 rounded-md card focus:outline-none focus:ring-2 focus:ring-blue-500">
-          
                     </div>
                     <div class="w-full sm:w-auto">
                         <label for="month-filter" class="sr-only">Filtrar por Mês</label>
                         <select id="month-filter" class="w-full p-2 rounded-md card">
-           
                         </select>
                     </div>
                 </div>
                 <div id="destaque-mes-container" class="mb-6"></div>
                 <div id="rankings-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          
+                </div>
+            </div>
+
+            <div id="selecao-mes" class="tab-pane hidden">
+                <div class="card p-4 rounded-lg mb-6 max-w-sm mx-auto">
+                    <label for="selecao-month-filter" class="font-semibold block text-center mb-2">Selecione o Mês:</label>
+                    <select id="selecao-month-filter" class="w-full p-2 rounded-md card"></select>
+                </div>
+                <div id="selecao-mes-display">
+                    <!-- The football field will be rendered here -->
                 </div>
             </div>
 
             <div id="graficos" class="tab-pane hidden">
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     <div class="card p-4 rounded-lg chart-container h-96"><canvas id="topGoleadoresChart"></canvas></div>
-                    
                     <div class="card p-4 rounded-lg chart-container h-96"><canvas id="topAssistidoresChart"></canvas></div>
                     <div class="card p-4 rounded-lg chart-container h-96"><canvas id="participacoesChart"></canvas></div>
                     <div class="card p-4 rounded-lg chart-container h-96"><canvas id="aproveitamentoChart"></canvas></div>
                     <div class="card p-4 rounded-lg chart-container h-96"><canvas id="contribuicaoChart"></canvas></div>
-                
                     <div class="card p-4 rounded-lg chart-container h-96"><canvas id="evolucaoGolsChart"></canvas></div>
                     <div class="card p-4 rounded-lg chart-container h-96 xl:col-span-1"><canvas id="topEvolucoesChart"></canvas></div>
                 </div>
                 <div id="compare-section" class="mt-8 card p-6 rounded-lg">
                     <h2 class="text-2xl font-bold mb-4">Comparar Jogadores</h2>
-  
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                         <div class="w-full">
                             <label for="player1-select" class="block text-sm font-medium mb-1">Jogador 1</label>
-                  
                             <select id="player1-select" class="w-full p-2 rounded-md bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600"></select>
                         </div>
                         <div class="hidden text-center text-4xl font-bold md:flex items-center justify-center pb-2">VS</div>
-                        <div 
-class="w-full">
+                        <div class="w-full">
                             <label for="player2-select" class="block text-sm font-medium mb-1">Jogador 2</label>
                             <select id="player2-select" class="w-full p-2 rounded-md bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600"></select>
                         </div>
-     
                     </div>
                     <div id="comparison-result" class="mt-6">
                         <p class="text-center text-gray-500">Selecione dois jogadores para comparar.</p>
                     </div>
-             
                 </div>
             </div>
 
@@ -220,50 +209,41 @@ class="w-full">
             </div>
 
             <div id="partidas" class="tab-pane hidden space-y-6">
-    
             </div>
 
             <div id="admins" class="tab-pane hidden">
                 <h2 class="text-2xl font-bold mb-6">Administradores & Créditos</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div class="card p-4 rounded-lg flex flex-col items-center text-center fade-in">
-       
                         <img src="https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Henrique.jpg" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-blue-500" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Henrique+Amaral&background=random';">
                         <h4 class="font-bold text-lg">Henrique Amaral</h4>
                         <p class="text-sm text-blue-500 font-semibold">Administrador</p>
-                    
                     </div>
                     <div class="card p-4 rounded-lg flex flex-col items-center text-center fade-in">
                         <img src="https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Douglas.jpg" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-blue-500" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Douglas+Daitx&background=random';">
                         <h4 class="font-bold text-lg">Douglas Daitx</h4>
-            
                         <p class="text-sm text-blue-500 font-semibold">Administrador</p>
                     </div>
                     <div class="card p-4 rounded-lg flex flex-col items-center text-center fade-in">
                         <img src="https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/WILLY.jpg" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-blue-500" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Willy+Grafumbek&background=random';">
-    
                         <h4 class="font-bold text-lg">Willy Grafumbek</h4>
                         <p class="text-sm text-blue-500 font-semibold">Administrador</p>
                     </div>
-                    <div class="card p-4 rounded-lg flex flex-col items-center text-center fade-in bg-gradient-to-tr 
-from-gray-700 to-gray-800 text-white">
+                    <div class="card p-4 rounded-lg flex flex-col items-center text-center fade-in bg-gradient-to-tr from-gray-700 to-gray-800 text-white">
                          <img src="https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Iago%20Nunes.jpg" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-green-400" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=Iago+Nunes&background=random&color=fff';">
                         <h4 class="font-bold text-lg">Iago Nunes</h4>
                         <p class="text-sm text-green-400 font-semibold">Programador</p>
-          
                     </div>
                 </div>
             </div>
 
             <div id="curiosidades" class="tab-pane hidden">
                 <div class="flex justify-between items-center mb-6">
-                      <h2 class="text-2xl font-bold">Fatos Curiosos</h2>
-  
-                    <button id="new-facts-button" class="px-4 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors">
-                          <i class="fas fa-sync-alt mr-2"></i>Gerar Novas
-                      </button>
+                        <h2 class="text-2xl font-bold">Fatos Curiosos</h2>
+                        <button id="new-facts-button" class="px-4 py-2 text-sm font-medium card rounded-md hover:bg-blue-500 hover:text-white transition-colors">
+                            <i class="fas fa-sync-alt mr-2"></i>Gerar Novas
+                        </button>
                 </div>
-  
                 <div id="curiosidades-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 </div>
             </div>
@@ -272,7 +252,6 @@ from-gray-700 to-gray-800 text-white">
 
     <div id="main-modal" class="modal fixed inset-0 bg-black bg-opacity-70 items-center justify-center p-4 z-40">
         <div id="modal-container" class="card rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto relative animate-scale-in">
-         
             <button id="modal-close-button" class="absolute top-4 right-4 text-2xl hover:text-red-500 transition-colors z-10">&times;</button>
             <div id="modal-content" class="p-6">
             </div>
@@ -293,6 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     document.addEventListener('click', handleFirstInteraction, true);
     document.addEventListener('keydown', handleFirstInteraction, true);
+    
     // --- EFEITO SONORO DE CLIQUE ---
     const clickSound = new Audio('https://raw.githubusercontent.com/ittokki/Futebol/5cc70b08d51f09dae0341672e52b2a435a276c05/PES%202013%20Select%20Game%20Main%20Menu%20Sound%20Effect%20(mp3cut.net).mp3');
     function playClickSound() {
@@ -307,28 +287,33 @@ document.addEventListener('DOMContentLoaded', () => {
             playClickSound();
         }
     });
+
     // =================================================================================
     // CONFIGURAÇÕES PRINCIPAIS
     // =================================================================================
     const apiKey = "AIzaSyCL19ds6YqVOv5vV-zygBjeC-byy-rDPfM";
     const spreadsheetId = "1TvrVT8ksYYMlpw8gkKIFvpnnCf02J8uYTkhHc5c0vdo";
     const rangePagina1 = "Página1!A2:H100";
-    const rangePagina2 = "Página2!A2:K300";
+    const rangePagina2 = "Página2!A2:L300"; // Aumentado para coluna L (Posição)
+    
     // Mapa de fotos dos jogadores
     const playerPhotos = {
-        "HENRIQUE AMARAL": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Henrique.jpg", "VITOR": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Vitor%20gol.jpg", "MARCO DAITX": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Marco.jpg", "EDUARDO DUDU": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Eduardo.jpg", "WILIAN SILVA": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Wiliam%20Silva.jpg", "DOUGLAS DAITX": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Douglas.jpg", "GUSTAVO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Gustavo.jpg", "ADEMIR": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Ademir.jpg", "DAVI": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Davi%20Mattos.jpg", "VICTOR MATHEUS": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Victor%20Matheus.jpg", "ANDRE": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/main/Andre.jpg", "MAICON": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Maicon.jpg", "CRISTIANO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Cristiano.jpg", "CLAUDIO SCHNEIRDER": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Claudio.jpg", "WILIAN": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/main/Wiliam.jpg", "IAGO NUNES": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Iago%20Nunes.jpg", "WILLY": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/WILLY.jpg", "ZECA": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/ZECA.jpg", "FRANCISCO CHICO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/FRANCISCO%20CHICO.jpg", "PEDRALLI": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/PEDRALLI.jpg", "THALES RAMOS": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Thales%20Ramos.jpg", "BRUNO GUIMARAES": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Bruno.jpg", "EVERTON": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Everton.jpg", "JUAREZ CARDOSO": "https://github.com/ittokki/Fotos-jogadores/blob/main/juarez.jpg?raw=true", "CARLOS ALEXANDRE": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Carlos%20alexandre.jpg"
+        "HENRIQUE AMARAL": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/henrique.jpg", "VITOR": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Vitor%20gol.jpg", "MARCO DAITX": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Marco.jpg", "EDUARDO DUDU": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Eduardo.jpg", "WILIAN SILVA": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Wilian%20Silva.jpg", "DOUGLAS DAITX": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Douglas.jpg", "GUSTAVO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Gustavo.jpg", "ADEMIR": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Ademir.jpg", "DAVI": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Davi%20Mattos.jpg", "VICTOR MATHEUS": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Victor%20Matheus.jpg", "MATHEUS": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/matheus.jpg", "ANDRE": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/main/Andre.jpg", "MAICON": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Maicon.jpg", "CRISTIANO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Cristiano.jpg", "CLAUDIO SCHNEIRDER": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Claudio.jpg", "WILIAN": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/main/Wiliam.jpg", "IAGO NUNES": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Iago%20Nunes.jpg", "WILLY": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/WILLY.jpg", "ZECA": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/ZECA.jpg", "FRANCISCO CHICO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/FRANCISCO%20CHICO.jpg", "PEDRALLI": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/PEDRALLI.jpg", "THALES RAMOS": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Thales%20Ramos.jpg", "BRUNO GUIMARAES": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Bruno.jpg", "EVERTON": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Everton.jpg", "JUAREZ CARDOSO": "https://github.com/ittokki/Fotos-jogadores/blob/main/juarez.jpg?raw=true", "CARLOS ALEXANDRE": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Carlos%20alexandre.jpg"
     };
+    
     // Mapeamento de cores para borda da foto de acordo com o nível
     const levelBorderColors = {
         'Lenda': '#f59e0b',       // Dourado
         'Craque': '#9ca3af',      // Cinza/Prata
         'Diferenciado': '#3b82f6', // Azul
         'Esforçado': '#10b981',   // Verde
-        'Iniciante': '#6b7280'     // Cinza
+        'Iniciante': '#6b7280'    // Cinza
     };
+
     let allPlayersData = [];
     let allMatchesData = [];
     let chartInstances = {};
+    let selecaoMesFilterInitialized = false;
 
     const loadingEl = document.getElementById('loading');
     const appContainerEl = document.getElementById('app-container');
@@ -340,11 +325,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalContentEl = document.getElementById('modal-content');
     const modalCloseBtn = document.getElementById('modal-close-button');
     const themeToggleBtn = document.getElementById('theme-toggle');
+
     const parseNum = (val) => {
         if (typeof val === "number") return val;
         if (!val) return 0;
         return Number(val.toString().replace(',', '.').trim()) || 0;
     };
+
     const normalizaNome = (nome) => {
         if (!nome || typeof nome !== 'string') return '';
         return nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").replace(/\(GOL\)/gi, "").trim().toUpperCase();
@@ -356,6 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (type === 'notaGeral') return value.toFixed(1);
         return Math.round(value);
     };
+
     async function fetchSheetData(range) {
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
         const response = await fetch(url);
@@ -398,19 +386,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const NOTA_BASE = 6.0;
 
         const notaTecnica = NOTA_BASE + (dados.gols * PESO_GOLS) + (dados.assistencias * PESO_ASSIST) + (dados.golsTomados * PESO_GOLS_TOMADOS) + (dados.golsContra * PESO_GOLS_CONTRA);
+        
         let notaPonderada = (notaTecnica + (dados.notaADM * PESO_ADM)) / (1 + PESO_ADM);
 
         const bonusResultado = dados.vitoria === 1 ? 0.3 : dados.vitoria === 0.5 ? 0.15 : 0;
         let notaFinal = notaPonderada + bonusResultado;
+        
         notaFinal = Math.max(0, Math.min(10, Math.round(notaFinal * 10) / 10));
         return notaFinal;
     }
 
     function calcularConquistas(jogador, partidasJogador, todasAsPartidas) {
         const conquistas = [];
-        if (!partidasJogador) return [];
-
-        // --- Conquistas de desempenho em partida (Gols, Assistências, etc.) ---
+        if(!partidasJogador) return [];
+        
         partidasJogador.forEach(p => {
             if (p.gols >= 6) {
                 conquistas.push({ nome: "Exterminador", desc: `Marcou 6+ gols em ${p.dataJogo}`, icon: "fa-solid fa-skull-crossbones", rarity: "mitico" });
@@ -442,44 +431,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 conquistas.push({ nome: "Partida Épica", desc: `Nota ${p.notaPartida} em ${p.dataJogo}`, icon: "fa-solid fa-meteor", rarity: "epico" });
             }
         });
-
-        // --- LÓGICA PARA JOGADOR DO MÊS ---
-        const uniqueMonths = [...new Set(todasAsPartidas.map(p => p.dataJogo.slice(3)))];
-
-        uniqueMonths.forEach(monthYear => {
-            const periodMatches = todasAsPartidas.filter(p => p.dataJogo.slice(3) === monthYear);
-            const playersForPeriod = recalculateStatsForPeriod(allPlayersData, periodMatches);
-
-            if (playersForPeriod.length > 0) {
-                 const bestPlayerOfMonth = [...playersForPeriod]
-                    .filter(p => p.jogos > 0)
-                    .sort((a, b) => b.notaGeral - a.notaGeral)[0];
-
-                if (bestPlayerOfMonth && bestPlayerOfMonth.nome === jogador.nome) {
-                    const [month, year] = monthYear.split('/');
-                    const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-                    const monthName = monthNames[parseInt(month, 10) - 1];
-
-                    conquistas.push({
-                        nome: "Jogador do Mês",
-                        desc: `Melhor jogador de ${monthName} de ${year}`,
-                        icon: "fa-solid fa-award",
-                        rarity: "epico"
-                    });
-                }
-            }
-        });
         
-        // --- Conquistas de Carreira (Veterano, Campeão) ---
         if (jogador.jogos >= 25) conquistas.push({ nome: "Veterano", desc: "Disputou 25 partidas", icon: "fa-solid fa-shield-halved", rarity: "raro" });
         if (jogador.vitorias >= 10) conquistas.push({ nome: "Campeão", desc: "Alcançou 10 vitórias", icon: "fa-solid fa-trophy", rarity: "raro" });
 
         return conquistas;
     }
 
-    function calcularBonusMVP(conquistas) {
+    function calculateMatchBonus(gols, assistencias, notaPartida) {
+        let bonus = 0;
         const pontos = { comum: 1, raro: 2, epico: 3, lendario: 5, mitico: 10 };
-        return conquistas.reduce((acc, c) => acc + (pontos[c.rarity] || 0), 0);
+
+        if (gols >= 6) bonus += pontos.mitico;
+        else if (gols >= 5) bonus += pontos.lendario;
+        else if (gols >= 4) bonus += pontos.epico;
+        else if (gols >= 3) bonus += pontos.raro;
+        else if (gols >= 2) bonus += pontos.comum;
+
+        if (assistencias >= 6) bonus += pontos.mitico;
+        else if (assistencias >= 5) bonus += pontos.lendario;
+        else if (assistencias >= 4) bonus += pontos.epico;
+        else if (assistencias >= 3) bonus += pontos.raro;
+        else if (assistencias >= 2) bonus += pontos.comum;
+        
+        if (notaPartida >= 9.5) bonus += pontos.lendario;
+        else if (notaPartida >= 9) bonus += pontos.epico;
+
+        return bonus;
     }
 
     function processarDados(partidasRaw, jogadoresRaw) {
@@ -490,6 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 jogadoresMap.set(nome, { id: row[0], nome, nomeOriginal: row[1] });
             }
         });
+
         const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
         allMatchesData = partidasRaw.map(row => {
             const vitoriaStatus = (row[7] || "").toLowerCase().trim();
@@ -502,13 +481,101 @@ document.addEventListener('DOMContentLoaded', () => {
                 vitoria: vitoriaStatus === 'sim' ? 1 : vitoriaStatus === 'empate' ? 0.5 : 0,
                 time: row[8] || 'N/A',
                 jogoAconteceu: (row[10] || "").toLowerCase() === 'sim',
-                isGoleiro: isGoleiro
+                isGoleiro: isGoleiro,
+                posicao: row[11] || 'N/A'
             };
         }).filter(p => p.nome && dateRegex.test(p.dataJogo));
+
         allMatchesData.forEach(p => {
             p.notaPartida = p.jogoAconteceu ? calcularNotaPartida(p) : 0;
         });
-        allPlayersData = recalculateStatsForPeriod(Array.from(jogadoresMap.values()), allMatchesData);
+
+        const timeDaSemanaCounts = new Map();
+        const getWeekIdentifier = (dateStr) => {
+            const [day, month, year] = dateStr.split('/');
+            const date = new Date(year, month - 1, day);
+            const firstDayOfWeek = new Date(date.setDate(date.getDate() - date.getDay()));
+            return firstDayOfWeek.toLocaleDateString('pt-BR');
+        };
+        const matchesByWeek = allMatchesData.reduce((acc, p) => {
+            if (p.jogoAconteceu) {
+                const weekId = getWeekIdentifier(p.dataJogo);
+                (acc[weekId] = acc[weekId] || []).push(p);
+            }
+            return acc;
+        }, {});
+
+        Object.values(matchesByWeek).forEach(partidasDaSemana => {
+            const weeklyPlayerStats = new Map();
+
+            partidasDaSemana.forEach(p => {
+                if (!weeklyPlayerStats.has(p.nome)) {
+                    weeklyPlayerStats.set(p.nome, {
+                        nome: p.nome,
+                        posicoes: [],
+                        notas: []
+                    });
+                }
+                const stats = weeklyPlayerStats.get(p.nome);
+                stats.posicoes.push(p.posicao);
+                stats.notas.push(p.notaPartida);
+            });
+
+            const weeklyAverages = [];
+            for (const stats of weeklyPlayerStats.values()) {
+                const avgNota = stats.notas.reduce((a, b) => a + b, 0) / stats.notas.length;
+                
+                const posCount = stats.posicoes.reduce((acc, pos) => {
+                    acc[pos] = (acc[pos] || 0) + 1;
+                    return acc;
+                }, {});
+                const primaryPosition = Object.keys(posCount).sort((a, b) => posCount[b] - posCount[a])[0];
+
+                weeklyAverages.push({
+                    nome: stats.nome,
+                    avgNota: avgNota,
+                    posicao: primaryPosition
+                });
+            }
+
+            const getBestWeeklyPlayer = (pos, count) => {
+                return weeklyAverages
+                    .filter(p => p.posicao && p.posicao.toLowerCase() === pos.toLowerCase())
+                    .sort((a, b) => b.avgNota - a.avgNota)
+                    .slice(0, count);
+            };
+
+            const weeklyTeam = [
+                ...getBestWeeklyPlayer('ata', 2),
+                ...getBestWeeklyPlayer('mei', 2),
+                ...getBestWeeklyPlayer('ala', 2),
+                ...getBestWeeklyPlayer('zag', 1),
+                ...getBestWeeklyPlayer('gol', 1),
+            ];
+
+            weeklyTeam.forEach(player => {
+                if (player) {
+                    timeDaSemanaCounts.set(player.nome, (timeDaSemanaCounts.get(player.nome) || 0) + 1);
+                }
+            });
+        });
+
+        const basePlayers = Array.from(jogadoresMap.values());
+
+        allPlayersData = recalculateStatsForPeriod(basePlayers, allMatchesData);
+
+        allPlayersData.forEach(player => {
+            player.timeDaSemanaCount = timeDaSemanaCounts.get(player.nome) || 0;
+            if (player.timeDaSemanaCount > 0) {
+                const isPlural = player.timeDaSemanaCount > 1;
+                player.conquistas.unshift({
+                    nome: `${player.timeDaSemanaCount}x Seleção da Semana`,
+                    desc: `Eleito para a seleção da semana ${player.timeDaSemanaCount} ${isPlural ? 'vezes' : 'vez'}.`,
+                    icon: "fa-solid fa-award",
+                    rarity: "raro"
+                });
+            }
+        });
         
         return allPlayersData;
     }
@@ -516,11 +583,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function recalculateStatsForPeriod(basePlayers, periodMatches) {
         const periodPlayersMap = new Map();
         basePlayers.forEach(p => {
-             periodPlayersMap.set(p.nome, {
-                 ...p, jogos: 0, vitorias: 0, empates: 0,
-                 gols: 0, assistencias: 0, golsContra: 0, golsTomados: 0,
-                 partidas: [], notasGeral: [], notasGoleiro: [], notasLinha: []
-             });
+                 periodPlayersMap.set(p.nome, {
+                    ...p, 
+                    jogos: 0, vitorias: 0, empates: 0,
+                    gols: 0, assistencias: 0, golsContra: 0, golsTomados: 0,
+                    partidas: [], notasGeral: [], notasGoleiro: [], notasLinha: []
+                 });
         });
 
         const matchesPlayed = periodMatches.filter(p => p.jogoAconteceu);
@@ -540,42 +608,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 else j.notasLinha.push(p.notaPartida);
             }
         });
+
         const players = Array.from(periodPlayersMap.values()).filter(p => p.jogos > 0);
         
         players.forEach(j => {
             j.notaGeral = j.notasGeral.length > 0 ? j.notasGeral.reduce((a, b) => a + b, 0) / j.notasGeral.length : 0;
-            j.notaGeralGoleiro = j.notasGoleiro.length > 0 ? j.notasGoleiro.reduce((a, b) => a + b, 0) / j.notasGoleiro.length : 0;
-            j.notaGeralLinha = j.notasLinha.length > 0 ? j.notasLinha.reduce((a, b) => a + b, 0) / j.notasLinha.length : 0;
             j.jogosGoleiro = j.notasGoleiro.length;
             j.mediaGolsSofridos = j.jogosGoleiro > 0 ? (j.golsTomados / j.jogosGoleiro) : 0;
-            
-            // --- ALTERAÇÃO APLICADA AQUI ---
             j.aproveitamento = j.jogos >= 3 ? ((j.vitorias + j.empates * 0.5) / j.jogos) * 100 : 0;
             
             j.conquistas = calcularConquistas(j, j.partidas, matchesPlayed);
-            const bonusConquistas = calcularBonusMVP(j.conquistas);
-            
-            j._pontosBrutos = (j.gols * 2) + j.assistencias + j.vitorias - (j.golsContra * 0.5) + (j.notaGeral * 10) + bonusConquistas;
-            j.partidas.sort((a,b) => new Date(a.dataJogo.split('/').reverse().join('-')) - new Date(b.dataJogo.split('/').reverse().join('-')));
-        });
-        
-        const maxPontosBrutos = Math.max(...players.map(j => j._pontosBrutos || 0));
-        players.forEach(j => {
-            let pontosRecentes = 0, pesoTotal = 0;
-            j.partidas.slice(-5).forEach((p, idx) => {
-                const peso = (idx + 1);
-                const pb = p.gols*2 + p.assistencias + (p.vitoria === 1 ? 1 : p.vitoria === 0.5 ? 0.5 : 0) - p.golsContra*0.5 + p.notaPartida*10;
-                pontosRecentes += pb * peso;
-                pesoTotal += peso;
-            });
-            const mediaRecente = pesoTotal > 0 ? pontosRecentes / pesoTotal : j._pontosBrutos;
-            
-            const combinadoBase = (j._pontosBrutos * 0.7) + (mediaRecente * 0.3);
-            const combinado = j.jogosGoleiro > 0 ? combinadoBase * 1.2 : combinadoBase;
-            
-            j.pontosMVP = maxPontosBrutos > 0 ? Math.round((combinado / maxPontosBrutos) * 100) : 0;
 
-            j.nivel = j.pontosMVP >= 90 ? 'Lenda' : j.pontosMVP >= 70 ? 'Craque' : j.pontosMVP >= 50 ? 'Diferenciado' : j.pontosMVP >= 20 ? 'Esforçado' : 'Iniciante';
+            if (j.notaGeral >= 9.0) {
+                j.nivel = 'Lenda';
+            } else if (j.notaGeral >= 8.0) {
+                j.nivel = 'Craque';
+            } else if (j.notaGeral >= 7.0) {
+                j.nivel = 'Diferenciado';
+            } else if (j.notaGeral >= 6.0) {
+                j.nivel = 'Esforçado';
+            } else {
+                j.nivel = 'Iniciante';
+            }
+            
+            j.partidas.sort((a,b) => new Date(a.dataJogo.split('/').reverse().join('-')) - new Date(b.dataJogo.split('/').reverse().join('-')));
         });
 
         return players;
@@ -601,7 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
             top5.forEach((p, index) => {
                 const value = formatValue(p[key], key);
                 const photoUrl = playerPhotos[p.nome] || `https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random`;
-                const playerLabel = key === 'pontosMVP' ? `<span class="block text-xs font-medium text-level-${p.nivel.toLowerCase()}">${p.nivel}</span>` : '';
+                const playerLabel = key === 'notaGeral' ? `<span class="block text-xs font-medium text-level-${p.nivel.toLowerCase()}">${p.nivel}</span>` : '';
                 html += `
                     <div class="player-card flex items-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-md" data-player-name="${p.nomeOriginal}">
                         <span class="font-bold w-6">${index + 1}.</span>
@@ -621,33 +677,42 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function renderDestaqueDoMes(players, monthLabel) {
          const container = document.getElementById('destaque-mes-container');
-        const bestPlayer = [...players].filter(p => p.jogos > 0).sort((a,b) => b.notaGeral - a.notaGeral)[0];
-        if(bestPlayer) {
-            const photoUrl = playerPhotos[bestPlayer.nome] || `https://ui-avatars.com/api/?name=${bestPlayer.nome.replace(' ', '+')}&background=random`;
-            container.innerHTML = `
-            <div class="card p-5 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg">
-                <h3 class="text-xl font-bold mb-3"><i class="fas fa-crown mr-2 text-yellow-300"></i>Destaque de ${monthLabel}</h3>
-                <div class="flex items-center space-x-4 cursor-pointer" data-player-name="${bestPlayer.nomeOriginal}">
-                    <img src="${photoUrl}" class="w-20 h-20 rounded-full object-cover border-4 border-yellow-300" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${bestPlayer.nome.replace(' ', '+')}&background=random';">
-                    <div>
-                        <p class="text-2xl font-bold">${bestPlayer.nomeOriginal}</p>
-                        <p class="text-lg">Nota Média: <span class="font-bold text-yellow-300">${bestPlayer.notaGeral.toFixed(1)}</span></p>
-                    </div>
-                </div>
-            </div>`;
-        } else {
+         const bestPlayer = [...players].filter(p => p.jogos > 0).sort((a,b) => b.notaGeral - a.notaGeral)[0];
+         if(bestPlayer) {
+             const photoUrl = playerPhotos[bestPlayer.nome] || `https://ui-avatars.com/api/?name=${bestPlayer.nome.replace(' ', '+')}&background=random`;
              container.innerHTML = `
-             <div class="card p-5 rounded-lg">
-                 <h3 class="text-xl font-bold mb-2">Destaque de ${monthLabel}</h3>
-                 <p class="text-gray-500">Nenhum jogador com partidas registradas neste mês.</p>
+             <div class="card p-5 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg">
+                 <h3 class="text-xl font-bold mb-3"><i class="fas fa-crown mr-2 text-yellow-300"></i>Destaque de ${monthLabel}</h3>
+                 <div class="flex items-center space-x-4 cursor-pointer" data-player-name="${bestPlayer.nomeOriginal}">
+                     <img src="${photoUrl}" class="w-20 h-20 rounded-full object-cover border-4 border-yellow-300" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${bestPlayer.nome.replace(' ', '+')}&background=random';">
+                     <div>
+                         <p class="text-2xl font-bold">${bestPlayer.nomeOriginal}</p>
+                         <p class="text-lg">Nota Média: <span class="font-bold text-yellow-300">${bestPlayer.notaGeral.toFixed(1)}</span></p>
+                     </div>
+                 </div>
              </div>`;
-        }
+         } else {
+              container.innerHTML = `
+                 <div class="card p-5 rounded-lg">
+                     <h3 class="text-xl font-bold mb-2">Destaque de ${monthLabel}</h3>
+                     <p class="text-gray-500">Nenhum jogador com partidas registradas neste mês.</p>
+                 </div>`;
+         }
     }
 
     function renderRankings(players) {
         const container = document.getElementById('rankings-grid');
         container.innerHTML = '';
-        const cards = [{ title: 'Pontos MVP', key: 'pontosMVP' },{ title: 'Gols', key: 'gols' },{ title: 'Assistências', key: 'assistencias' },{ title: 'Vitórias', key: 'vitorias' },{ title: 'Jogos', key: 'jogos' },{ title: 'Ranking Goleiros (Média Gols Sofridos)', key: 'mediaGolsSofridos', higherIsBetter: false },{ title: 'Aproveitamento', key: 'aproveitamento', unit: '%' },{ title: 'Nota Geral', key: 'notaGeral' }];
+        const cards = [
+            { title: 'Nota Geral', key: 'notaGeral' },
+            { title: 'SELEÇÃO DA SEMANA', key: 'timeDaSemanaCount' },
+            { title: 'Gols', key: 'gols' },
+            { title: 'Assistências', key: 'assistencias' },
+            { title: 'Vitórias', key: 'vitorias' },
+            { title: 'Jogos', key: 'jogos' },
+            { title: 'Ranking Goleiros (Média Gols Sofridos)', key: 'mediaGolsSofridos', higherIsBetter: false },
+            { title: 'Aproveitamento', key: 'aproveitamento', unit: '%' },
+        ];
         cards.forEach(card => {
             const data = (card.key === 'mediaGolsSofridos') ? players.filter(p => p.jogosGoleiro > 0) : players;
             container.innerHTML += createRankingCard(card.title, data, card.key, card.unit, card.higherIsBetter);
@@ -668,8 +733,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (achievementsByType[rarity]) badgesHtml += `<span class="px-2 py-1 text-xs font-semibold rounded-full border-2 rarity-${rarity}">${achievementsByType[rarity]} ${rarity.charAt(0).toUpperCase() + rarity.slice(1)}</span>`;
             });
             badgesHtml += '</div>';
-            container.innerHTML += `<div class="card p-4 rounded-lg flex flex-col items-center text-center cursor-pointer hover:shadow-lg transition-shadow" data-player-name="${p.nomeOriginal}"><img src="${photoUrl}" class="w-24 h-24 rounded-full 
-object-cover mb-4 border-4 border-gray-300 dark:border-gray-600" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random';"><h4 class="font-bold text-lg">${p.nomeOriginal}</h4><p class="text-sm text-gray-500 dark:text-gray-400">${p.conquistas.length} Conquistas</p>${badgesHtml}</div>`;
+            container.innerHTML += `<div class="card p-4 rounded-lg flex flex-col items-center text-center cursor-pointer hover:shadow-lg transition-shadow" data-player-name="${p.nomeOriginal}"><img src="${photoUrl}" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-gray-300 dark:border-gray-600" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random';"><h4 class="font-bold text-lg">${p.nomeOriginal}</h4><p class="text-sm text-gray-500 dark:text-gray-400">${p.conquistas.length} Conquistas</p>${badgesHtml}</div>`;
         });
     }
 
@@ -687,18 +751,15 @@ object-cover mb-4 border-4 border-gray-300 dark:border-gray-600" onerror="this.o
             
             let placar;
             if(jogoRealizado) {
-                const scoreA = partidasDoDia.filter(p => p.time.toUpperCase() === 'BOCA').reduce((sum, p) => sum + 
-p.gols, 0);
+                const scoreA = partidasDoDia.filter(p => p.time.toUpperCase() === 'BOCA').reduce((sum, p) => sum + p.gols, 0);
                 const scoreB = partidasDoDia.filter(p => p.time.toUpperCase() === 'RIVER').reduce((sum, p) => sum + p.gols, 0);
                 placar = `
                     <div class="flex items-center space-x-2 text-lg md:text-xl font-bold">
-                        <span class="hidden 
-sm:inline text-blue-500">BOCA</span>
+                        <span class="hidden sm:inline text-blue-500">BOCA</span>
                         <span class="text-blue-500">${scoreA}</span>
                         <span>x</span>
                         <span class="text-red-500">${scoreB}</span>
-                        <span 
-class="hidden sm:inline text-red-500">RIVER</span>
+                        <span class="hidden sm:inline text-red-500">RIVER</span>
                     </div>
                 `;
             } else {
@@ -709,12 +770,136 @@ class="hidden sm:inline text-red-500">RIVER</span>
                 <div class="card p-4 rounded-lg match-card cursor-pointer hover:shadow-lg transition-shadow" data-gamedate="${date}">
                     <div class="flex justify-between items-center">
                         <h3 class="font-bold text-lg md:text-xl">Partida de ${date}</h3>
-          
                         ${placar}
                     </div>
                 </div>
             `;
         });
+    }
+
+    function getLevelProgress(notaGeral) {
+        const levels = {
+            'Iniciante': { min: 0, max: 6.0, next: 'Esforçado' },
+            'Esforçado': { min: 6.0, max: 7.0, next: 'Diferenciado' },
+            'Diferenciado': { min: 7.0, max: 8.0, next: 'Craque' },
+            'Craque': { min: 8.0, max: 9.0, next: 'Lenda' },
+            'Lenda': { min: 9.0, max: 10.0, next: null }
+        };
+
+        let currentLevelName = 'Iniciante';
+        if (notaGeral >= 9.0) currentLevelName = 'Lenda';
+        else if (notaGeral >= 8.0) currentLevelName = 'Craque';
+        else if (notaGeral >= 7.0) currentLevelName = 'Diferenciado';
+        else if (notaGeral >= 6.0) currentLevelName = 'Esforçado';
+
+        const currentLevel = levels[currentLevelName];
+        
+        if (!currentLevel.next) {
+            return {
+                percentage: 100,
+                text: `Nível Máximo!`
+            };
+        }
+
+        const range = currentLevel.max - currentLevel.min;
+        const progress = notaGeral - currentLevel.min;
+        const percentage = Math.round((progress / range) * 100);
+
+        return {
+            percentage: Math.max(0, Math.min(100, percentage)), // Clamp between 0 and 100
+            text: `${notaGeral.toFixed(1)} / ${currentLevel.max.toFixed(1)} para ${currentLevel.next}`
+        };
+    }
+
+
+    function renderTeamOfTheRound(partidasDoDia) {
+        if (!partidasDoDia || partidasDoDia.length === 0) return '';
+        const jogoRealizado = partidasDoDia.some(p => p.jogoAconteceu);
+        if (!jogoRealizado) return ''; // Só mostra se o jogo aconteceu
+
+        const getBestPlayers = (pos, count) => {
+            return partidasDoDia
+                .filter(p => p.posicao && p.posicao.toLowerCase() === pos.toLowerCase())
+                .sort((a, b) => b.notaPartida - a.notaPartida)
+                .slice(0, count);
+        };
+
+        const team = {
+            ata: getBestPlayers('ATA', 2),
+            mei: getBestPlayers('MEI', 2),
+            ala: getBestPlayers('ALA', 2),
+            zag: getBestPlayers('ZAG', 1),
+            gol: getBestPlayers('GOL', 1),
+        };
+        
+        const melhorDaPartida = [...partidasDoDia].sort((a,b) => b.notaPartida - a.notaPartida)[0];
+
+        const renderPlayer = (player) => {
+            if (!player) return '<div class="w-24 h-28"></div>'; // Placeholder for empty slot
+
+            const photoUrl = playerPhotos[normalizaNome(player.nomeRaw)] || `https://ui-avatars.com/api/?name=${normalizaNome(player.nomeRaw).replace(' ', '+')}&background=random`;
+            
+            const isMvp = melhorDaPartida && melhorDaPartida.nomeRaw === player.nomeRaw;
+
+            return `
+                <div class="relative flex flex-col items-center text-center text-white w-24 mx-1">
+                    <div class="relative">
+                        <img src="${photoUrl}" class="w-16 h-16 rounded-full object-cover border-2 border-gray-400" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${normalizaNome(player.nomeRaw).replace(' ', '+')}&background=random';">
+                        ${isMvp ? '<i class="fas fa-star text-yellow-300 absolute -top-1 -right-1 text-xl transform rotate-12"></i>' : ''}
+                    </div>
+                    <p class="text-xs font-semibold mt-1 truncate w-full">${player.nomeRaw.split(' ')[0]}</p>
+                    <p class="text-sm font-bold">${player.notaPartida.toFixed(1)}</p>
+                </div>
+            `;
+        };
+
+        // Garante que existam placeholders se uma posição não for preenchida
+        while(team.ata.length < 2) team.ata.push(null);
+        while(team.mei.length < 2) team.mei.push(null);
+        while(team.ala.length < 2) team.ala.push(null);
+        while(team.zag.length < 1) team.zag.push(null);
+        while(team.gol.length < 1) team.gol.push(null);
+
+        return `
+            <div class="mt-8">
+                <h3 class="font-bold text-xl text-center mb-4">Time Destaque da Partida</h3>
+                <div class="bg-blue-900/50 dark:bg-gray-900 p-4 rounded-lg relative overflow-hidden" 
+                     style="background: linear-gradient(to bottom, #061e3c, #0d3b66, #061e3c); border: 2px solid #ffffff30;">
+                    <!-- Campo com linhas -->
+                    <div class="absolute inset-0 z-0">
+                        <div class="absolute top-1/2 left-4 right-4 h-px bg-white/20"></div>
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-2 border-white/20 rounded-full"></div>
+                        <div class="absolute top-0 left-4 right-4 h-48 border-x-2 border-white/20">
+                            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-16 border-2 border-white/20 rounded-b-2xl border-t-0"></div>
+                        </div>
+                         <div class="absolute bottom-0 left-4 right-4 h-48 border-x-2 border-white/20">
+                             <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-2/3 h-16 border-2 border-white/20 rounded-t-2xl border-b-0"></div>
+                         </div>
+                    </div>
+
+                    <div class="relative z-10 flex flex-col justify-between h-full space-y-4 py-4 min-h-[500px]">
+                        <!-- Atacantes -->
+                        <div class="flex justify-center w-full">
+                            ${team.ata.map(renderPlayer).join('')}
+                        </div>
+                        <!-- Meias -->
+                        <div class="flex justify-center w-full">
+                            ${team.mei.map(renderPlayer).join('')}
+                        </div>
+                        <!-- Defensores -->
+                        <div class="flex justify-center w-full items-center">
+                            ${renderPlayer(team.ala[0])}
+                            ${renderPlayer(team.zag[0])}
+                            ${renderPlayer(team.ala[1])}
+                        </div>
+                        <!-- Goleiro -->
+                        <div class="flex justify-center w-full">
+                             ${renderPlayer(team.gol[0])}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
     }
     
     function showPlayerModal(playerName) {
@@ -740,68 +925,69 @@ class="hidden sm:inline text-red-500">RIVER</span>
                 conquistasHtml += `<div class="mb-4"><h5 class="font-bold text-md capitalize mb-2 rarity-${rarity}">${rarity}</h5><div class="flex flex-wrap gap-2">`;
                 groupedConquistas[rarity].forEach(c => conquistasHtml += `<div class="card p-2 rounded-md flex items-center" title="${c.desc}"><i class="${c.icon} mr-2"></i><span class="text-sm">${c.nome}</span></div>`);
                 conquistasHtml += `</div></div>`;
-          
             }
         });
+
         const ultimasPartidasHtml = player.partidas.filter(p => p.jogoAconteceu).slice(-5).reverse().map(p => {
             let resultadoHtml = '';
             if (p.vitoria === 1) {
                 resultadoHtml = '<span class="font-bold text-green-500 w-4 text-center" title="Vitória">V</span>';
             } else if (p.vitoria === 0.5) {
-                resultadoHtml = '<span class="font-bold text-gray-400 
-w-4 text-center" title="Empate">E</span>';
+                resultadoHtml = '<span class="font-bold text-gray-400 w-4 text-center" title="Empate">E</span>';
             } else {
                 resultadoHtml = '<span class="font-bold text-red-500 w-4 text-center" title="Derrota">D</span>';
             }
 
             return `<div class="card p-3 rounded-md flex justify-between items-center text-sm">
                         <div>
-     
                             <span class="font-semibold">${p.dataJogo}</span>
                             <span class="ml-2 text-gray-500">${p.isGoleiro ? '(GOL)' : ''}</span>
                         </div>
-                  
                         <div class="text-right flex items-center space-x-3 sm:space-x-4">
                             <span>G: ${p.gols}, A: ${p.assistencias}</span>
                             ${resultadoHtml}
-                            <span class="font-bold 
-text-blue-500 w-8 inline-block text-right">${p.notaPartida.toFixed(1)}</span>
+                            <span class="font-bold text-blue-500 w-8 inline-block text-right">${p.notaPartida.toFixed(1)}</span>
                         </div>
                     </div>`;
         }).join('') || '<p>Nenhuma partida registrada.</p>';
+
+        const levelProgress = getLevelProgress(player.notaGeral);
 
         modalContentEl.innerHTML = `
             <div class="flex flex-col md:flex-row items-center md:items-start mb-6">
                 <img src="${photoUrl}" class="w-32 h-32 rounded-full object-cover border-4 border-blue-500 mb-4 md:mb-0 md:mr-6" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${player.nome.replace(' ', '+')}&background=random';">
                 <div class="flex-grow text-center md:text-left">
                     <h2 class="text-3xl font-bold">${player.nomeOriginal}</h2>
-     
                     <span class="badge-level badge-level-${player.nivel.toLowerCase()}">${player.nivel}</span>
-                    <div class="mt-4"><p class="text-sm font-medium">Pontos MVP (Geral)</p><div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mt-1"><div class="xp-bar-inner bg-gradient-to-r from-blue-400 to-blue-600 h-4 rounded-full" style="width: ${player.pontosMVP}%;"></div></div><p class="text-right text-sm font-bold mt-1">${player.pontosMVP} / 100</p></div>
+                    <div class="mt-4">
+                        <p class="text-sm font-medium">Progresso para próximo Nível</p>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mt-1">
+                            <div class="xp-bar-inner bg-gradient-to-r from-blue-400 to-blue-600 h-4 rounded-full" style="width: ${levelProgress.percentage}%;"></div>
+                        </div>
+                        <p class="text-right text-sm font-bold mt-1">${levelProgress.text}</p>
+                    </div>
                 </div>
             </div>
-          
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center mb-6">
+                    <div class="grid grid-cols-2 ${player.timeDaSemanaCount > 0 ? 'sm:grid-cols-5' : 'sm:grid-cols-4'} gap-4 text-center mb-6">
                         <div><p class="text-2xl font-bold">${player.jogos}</p><p class="text-sm text-gray-500">Jogos</p></div>
-                        
                         <div><p class="text-2xl font-bold">${player.gols}</p><p class="text-sm text-gray-500">Gols</p></div>
                         <div><p class="text-2xl font-bold">${player.assistencias}</p><p class="text-sm text-gray-500">Assistências</p></div>
                         <div><p class="text-2xl font-bold">${player.vitorias}</p><p class="text-sm text-gray-500">Vitórias</p></div>
+                        ${player.timeDaSemanaCount > 0 ? `<div><p class="text-2xl font-bold">${player.timeDaSemanaCount}</p><p class="text-sm text-gray-500">Seleção Sem.</p></div>` : ''}
                     </div>
-                    
                     <h4 class="font-bold text-lg mb-3">Últimas 5 Partidas Jogadas <span class="trend-arrow ml-2">${trendIcon}</span></h4>
                     <div class="space-y-2">${ultimasPartidasHtml}</div>
                 </div>
                 <div>
                     <h4 class="font-bold text-lg mb-3">Evolução da Nota</h4>
-             
                     <div class="h-60 card p-2 rounded-lg"><canvas id="player-evolution-chart"></canvas></div>
                 </div>
             </div>
             <div class="mt-6"><h4 class="font-bold text-lg mb-3">Conquistas (Geral)</h4><div class="max-h-60 overflow-y-auto pr-2">${conquistasHtml || '<p>Nenhuma conquista ainda.</p>'}</div></div>
             <div class="mt-6 text-center"><button id="export-player-history" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">Exportar Histórico</button></div>`;
+        
         mainModalEl.classList.add('show');
         document.body.style.overflow = 'hidden';
 
@@ -809,6 +995,7 @@ text-blue-500 w-8 inline-block text-right">${p.notaPartida.toFixed(1)}</span>
             const ctx = document.getElementById('player-evolution-chart')?.getContext('2d');
             if (ctx) createPlayerEvolutionChart(ctx, player);
         }, 100);
+
         document.getElementById('export-player-history').addEventListener('click', () => exportPlayerHistoryToCSV(player));
     }
 
@@ -816,11 +1003,12 @@ text-blue-500 w-8 inline-block text-right">${p.notaPartida.toFixed(1)}</span>
         const partidasDoDia = allMatchesData.filter(p => p.dataJogo === date);
         const jogoRealizado = partidasDoDia.some(p => p.jogoAconteceu);
 
-        modalContainer.className = 'card rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto relative animate-scale-in';
+        modalContainer.className = 'card rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto relative animate-scale-in';
 
         let modalHtml = '';
         const timeA = partidasDoDia.filter(p => p.time.toUpperCase() === 'BOCA');
         const timeB = partidasDoDia.filter(p => p.time.toUpperCase() === 'RIVER');
+        
         const renderTeamTable = (team, showStats) => `
             <table class="w-full text-left">
                 <thead><tr class="border-b dark:border-gray-700">
@@ -835,6 +1023,7 @@ text-blue-500 w-8 inline-block text-right">${p.notaPartida.toFixed(1)}</span>
                 `).join('')}</tbody>
             </table>
         `;
+
         if (jogoRealizado) {
             const scoreA = timeA.reduce((sum, p) => sum + p.gols, 0);
             const scoreB = timeB.reduce((sum, p) => sum + p.gols, 0);
@@ -844,15 +1033,15 @@ text-blue-500 w-8 inline-block text-right">${p.notaPartida.toFixed(1)}</span>
                     <h2 class="text-3xl font-bold">BOCA ${scoreA} x ${scoreB} RIVER</h2>
                     <p class="text-amber-500 font-semibold mt-1"><i class="fas fa-star mr-1"></i> Melhor da Partida: ${melhorJogador.nomeRaw} (${melhorJogador.notaPartida.toFixed(1)})</p>
                 </div>
-       
-                <div class="mb-4">
-                    <h3 class="font-bold text-xl text-center p-2 bg-blue-600 text-white rounded-t-md">BOCA</h3>
-                    ${renderTeamTable(timeA, true)}
-                </div>
-                <div>
-          
-                    <h3 class="font-bold text-xl text-center p-2 bg-red-600 text-white rounded-t-md">RIVER</h3>
-                    ${renderTeamTable(timeB, true)}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-bold text-xl text-center p-2 bg-blue-600 text-white rounded-t-md">BOCA</h3>
+                        ${renderTeamTable(timeA, true)}
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl text-center p-2 bg-red-600 text-white rounded-t-md">RIVER</h3>
+                        ${renderTeamTable(timeB, true)}
+                    </div>
                 </div>
             `;
         } else {
@@ -861,17 +1050,21 @@ text-blue-500 w-8 inline-block text-right">${p.notaPartida.toFixed(1)}</span>
                     <h2 class="text-3xl font-bold">Jogo Agendado</h2>
                     <p class="text-gray-500">${date}</p>
                 </div>
-     
-                <div class="mb-4">
-                    <h3 class="font-bold text-xl text-center p-2 bg-blue-600 text-white rounded-t-md">BOCA (Escalação)</h3>
-                    ${renderTeamTable(timeA, false)}
-                </div>
-                <div>
-       
-                    <h3 class="font-bold text-xl text-center p-2 bg-red-600 text-white rounded-t-md">RIVER (Escalação)</h3>
-                    ${renderTeamTable(timeB, false)}
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-bold text-xl text-center p-2 bg-blue-600 text-white rounded-t-md">BOCA (Escalação)</h3>
+                        ${renderTeamTable(timeA, false)}
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl text-center p-2 bg-red-600 text-white rounded-t-md">RIVER (Escalação)</h3>
+                        ${renderTeamTable(timeB, false)}
+                    </div>
                 </div>
             `;
+        }
+
+        if (jogoRealizado) {
+            modalHtml += renderTeamOfTheRound(partidasDoDia);
         }
 
         modalContentEl.innerHTML = modalHtml;
@@ -892,7 +1085,6 @@ text-blue-500 w-8 inline-block text-right">${p.notaPartida.toFixed(1)}</span>
                 labels,
                 datasets: [{ label: 'Nota por Partida', data: data, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.2 }]
             },
- 
             options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false, max: 10 } } }
         });
     }
@@ -909,27 +1101,29 @@ text-blue-500 w-8 inline-block text-right">${p.notaPartida.toFixed(1)}</span>
             responsive: true, maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: { display: true, color: document.documentElement.classList.contains('dark') ?
-'#d1d5db' : '#1f2937', font: { size: 16 } }
+                title: { display: true, color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#1f2937', font: { size: 16 } }
             },
             scales: {
-                x: { ticks: { color: document.documentElement.classList.contains('dark') ?
-'#d1d5db' : '#1f2937' }, grid: { color: 'rgba(128,128,128,0.2)' } },
-                y: { ticks: { color: document.documentElement.classList.contains('dark') ?
-'#d1d5db' : '#1f2937' }, grid: { color: 'rgba(128,128,128,0.2)' }, beginAtZero: true }
+                x: { ticks: { color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#1f2937' }, grid: { color: 'rgba(128,128,128,0.2)' } },
+                y: { ticks: { color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#1f2937' }, grid: { color: 'rgba(128,128,128,0.2)' }, beginAtZero: true }
             },
             animation: { duration: 1000, easing: 'easeOutQuart' }
         };
         const top10Goleadores = [...players].sort((a,b) => b.gols - a.gols).slice(0, 10);
         createChart(document.getElementById('topGoleadoresChart').getContext('2d'), 'bar', { labels: top10Goleadores.map(p => p.nomeOriginal), datasets: [{ label: 'Gols', data: top10Goleadores.map(p => p.gols), backgroundColor: '#3b82f6' }] }, { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Top 10 Goleadores' } } });
+        
         const top10Assist = [...players].sort((a,b) => b.assistencias - a.assistencias).slice(0, 10);
         createChart(document.getElementById('topAssistidoresChart').getContext('2d'), 'bar', { labels: top10Assist.map(p => p.nomeOriginal), datasets: [{ label: 'Assistências', data: top10Assist.map(p => p.assistencias), backgroundColor: '#10b981' }] }, { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Top 10 Assistidores' } } });
+        
         const participacoes = [...players].sort((a,b) => b.jogos - a.jogos).slice(0, 10);
         createChart(document.getElementById('participacoesChart').getContext('2d'), 'bar', { labels: participacoes.map(p => p.nomeOriginal), datasets: [{ label: 'Jogos', data: participacoes.map(p => p.jogos), backgroundColor: '#8b5cf6' }] }, { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Top 10 Participações' } } });
+        
         const topAproveitamento = [...players].filter(p => p.jogos >= 3).sort((a,b) => b.aproveitamento - a.aproveitamento).slice(0, 10);
         createChart(document.getElementById('aproveitamentoChart').getContext('2d'), 'bar', { labels: topAproveitamento.map(p => p.nomeOriginal), datasets: [{ label: 'Aproveitamento (%)', data: topAproveitamento.map(p => p.aproveitamento), backgroundColor: '#f59e0b' }] }, { ...commonOptions, scales: {...commonOptions.scales, y: {...commonOptions.scales.y, max: 100}}, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Top 10 Aproveitamento (min. 3 jogos)' } } });
+        
         const topContribuicao = [...players].map(p => ({...p, contribuicao: p.gols + p.assistencias})).sort((a,b) => b.contribuicao - a.contribuicao).slice(0, 10);
         createChart(document.getElementById('contribuicaoChart').getContext('2d'), 'bar', { labels: topContribuicao.map(p => p.nomeOriginal), datasets: [{ label: 'Gols + Assistências', data: topContribuicao.map(p => p.contribuicao), backgroundColor: '#ef4444' }] }, { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Top 10 Contribuição (Gols + Assist.)' } } });
+        
         const monthlyGoals = allMatchesData.filter(p => p.jogoAconteceu).reduce((acc, p) => {
             const monthYear = p.dataJogo.slice(3);
             acc[monthYear] = (acc[monthYear] || 0) + p.gols;
@@ -938,13 +1132,13 @@ text-blue-500 w-8 inline-block text-right">${p.notaPartida.toFixed(1)}</span>
         const sortedLabels = Object.keys(monthlyGoals).sort((a, b) => { const [ma, ya] = a.split('/'); const [mb, yb] = b.split('/'); return new Date(ya, ma - 1) - new Date(yb, mb - 1); });
         const evolutionData = sortedLabels.map(label => monthlyGoals[label]);
         createChart(document.getElementById('evolucaoGolsChart').getContext('2d'), 'line', { labels: sortedLabels, datasets: [{ label: 'Gols por Mês', data: evolutionData, borderColor: '#ec4899', tension: 0.1, fill: false }] }, { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Evolução de Gols por Mês' } } });
+        
         const playersComEvolucao = players.map(p => {
             const partidasJogadas = p.partidas.filter(match => match.jogoAconteceu);
             if (partidasJogadas.length < 3) return {...p, evolucao: -Infinity };
             const ultimas3Notas = partidasJogadas.slice(-3).map(match => match.notaPartida);
             const evolucao = ultimas3Notas[2] - ultimas3Notas[0]; 
             return {...p, evolucao };
-        
         }).filter(p => p.evolucao > -Infinity).sort((a,b) => b.evolucao - a.evolucao).slice(0, 10);
         createChart(document.getElementById('topEvolucoesChart').getContext('2d'), 'bar', { labels: playersComEvolucao.map(p => p.nomeOriginal), datasets: [{ label: 'Evolução de Nota', data: playersComEvolucao.map(p => p.evolucao.toFixed(2)), backgroundColor: '#6366f1' }] }, { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'Top Evoluções (Últimos 3 Jogos)' } } });
     }
@@ -977,9 +1171,9 @@ text-blue-500 w-8 inline-block text-right">${p.notaPartida.toFixed(1)}</span>
         const p2 = players.find(p => p.nomeOriginal === player2Name);
 
         const stats = [
-            { label: 'Pontos MVP', key: 'pontosMVP', higherIsBetter: true }, { label: 'Nível', key: 'nivel' }, { label: 'Nota Geral', key: 'notaGeral', higherIsBetter: true, fixed: 1 }, { label: 'Jogos', key: 'jogos', higherIsBetter: true }, { label: 'Aproveitamento', key: 'aproveitamento', higherIsBetter: true, unit: '%' }, { label: 'Vitórias', key: 'vitorias', higherIsBetter: true }, { label: 'Empates', key: 'empates' }, { label: 'Derrotas', key: 'derrotas', higherIsBetter: false }, { label: 'Gols', key: 'gols', higherIsBetter: true }, { label: 'Assistências', 
-key: 'assistencias', higherIsBetter: true }, { label: 'Gols Contra', key: 'golsContra', higherIsBetter: false },
+            { label: 'Nível', key: 'nivel' }, { label: 'Nota Geral', key: 'notaGeral', higherIsBetter: true, fixed: 1 }, { label: 'Jogos', key: 'jogos', higherIsBetter: true }, { label: 'Aproveitamento', key: 'aproveitamento', higherIsBetter: true, unit: '%' }, { label: 'Vitórias', key: 'vitorias', higherIsBetter: true }, { label: 'Empates', key: 'empates' }, { label: 'Derrotas', key: 'derrotas', higherIsBetter: false }, { label: 'Gols', key: 'gols', higherIsBetter: true }, { label: 'Assistências', key: 'assistencias', higherIsBetter: true }, { label: 'Gols Contra', key: 'golsContra', higherIsBetter: false },
         ];
+        
         let tableHtml = '<table class="w-full">';
         stats.forEach(stat => {
             const val1 = stat.fixed ? p1[stat.key].toFixed(stat.fixed) : p1[stat.key];
@@ -987,27 +1181,22 @@ key: 'assistencias', higherIsBetter: true }, { label: 'Gols Contra', key: 'golsC
             
             let p1Class = '', p2Class = '';
             if(typeof p1[stat.key] === 'number' && typeof p2[stat.key] === 'number') {
-    
                 if (stat.higherIsBetter !== undefined) {
-                     if (stat.higherIsBetter) {
-                          if(p1[stat.key] > p2[stat.key]) p1Class = 'font-bold text-green-500';
-                          if(p2[stat.key] > p1[stat.key]) 
-p2Class = 'font-bold text-green-500';
-                     } else {
-                          if(p1[stat.key] < p2[stat.key]) p1Class = 'font-bold text-green-500';
-                          if(p2[stat.key] < p1[stat.key]) p2Class = 'font-bold text-green-500';
-          
-                    }
+                      if (stat.higherIsBetter) {
+                           if(p1[stat.key] > p2[stat.key]) p1Class = 'font-bold text-green-500';
+                           if(p2[stat.key] > p1[stat.key]) p2Class = 'font-bold text-green-500';
+                      } else {
+                           if(p1[stat.key] < p2[stat.key]) p1Class = 'font-bold text-green-500';
+                           if(p2[stat.key] < p1[stat.key]) p2Class = 'font-bold text-green-500';
+                      }
                 }
             }
 
             tableHtml += `
                 <tr class="border-b dark:border-gray-700">
-                    <td class="p-2 text-left ${p1Class}">${val1}${stat.unit ||
-''}</td>
+                    <td class="p-2 text-left ${p1Class}">${val1}${stat.unit || ''}</td>
                     <th class="p-2 font-normal text-gray-500 dark:text-gray-400">${stat.label}</th>
-                    <td class="p-2 text-right ${p2Class}">${val2}${stat.unit ||
-''}</td>
+                    <td class="p-2 text-right ${p2Class}">${val2}${stat.unit || ''}</td>
                 </tr>
             `;
         });
@@ -1028,6 +1217,7 @@ p2Class = 'font-bold text-green-500';
             const monthName = monthNames[parseInt(month, 10) - 1];
             filter.innerHTML += `<option value="${monthYear}">${monthName} de ${year}</option>`;
         });
+        
         filter.addEventListener('change', updateFilteredView);
         document.getElementById('player-search').addEventListener('input', updateFilteredView);
     }
@@ -1038,7 +1228,7 @@ p2Class = 'font-bold text-green-500';
 
         let playersForPeriod;
         let monthLabel;
-
+        
         if (selectedMonth === 'Geral') {
             playersForPeriod = allPlayersData;
             const date = new Date();
@@ -1074,9 +1264,9 @@ p2Class = 'font-bold text-green-500';
         const container = document.getElementById('curiosidades-container');
         container.innerHTML = ''; // Limpa curiosidades antigas
         const facts = generateFunFacts(allPlayersData, allMatchesData);
+
         if(facts.length === 0){
-            container.innerHTML = `<p class="text-gray-500 col-span-full text-center">Não foi possível gerar curiosidades.
-Tente novamente mais tarde.</p>`;
+            container.innerHTML = `<p class="text-gray-500 col-span-full text-center">Não foi possível gerar curiosidades. Tente novamente mais tarde.</p>`;
             return;
         }
 
@@ -1085,7 +1275,6 @@ Tente novamente mais tarde.</p>`;
                 <div class="card p-4 rounded-lg flex flex-col items-center justify-center text-center fade-in">
                     <div class="text-3xl mb-3">${fact.icon}</div>
                     <p class="text-base">${fact.text}</p>
-  
                 </div>
             `;
             container.innerHTML += card;
@@ -1101,6 +1290,7 @@ Tente novamente mais tarde.</p>`;
 
     function generateFunFacts(players, matches) {
         let selectedFacts = [];
+
         // 1. FATO DE PRIORIDADE: Feitos de Goleiros
         const parseDateString = (ds) => {
             if (!ds) return null;
@@ -1112,11 +1302,14 @@ Tente novamente mais tarde.</p>`;
         today.setHours(0, 0, 0, 0);
         const twoWeeksAgo = new Date(today);
         twoWeeksAgo.setDate(today.getDate() - 14);
+
         const recentMatches = matches.filter(m => {
             const matchDate = parseDateString(m.dataJogo);
             return matchDate && m.jogoAconteceu && matchDate >= twoWeeksAgo && matchDate <= today;
         });
+
         const goalkeeperFeats = recentMatches.filter(m => m.isGoleiro && (m.gols > 0 || m.assistencias > 0));
+
         if (goalkeeperFeats.length > 0) {
             const featsByGoalkeeper = {};
             goalkeeperFeats.forEach(feat => {
@@ -1124,13 +1317,14 @@ Tente novamente mais tarde.</p>`;
                     featsByGoalkeeper[feat.nome] = { nome: feat.nome, gols: 0, assistencias: 0 };
                 }
                 featsByGoalkeeper[feat.nome].gols += feat.gols;
-                featsByGoalkeeper[feat.nome].assistencias 
-+= feat.assistencias;
+                featsByGoalkeeper[feat.nome].assistencias += feat.assistencias;
             });
+
             for (const gkNome in featsByGoalkeeper) {
                 const gkData = featsByGoalkeeper[gkNome];
                 const playerInfo = players.find(p => p.nome === gkNome);
                 const originalName = playerInfo ? playerInfo.nomeOriginal : gkNome;
+                
                 let text = `Feito incrível! O goleiro <b>${originalName}</b> `;
                 if (gkData.gols > 0 && gkData.assistencias > 0) {
                     text += `marcou ${gkData.gols} gol(s) e deu ${gkData.assistencias} assistência(s)`;
@@ -1140,6 +1334,7 @@ Tente novamente mais tarde.</p>`;
                     text += `deu ${gkData.assistencias} assistência(s)`;
                 }
                 text += ` nas últimas duas semanas!`;
+
                 selectedFacts.push({ icon: '🧤', text: text });
             }
         }
@@ -1228,6 +1423,7 @@ Tente novamente mais tarde.</p>`;
         ];
         
         const shuffled = factFunctions.sort(() => 0.5 - Math.random());
+        
         let i = 0;
         while(selectedFacts.length < 3 && i < shuffled.length) {
             const func = shuffled[i];
@@ -1258,20 +1454,23 @@ Tente novamente mais tarde.</p>`;
             if (button && button.dataset.tab) {
                 tabsContainer.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
-                tabContent.querySelectorAll('.tab-pane').forEach(pane => 
-pane.classList.add('hidden'));
+                tabContent.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
                 const activeTab = document.getElementById(button.dataset.tab);
                 activeTab.classList.remove('hidden');
                 
                 if (button.dataset.tab === 'graficos') {
                     renderAllCharts(allPlayersData);
-         
                 }
                 if (button.dataset.tab === 'curiosidades') {
                     renderCuriosidades();
                 }
+                if (button.dataset.tab === 'selecao-mes' && !selecaoMesFilterInitialized) {
+                    setupSelecaoMesFilter();
+                    selecaoMesFilterInitialized = true;
+                }
             }
         });
+        
         document.getElementById('new-facts-button').addEventListener('click', renderCuriosidades);
         document.getElementById('update-data-button').addEventListener('click', clearCacheAndReload);
 
@@ -1279,24 +1478,25 @@ pane.classList.add('hidden'));
             const card = e.target.closest('[data-player-name]');
             if(card) showPlayerModal(card.dataset.playerName);
         });
+
         document.getElementById('partidas').addEventListener('click', e => {
             const card = e.target.closest('.match-card');
             if(card) showMatchModal(card.dataset.gamedate);
         });
+
         modalCloseBtn.addEventListener('click', () => { mainModalEl.classList.remove('show'); document.body.style.overflow = ''; });
         mainModalEl.addEventListener('click', e => { if(e.target === mainModalEl) { mainModalEl.classList.remove('show'); document.body.style.overflow = ''; } });
+        
         document.getElementById('rankings').addEventListener('click', (e) => {
             if(e.target.classList.contains('ver-mais-btn')){
                 const { key, title, unit, hib } = e.target.dataset;
                 const selectedMonth = document.getElementById('month-filter').value;
                 let playersForRanking;
                 if (selectedMonth === 'Geral') {
-     
                     playersForRanking = allPlayersData;
                 } else {
                     const periodMatches = allMatchesData.filter(p => p.dataJogo.slice(3) === selectedMonth);
                     playersForRanking = recalculateStatsForPeriod(allPlayersData, periodMatches);
-               
                 }
                 const data = (key === 'mediaGolsSofridos') ? playersForRanking.filter(p => p.jogosGoleiro > 0) : playersForRanking;
                 const sortedData = [...data].sort((a,b) => (hib === 'true') ? b[key] - a[key] : a[key] - b[key]);
@@ -1310,15 +1510,148 @@ pane.classList.add('hidden'));
             html.classList.toggle('light');
             themeToggleBtn.innerHTML = html.classList.contains('dark') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
             localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
-          
             if(Object.keys(chartInstances).length > 0) renderAllCharts(allPlayersData);
         });
+
         document.getElementById('mobile-mode-toggle').addEventListener('change', (e) => { 
             document.getElementById('app-container').classList.toggle('mobile-mode', e.target.checked); 
             localStorage.setItem('mobileMode', e.target.checked); 
         });
+
         document.getElementById('export-csv-button').addEventListener('click', exportVisibleDataToCSV);
         document.getElementById('share-button').addEventListener('click', shareDashboard);
+    }
+    
+    function setupSelecaoMesFilter() {
+        const filter = document.getElementById('selecao-month-filter');
+        const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        const uniqueMonths = [...new Set(allMatchesData.map(p => p.dataJogo.slice(3)))].sort((a, b) => {
+            const [ma, ya] = a.split('/'); const [mb, yb] = b.split('/');
+            return new Date(yb, mb - 1) - new Date(ya, ma - 1);
+        });
+        
+        filter.innerHTML = ''; 
+        if (uniqueMonths.length === 0) {
+            filter.innerHTML = '<option>Nenhum mês disponível</option>';
+            document.getElementById('selecao-mes-display').innerHTML = '<p class="text-center text-gray-500">Não há dados de partidas para exibir.</p>';
+            return;
+        }
+
+        uniqueMonths.forEach(monthYear => {
+            const [month, year] = monthYear.split('/');
+            const monthName = monthNames[parseInt(month, 10) - 1];
+            filter.innerHTML += `<option value="${monthYear}">${monthName} de ${year}</option>`;
+        });
+
+        filter.removeEventListener('change', renderSelecaoMesTab);
+        filter.addEventListener('change', renderSelecaoMesTab);
+        
+        renderSelecaoMesTab();
+    }
+    
+    function renderSelecaoMesTab() {
+        const container = document.getElementById('selecao-mes-display');
+        const selectedMonth = document.getElementById('selecao-month-filter').value;
+        
+        if (!selectedMonth) {
+            container.innerHTML = '<p class="text-center card p-4 text-gray-500">Selecione um mês para ver a seleção.</p>';
+            return;
+        }
+
+        const monthLabel = document.getElementById('selecao-month-filter').options[document.getElementById('selecao-month-filter').selectedIndex].text;
+        const periodMatches = allMatchesData.filter(p => p.dataJogo.slice(3) === selectedMonth);
+
+        const monthlyPlayerStats = new Map();
+        periodMatches.forEach(p => {
+            if (!p.jogoAconteceu || !p.posicao || p.posicao === 'N/A') return;
+            if (!monthlyPlayerStats.has(p.nome)) {
+                monthlyPlayerStats.set(p.nome, {
+                    nome: p.nome,
+                    nomeOriginal: allPlayersData.find(ap => ap.nome === p.nome)?.nomeOriginal || p.nomeRaw,
+                    positions: {}
+                });
+            }
+            const playerStats = monthlyPlayerStats.get(p.nome);
+            const posKey = p.posicao.toLowerCase();
+            if (!playerStats.positions[posKey]) {
+                playerStats.positions[posKey] = { notes: [], count: 0 };
+            }
+            playerStats.positions[posKey].notes.push(p.notaPartida);
+            playerStats.positions[posKey].count++;
+        });
+
+        const allPositionPerformances = [];
+        for (const stats of monthlyPlayerStats.values()) {
+            for (const pos in stats.positions) {
+                const avgNota = stats.positions[pos].notes.reduce((a, b) => a + b, 0) / stats.positions[pos].count;
+                allPositionPerformances.push({
+                    nome: stats.nome,
+                    nomeOriginal: stats.nomeOriginal,
+                    posicao: pos,
+                    avgNota: avgNota
+                });
+            }
+        }
+
+        const getBestMonthlyPlayers = (positions, count) => {
+            return allPositionPerformances
+                .filter(p => positions.includes(p.posicao))
+                .sort((a, b) => b.avgNota - a.avgNota)
+                .slice(0, count);
+        };
+
+        const team = {
+            ata: getBestMonthlyPlayers(['ata'], 2),
+            mei: getBestMonthlyPlayers(['mei'], 2),
+            def: getBestMonthlyPlayers(['zag', 'ala'], 3),
+            gol: getBestMonthlyPlayers(['gol'], 1),
+        };
+
+        const totalPlayersInTeam = Object.values(team).reduce((sum, players) => sum + players.length, 0);
+        if (totalPlayersInTeam === 0) {
+            container.innerHTML = `<div class="card p-4 rounded-lg text-center text-gray-500">Nenhum jogador encontrado com dados suficientes para a Seleção de ${monthLabel}.</div>`;
+            return;
+        }
+
+        const renderPlayer = (player) => {
+            if (!player) return '<div class="w-24 h-28"></div>'; 
+            const photoUrl = playerPhotos[player.nome] || `https://ui-avatars.com/api/?name=${player.nome.replace(' ', '+')}&background=random`;
+            return `
+                <div class="relative flex flex-col items-center text-center text-white w-24 mx-1">
+                    <img src="${photoUrl}" class="w-16 h-16 rounded-full object-cover border-2 border-yellow-300" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${player.nome.replace(' ', '+')}&background=random';">
+                    <p class="text-xs font-semibold mt-1 truncate w-full">${player.nomeOriginal.split(' ')[0]}</p>
+                    <p class="text-sm font-bold">${player.avgNota.toFixed(1)}</p>
+                </div>
+            `;
+        };
+
+        while(team.ata.length < 2) team.ata.push(null);
+        while(team.mei.length < 2) team.mei.push(null);
+        while(team.def.length < 3) team.def.push(null);
+        while(team.gol.length < 1) team.gol.push(null);
+
+        container.innerHTML = `
+            <h3 class="font-bold text-xl text-center mb-4">Seleção de ${monthLabel}</h3>
+            <div class="bg-blue-900/50 dark:bg-gray-900 p-4 rounded-lg relative overflow-hidden" 
+                 style="background: linear-gradient(to bottom, #061e3c, #0d3b66, #061e3c); border: 2px solid #ffffff30;">
+                <div class="absolute inset-0 z-0">
+                    <div class="absolute top-1/2 left-4 right-4 h-px bg-white/20"></div>
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-2 border-white/20 rounded-full"></div>
+                    <div class="absolute top-0 left-4 right-4 h-48 border-x-2 border-white/20">
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-16 border-2 border-white/20 rounded-b-2xl border-t-0"></div>
+                    </div>
+                     <div class="absolute bottom-0 left-4 right-4 h-48 border-x-2 border-white/20">
+                         <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-2/3 h-16 border-2 border-white/20 rounded-t-2xl border-b-0"></div>
+                     </div>
+                </div>
+                <div class="relative z-10 flex flex-col justify-between h-full space-y-4 py-4 min-h-[500px]">
+                    <div class="flex justify-center w-full space-x-8">${team.ata.map(renderPlayer).join('')}</div>
+                    <div class="flex justify-center w-full space-x-8">${team.mei.map(renderPlayer).join('')}</div>
+                    <div class="flex justify-center w-full space-x-4">${team.def.map(renderPlayer).join('')}</div>
+                    <div class="flex justify-center w-full">${team.gol.map(renderPlayer).join('')}</div>
+                </div>
+            </div>
+        `;
     }
 
     function showFullRankingInModal(title, sortedData, key, unit) {
@@ -1327,23 +1660,18 @@ pane.classList.add('hidden'));
             const borderColor = levelBorderColors[p.nivel] || '#6b7280'; // Fallback para cor de 'Iniciante'
 
             return `
-                <tr class="border-b 
-dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer" data-player-name="${p.nomeOriginal}">
+                <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer" data-player-name="${p.nomeOriginal}">
                     <td class="p-3 font-bold text-center">${index + 1}</td>
                     <td class="p-3">
                         <div class="flex items-center">
-                        
                             <img src="${photoUrl}" 
                                  class="w-10 h-10 rounded-full object-cover mr-4" 
                                  style="border: 3px solid ${borderColor};"
-                    
                                  onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random';">
                             <span>${p.nomeOriginal}</span>
                         </div>
                     </td>
-             
-                    <td class="p-3 font-semibold text-right">${formatValue(p[key], key)}${unit ||
-''}</td>
+                    <td class="p-3 font-semibold text-right">${formatValue(p[key], key)}${unit || ''}</td>
                 </tr>
             `;
         }).join('');
@@ -1355,17 +1683,14 @@ dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer" dat
                 <table class="w-full text-left">
                     <thead class="sticky top-0 bg-gray-100 dark:bg-gray-800">
                         <tr>
-   
                             <th class="p-3 w-16 text-center">Pos.</th>
                             <th class="p-3">Jogador</th>
                             <th class="p-3 text-right">Valor</th>
-             
                         </tr>
                     </thead>
                     <tbody>
                         ${tableRows}
                     </tbody>
-     
                 </table>
             </div>`;
         mainModalEl.classList.add('show');
@@ -1385,8 +1710,7 @@ dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer" dat
     }
 
     function exportVisibleDataToCSV() {
-        // Implementar lógica 
-se necessário
+        // Implementar lógica se necessário
     }
 
     function exportPlayerHistoryToCSV(player) {
@@ -1399,12 +1723,12 @@ se necessário
         try {
             if (navigator.share) await navigator.share(shareData);
             else { await navigator.clipboard.writeText(window.location.href); alert("Link copiado!"); }
-        } catch (err) { console.error("Erro ao compartilhar: ", err);
-        }
+        } catch (err) { console.error("Erro ao compartilhar: ", err); }
     }
 
     const levelUpSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"+Array(300).join("123"));
     const conquistaSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"+Array(300).join("321"));
+    
     function showNotification(message, icon, type) {
         const container = document.getElementById('notification-popup');
         const notif = document.createElement('div');
@@ -1423,19 +1747,16 @@ se necessário
         const prevConquistasCount = parseInt(localStorage.getItem(`conq_${player.nome}`), 10) || 0;
         if (prevLevel && prevLevel !== player.nivel) showNotification(`<b>${player.nomeOriginal}</b> subiu para o nível <b>${player.nivel}</b>!`, 'fa-arrow-up', 'level');
         if (player.conquistas.length > prevConquistasCount) {
-            const fullPlayer = allPlayersData.find(p => p.nome === player.nome) ||
-player;
+            const fullPlayer = allPlayersData.find(p => p.nome === player.nome) || player;
             fullPlayer.conquistas.slice(prevConquistasCount).forEach(c => showNotification(`<b>${player.nomeOriginal}</b> desbloqueou: <b>${c.nome}</b>!`, c.icon, 'conquista'));
         }
-        const fullPlayer = allPlayersData.find(p => p.nome === player.nome) ||
-player;
+        const fullPlayer = allPlayersData.find(p => p.nome === player.nome) || player;
         localStorage.setItem(`nivel_${player.nome}`, fullPlayer.nivel);
         localStorage.setItem(`conq_${player.nome}`, fullPlayer.conquistas.length);
     }
     
     async function init() {
-        const savedTheme = localStorage.getItem('theme') ||
-'dark';
+        const savedTheme = localStorage.getItem('theme') || 'dark';
         document.documentElement.className = savedTheme;
         themeToggleBtn.innerHTML = savedTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
         const mobileMode = localStorage.getItem('mobileMode') === 'true';
@@ -1443,6 +1764,7 @@ player;
         if (mobileMode) document.getElementById('app-container').classList.add('mobile-mode');
 
         setupEventListeners();
+        
         try {
             const { partidas, jogadores } = await fetchAllData();
             const processedPlayers = processarDados(partidas, jogadores);
@@ -1460,3 +1782,4 @@ player;
 </script>
 </body>
 </html>
+
