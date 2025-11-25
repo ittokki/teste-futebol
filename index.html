@@ -565,6 +565,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const rangePagina1 = "Página1!A2:H100";
     const rangePagina2 = "Página2!A2:L300";
     
+    const clickSoundUrl = "https://raw.githubusercontent.com/ittokki/Futebol/main/PES%202013%20Select%20Game%20Main%20Menu%20Sound%20Effect%20(mp3cut.net).mp3";
+    const clickAudio = new Audio(clickSoundUrl);
+    clickAudio.volume = 0.5; // Adjust volume
+
+    document.addEventListener('click', () => {
+        // Clone node or reset time to allow rapid fire clicks
+        const sound = clickAudio.cloneNode();
+        sound.volume = 0.3; 
+        sound.play().catch(e => console.warn("Sound blocked", e));
+    });
+    
     const playerPhotos = {
         "ADEMIR": "https://drive.google.com/thumbnail?id=19uLFnCc6T_EWK0Z2R1Nfw7Mi10a3LIdQ&sz=w500",
         "ALESSANDRO": "https://drive.google.com/thumbnail?id=1eGjTXt1wcG8aqEphPjZZMo2DGSAVTA2h&sz=w500",
@@ -611,62 +622,101 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- CALCULOS ---
     function calculateFIFAStats(player) {
-        // 1. OVR (Overall): Curva baseada na Nota Geral
-        // Nota 6.0 = 75 (Ouro Comum). Nota 10.0 = 99.
-        let ovr = 75;
+        // 1. OVR (Overall): CURVA AJUSTADA (Mais rigorosa)
+        let ovr;
+        
+        // Jogadores com nota boa (>= 6.0)
+        // Nota 6.0 = 70 (Baixei de 75 para 70 para valorizar mais os 80+)
+        // Nota 10.0 = 98
         if (player.notaGeral >= 6) {
-            ovr = 75 + (player.notaGeral - 6) * 6; // Ex: Nota 8 = 75 + 12 = 87
-        } else {
-            ovr = 60 + (player.notaGeral * 2.5); // Notas baixas caem para Prata/Bronze
+            ovr = 70 + (player.notaGeral - 6) * 7; 
+        } 
+        // Jogadores com nota abaixo da média (< 6.0)
+        // Curva mais íngreme para diferenciar "quase lá" de "jogou mal"
+        // Nota 5.78 vai dar aprox 68/69
+        else {
+            ovr = 35 + (player.notaGeral * 5.8);
         }
         
         // Penalidade para novatos (menos de 3 jogos)
-        if (player.jogos < 3) ovr = Math.min(ovr, 74);
+        if (player.jogos < 3) ovr = Math.min(ovr, 68);
+        
+        ovr = Math.round(ovr);
 
-        // Estatísticas por Jogo
-        const gpg = player.gols / (player.jogos || 1); // Gols por jogo
-        const apg = player.assistencias / (player.jogos || 1); // Assist por jogo
+        // 2. Estatísticas Dinâmicas
+        const gpg = player.gols / (player.jogos || 1); 
+        const apg = player.assistencias / (player.jogos || 1);
         const pos = player.posicaoPref;
 
-        // 2. SHO (Chute) -> Baseado em GOLS
-        // Base 45 + Bônus absurdo por média de gols
-        let sho = 45 + (gpg * 40); 
-        if (pos === 'ata') sho += 10; // Atacante chuta melhor por padrão
+        // Base dos atributos um pouco abaixo do OVR para dar espaço aos boosts
+        let base = ovr - 12; 
 
-        // 3. PAS (Passe) -> Baseado em ASSISTÊNCIAS
-        // Base 50 + Bônus por média de assistências
-        let pas = 50 + (apg * 55);
-        if (pos === 'mei') pas += 10; // Meio-campo passa melhor
+        let pac = base;
+        let sho = base;
+        let pas = base;
+        let def = base;
+        let phy = base;
 
-        // 4. DEF (Defesa) -> Baseado em POSIÇÃO + NOTA (Se joga bem na zaga, defende bem)
-        let def = 40;
-        if (pos === 'zag' || pos === 'gol') {
-            def = 78 + ((player.notaGeral - 6) * 5);
-        } else if (pos === 'ala' || pos === 'mei') {
-            def = 55 + ((player.notaGeral - 6) * 2);
+        // 3. Especialização por Posição (Boosts ajustados para o novo OVR)
+        
+        // RITMO (PAC)
+        if (['ata', 'ala'].includes(pos)) pac = ovr - 3; 
+        else if (pos === 'mei') pac = ovr - 12;
+        else pac = ovr - 15; 
+        
+        // CHUTE (SHO)
+        let shoBonus = (gpg * 25); 
+        if (pos === 'ata') sho = (ovr - 6) + shoBonus;
+        else if (pos === 'mei' || pos === 'ala') sho = (ovr - 15) + shoBonus;
+        else sho = (ovr - 35) + shoBonus;
+
+        // PASSE (PAS)
+        let pasBonus = (apg * 30);
+        if (['mei', 'ala'].includes(pos)) pas = (ovr - 5) + pasBonus;
+        else if (pos === 'ata') pas = (ovr - 18) + pasBonus;
+        else pas = (ovr - 22) + pasBonus;
+
+        // DEFESA (DEF)
+        if (['zag', 'gol'].includes(pos)) def = ovr - 3;
+        else if (['ala', 'mei'].includes(pos)) def = ovr - 22;
+        else def = ovr - 45;
+
+        // FÍSICO (PHY)
+        let phyBonus = Math.min(8, player.jogos / 2);
+        if (['zag', 'gol'].includes(pos)) phy = (ovr - 5) + phyBonus;
+        else phy = (ovr - 18) + phyBonus;
+
+        // 4. CORREÇÃO DE COERÊNCIA (Boost final para o atributo principal não ficar lixo)
+        const boost = (val, target) => Math.max(val, target);
+
+        if(pos === 'ata') {
+            sho = boost(sho, ovr - 2);
+            pac = boost(pac, ovr - 5);
+        } else if (pos === 'ala') {
+            pac = boost(pac, ovr - 2);
+            pas = boost(pas, ovr - 6);
+        } else if (pos === 'mei') {
+            pas = boost(pas, ovr - 2);
+            sho = boost(sho, ovr - 10); 
+        } else if (pos === 'zag') {
+            def = boost(def, ovr - 2);
+            phy = boost(phy, ovr - 4);
+        } else if (pos === 'gol') {
+            def = boost(def, ovr - 1); 
+            phy = boost(phy, ovr - 3); 
         }
 
-        // 5. PAC (Ritmo) -> Baseado em POSIÇÃO (Atributo fixo da função em campo)
-        let pac = 60;
-        if (pos === 'ata' || pos === 'ala') pac = 80 + ((player.notaGeral - 6) * 2); // Alas/Atas são rápidos
-        else if (pos === 'mei') pac = 70;
-        else pac = 65;
+        // Clamping
+        const clamp = (n) => Math.max(25, Math.min(99, Math.round(n)));
 
-        // 6. PHY (Físico) -> Baseado em JOGOS (Resistência/Presença)
-        let phy = 55 + Math.min(20, player.jogos / 1.5); // Ganha físico jogando
-        if (pos === 'zag') phy += 10; // Zagueiros são mais fortes
-
-        // Limites (Clamping) entre 30 e 99 para não quebrar o layout
-        const clamp = (n) => Math.max(30, Math.min(99, Math.round(n)));
-
-        // Definir Raridade da Carta
+        // Definir Raridade (Ajustada para a nova escala)
         let type = 'card-silver';
         let cssClass = 'silver';
-        if (ovr >= 90) { type = 'card-mitico'; cssClass = 'special'; } // Roxo/Neon
-        else if (ovr >= 86) { type = 'card-special'; cssClass = 'special'; } // Azul
-        else if (ovr >= 75) { type = 'card-gold'; cssClass = 'gold'; } // Dourado
-        else if (ovr >= 65) { type = 'card-silver'; cssClass = 'silver'; } // Prata
-        else { type = 'card-bronze'; cssClass = 'silver'; } // Bronze (usa estilo silver no CSS por enquanto)
+        if (ovr >= 90) { type = 'card-mitico'; cssClass = 'special'; } 
+        else if (ovr >= 85) { type = 'card-special'; cssClass = 'special'; } 
+        else if (ovr >= 75) { type = 'card-gold'; cssClass = 'gold'; } // Ouro agora só acima de 75
+        else if (ovr >= 65) { type = 'card-silver'; cssClass = 'silver'; } // Prata 65-74
+        else { type = 'card-bronze'; cssClass = 'silver'; } // Bronze < 65
 
         return { 
             ovr: clamp(ovr), 
@@ -1098,7 +1148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('hall-grid').innerHTML = html || '<p class="text-gray-500 col-span-3 text-center py-8">Ainda não há conquistas registradas nesta temporada.</p>';
     }
     
-    // --- FUN FACTS ---
+    // --- FUN FACTS (EXPANDED TO 15) ---
     function renderFunFacts(players, matches) {
         const container = document.getElementById('curiosities-grid');
         if(!container) return;
@@ -1106,24 +1156,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const facts = [];
 
-        // Fato 1: Maior Nota
+        // 1. Atuação de Gala (Maior Nota)
         const bestMatch = matches.filter(m => m.jogoAconteceu).sort((a,b) => b.notaPartida - a.notaPartida)[0];
-        if(bestMatch) facts.push({ icon: 'fa-star', color: 'text-yellow-400', title: 'Atuação de Gala', text: `A maior nota registrada foi <strong>${bestMatch.notaPartida.toFixed(1)}</strong> por <strong>${bestMatch.nomeRaw}</strong> em ${bestMatch.dataJogo}.` });
+        if(bestMatch) facts.push({ icon: 'fa-star', color: 'text-yellow-400', title: 'Atuação de Gala', text: `Maior nota: <strong>${bestMatch.notaPartida.toFixed(1)}</strong> por <strong>${bestMatch.nomeRaw.split(' ')[0]}</strong> em ${bestMatch.dataJogo}.` });
 
-        // Fato 2: Jogo com mais gols
+        // 2. Chuva de Gols (Dia com mais gols)
         const goalsByDate = {};
         matches.filter(m=>m.jogoAconteceu).forEach(m => goalsByDate[m.dataJogo] = (goalsByDate[m.dataJogo] || 0) + m.gols);
         const topDate = Object.keys(goalsByDate).sort((a,b) => goalsByDate[b] - goalsByDate[a])[0];
-        if(topDate) facts.push({ icon: 'fa-fire', color: 'text-red-400', title: 'Chuva de Gols', text: `O dia <strong>${topDate}</strong> foi o mais movimentado, com um total de <strong>${goalsByDate[topDate]}</strong> gols marcados.` });
+        if(topDate) facts.push({ icon: 'fa-cloud-showers-heavy', color: 'text-blue-400', title: 'Chuva de Gols', text: `O dia <strong>${topDate}</strong> teve o recorde de <strong>${goalsByDate[topDate]}</strong> gols marcados.` });
 
-        // Fato 3: Amuleto
+        // 3. Amuleto da Sorte (Maior % vitória com min 5 jogos)
         const lucky = players.filter(p => p.jogos >= 5).sort((a,b) => b.aproveitamento - a.aproveitamento)[0];
-        if(lucky) facts.push({ icon: 'fa-gem', color: 'text-blue-400', title: 'Amuleto da Sorte', text: `<strong>${lucky.nomeOriginal.split(' ')[0]}</strong> tem o melhor aproveitamento (${lucky.aproveitamento.toFixed(0)}%) entre jogadores com 5+ jogos.` });
+        if(lucky) facts.push({ icon: 'fa-gem', color: 'text-purple-400', title: 'Amuleto da Sorte', text: `<strong>${lucky.nomeOriginal.split(' ')[0]}</strong> tem o melhor aproveitamento (${lucky.aproveitamento.toFixed(0)}%) com min. 5 jogos.` });
+
+        // 4. Pé Frio (Menor % vitória com min 5 jogos)
+        const unlucky = players.filter(p => p.jogos >= 5).sort((a,b) => a.aproveitamento - b.aproveitamento)[0];
+        if(unlucky) facts.push({ icon: 'fa-snowflake', color: 'text-cyan-300', title: 'Pé Frio', text: `<strong>${unlucky.nomeOriginal.split(' ')[0]}</strong> tem o menor aproveitamento (${unlucky.aproveitamento.toFixed(0)}%) até agora.` });
+
+        // 5. Zagueiro Artilheiro
+        const zagArtilheiro = players.filter(p => p.posicaoPref === 'zag').sort((a,b) => b.gols - a.gols)[0];
+        if(zagArtilheiro && zagArtilheiro.gols > 0) facts.push({ icon: 'fa-shield-alt', color: 'text-green-400', title: 'Zagueiro Artilheiro', text: `<strong>${zagArtilheiro.nomeOriginal.split(' ')[0]}</strong> é o defensor com mais gols (${zagArtilheiro.gols}).` });
+
+        // 6. Goleiro Garçom
+        const gkGarcom = players.filter(p => p.posicaoPref === 'gol').sort((a,b) => b.assistencias - a.assistencias)[0];
+        if(gkGarcom && gkGarcom.assistencias > 0) facts.push({ icon: 'fa-hands', color: 'text-yellow-300', title: 'Goleiro Garçom', text: `<strong>${gkGarcom.nomeOriginal.split(' ')[0]}</strong> já deu <strong>${gkGarcom.assistencias}</strong> assistências jogando no gol.` });
+
+        // 7. Máquina de Gols (Média)
+        const machine = players.filter(p => p.jogos >= 3).sort((a,b) => (b.gols/b.jogos) - (a.gols/a.jogos))[0];
+        if(machine) facts.push({ icon: 'fa-robot', color: 'text-red-500', title: 'Máquina de Gols', text: `<strong>${machine.nomeOriginal.split(' ')[0]}</strong> tem a melhor média: ${(machine.gols/machine.jogos).toFixed(2)} gols por jogo.` });
+
+        // 8. Rei da Regularidade (Menor variação de nota, min 5 jogos)
+        const regular = players.filter(p => p.jogos >= 5).map(p => ({...p, var: Math.max(...p.partidas.map(m=>m.notaPartida)) - Math.min(...p.partidas.map(m=>m.notaPartida))})).sort((a,b) => a.var - b.var)[0];
+        if(regular) facts.push({ icon: 'fa-balance-scale', color: 'text-gray-300', title: 'Rei da Regularidade', text: `<strong>${regular.nomeOriginal.split(' ')[0]}</strong> oscila pouco. Diferença de apenas ${regular.var.toFixed(1)} entre sua melhor e pior nota.` });
+
+        // 9. Montanha Russa (Maior variação)
+        const rollercoaster = players.filter(p => p.jogos >= 5).map(p => ({...p, var: Math.max(...p.partidas.map(m=>m.notaPartida)) - Math.min(...p.partidas.map(m=>m.notaPartida))})).sort((a,b) => b.var - a.var)[0];
+        if(rollercoaster) facts.push({ icon: 'fa-wave-square', color: 'text-orange-400', title: 'Montanha Russa', text: `<strong>${rollercoaster.nomeOriginal.split(' ')[0]}</strong> é imprevisível! Variação de ${rollercoaster.var.toFixed(1)} pontos entre jogos.` });
+
+        // 10. O "Inimigo" do Gol (Atacante com menos gols, min 5 jogos)
+        const shyStriker = players.filter(p => p.posicaoPref === 'ata' && p.jogos >= 5).sort((a,b) => (a.gols/a.jogos) - (b.gols/b.jogos))[0];
+        if(shyStriker) facts.push({ icon: 'fa-ban', color: 'text-red-300', title: 'Inimigo do Gol', text: `<strong>${shyStriker.nomeOriginal.split(' ')[0]}</strong> é o atacante com menor média de gols (${(shyStriker.gols/shyStriker.jogos).toFixed(2)}/jogo).` });
+
+        // 11. Melhor Estreia
+        // Find first match for each player
+        const debuts = players.map(p => {
+            const firstMatch = p.partidas.sort((a,b) => new Date(a.dataJogo.split('/').reverse().join('-')) - new Date(b.dataJogo.split('/').reverse().join('-')))[0];
+            return { name: p.nomeOriginal, note: firstMatch.notaPartida, date: firstMatch.dataJogo };
+        }).sort((a,b) => b.note - a.note)[0];
+        if(debuts) facts.push({ icon: 'fa-rocket', color: 'text-pink-400', title: 'Estreia de Ouro', text: `<strong>${debuts.name.split(' ')[0]}</strong> teve a melhor estreia registrada: Nota <strong>${debuts.note.toFixed(1)}</strong> em ${debuts.date}.` });
+
+        // 12. Artilheiro de Um Dia (Mais gols num jogo só)
+        const oneDayKing = matches.filter(m=>m.jogoAconteceu).sort((a,b) => b.gols - a.gols)[0];
+        if(oneDayKing) facts.push({ icon: 'fa-crown', color: 'text-yellow-500', title: 'Artilheiro de Um Dia', text: `<strong>${oneDayKing.nomeRaw.split(' ')[0]}</strong> fez história com <strong>${oneDayKing.gols} gols</strong> em uma única partida.` });
+
+        // 13. Garçom de Um Dia
+        const oneDayWaiter = matches.filter(m=>m.jogoAconteceu).sort((a,b) => b.assistencias - a.assistencias)[0];
+        if(oneDayWaiter) facts.push({ icon: 'fa-tray', color: 'text-blue-300', title: 'Garçom de Um Dia', text: `<strong>${oneDayWaiter.nomeRaw.split(' ')[0]}</strong> serviu <strong>${oneDayWaiter.assistencias} assistências</strong> em um único jogo.` });
+
+        // 14. O "Participativo" (Gols+Assist / Jogos)
+        const involved = players.filter(p => p.jogos >= 3).sort((a,b) => (b.ga/b.jogos) - (a.ga/a.jogos))[0];
+        if(involved) facts.push({ icon: 'fa-handshake', color: 'text-teal-400', title: 'O Onipresente', text: `<strong>${involved.nomeOriginal.split(' ')[0]}</strong> participa de ${(involved.ga/involved.jogos).toFixed(1)} gols por jogo (Gols+Assist).` });
+
+        // 15. Muralha (Menor média de gols sofridos, min 3 jogos no gol)
+        const wall = players.filter(p => p.jogosGoleiro >= 3).sort((a,b) => a.mediaGolsSofridos - b.mediaGolsSofridos)[0];
+        if(wall) facts.push({ icon: 'fa-brick', color: 'text-gray-400', title: 'A Muralha', text: `<strong>${wall.nomeOriginal.split(' ')[0]}</strong> é o goleiro mais difícil de bater: média de ${wall.mediaGolsSofridos.toFixed(1)} gols sofridos.` });
 
         facts.forEach(f => {
             container.innerHTML += `
                 <div class="glass-panel p-5 rounded-xl border border-white/5 flex items-start gap-4 hover:bg-white/5 transition">
-                    <div class="p-3 rounded-full bg-white/5 ${f.color} text-xl"><i class="fas ${f.icon}"></i></div>
+                    <div class="p-3 rounded-full bg-white/5 ${f.color} text-xl min-w-[3rem] text-center flex items-center justify-center"><i class="fas ${f.icon}"></i></div>
                     <div>
                         <h4 class="font-bold text-white text-sm uppercase mb-1">${f.title}</h4>
                         <p class="text-xs text-gray-400 leading-relaxed">${f.text}</p>
@@ -1458,5 +1560,4 @@ document.addEventListener('DOMContentLoaded', () => {
     initData();
 });
 </script>
-</body>
-</html>
+</script>
