@@ -2,819 +2,770 @@
 <html lang="pt-BR" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dashboard Inimigos da Bola</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inimigos da Bola - Ultimate Dashboard</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
     <style>
+        /* --- GLASSMORPHISM & VISUAL --- */
         :root {
-            --bg-dark: #111827; --text-dark: #d1d5db; --card-dark: #1f2937; --border-dark: #374151;
-            --bg-light: #f3f4f6; --text-light: #1f2937; --card-light: #ffffff; --border-light: #e5e7eb;
+            --glass-bg: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --neon-blue: #3b82f6;
+            --neon-gold: #fbbf24;
+            --card-gold: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            --card-blue: linear-gradient(135deg, #1e3a8a, #3b82f6, #60a5fa);
+            --card-silver: linear-gradient(135deg, #d1d5db, #f3f4f6, #9ca3af);
+            --card-green: linear-gradient(135deg, #064e3b, #10b981, #34d399);
         }
-        html.dark { --bg-color: var(--bg-dark); --text-color: var(--text-dark); --card-color: var(--card-dark); --border-color: var(--border-dark); }
-        html.light { --bg-color: var(--bg-light); --text-color: var(--text-light); --card-color: var(--card-light); --border-color: var(--border-light); }
-        
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; transition: 0.3s; padding-bottom: 80px; }
-        .card { background-color: var(--card-color); border: 1px solid var(--border-color); transition: 0.3s; }
-        .tab-button.active { border-color: #3b82f6; color: #3b82f6; background-color: rgba(59, 130, 246, 0.1); }
-        
-        .modal { display: none; }
-        .modal.show { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
 
-        /* Cores de Raridade */
-        .rarity-comum { border-color: #9ca3af; color: #9ca3af; }
-        .rarity-raro { border-color: #3b82f6; color: #3b82f6; }
-        .rarity-epico { border-color: #a855f7; color: #a855f7; }
-        .rarity-lendario { border-color: #f59e0b; color: #f59e0b; }
-        .rarity-mitico { border: 2px solid; border-image-slice: 1; border-image-source: linear-gradient(to right, #f59e0b, #ef4444, #ec4899); color: #f59e0b; }
+        body {
+            background: radial-gradient(circle at top left, #1a202c, #000000);
+            background-attachment: fixed;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
 
-        /* Estilos do Campo de Futebol */
-        .soccer-field {
-            background: linear-gradient(to bottom, #1e3a8a, #172554);
-            border: 2px solid rgba(255,255,255,0.2);
+        /* Fundo animado */
+        .bg-animated {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #0f172a);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Componentes Glass */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+
+        /* FIFA Card Styles */
+        .fut-card {
+            font-family: 'Rajdhani', sans-serif;
             position: relative;
+            width: 100%;
+            aspect-ratio: 2/3;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            transition: transform 0.3s;
+            clip-path: polygon(15% 0, 85% 0, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0 85%, 0 15%);
         }
-        /* Linhas do campo (absolute positioning dentro do soccer-field) */
-        .field-outline { position: absolute; top:0; left:0; right:0; bottom:0; border: 2px solid rgba(255,255,255,0.2); border-radius: 0.5rem; margin: 0.5rem; pointer-events: none; }
-        .field-midline { position: absolute; top: 50%; left: 0.5rem; right: 0.5rem; height: 2px; background-color: rgba(255,255,255,0.2); transform: translateY(-50%); pointer-events: none; }
-        .field-center-circle { position: absolute; top: 50%; left: 50%; width: 5rem; height: 5rem; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; }
-        .field-box-top { position: absolute; top: 0.5rem; left: 50%; width: 40%; height: 15%; border: 2px solid rgba(255,255,255,0.2); border-top: none; transform: translateX(-50%); pointer-events: none; }
-        .field-box-bottom { position: absolute; bottom: 0.5rem; left: 50%; width: 40%; height: 15%; border: 2px solid rgba(255,255,255,0.2); border-bottom: none; transform: translateX(-50%); pointer-events: none; }
+        .fut-card:hover { transform: scale(1.05); z-index: 10; }
+        
+        .card-bg-lenda { background: var(--card-gold); color: #422006; border: 2px solid #fbbf24; }
+        .card-bg-craque { background: var(--card-blue); color: white; border: 2px solid #60a5fa; }
+        .card-bg-diferenciado { background: var(--card-green); color: white; border: 2px solid #34d399; }
+        .card-bg-comum { background: var(--card-silver); color: #1f2937; border: 2px solid #9ca3af; }
 
-        /* Cards FIFA Backgrounds */
-        .bg-fifa-lenda { background: linear-gradient(135deg, #f59e0b, #b45309); color: white; }
-        .bg-fifa-craque { background: linear-gradient(135deg, #e5e7eb, #9ca3af); color: black; }
-        .bg-fifa-diferenciado { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
-        .bg-fifa-esforcado { background: linear-gradient(135deg, #10b981, #047857); color: white; }
-        .bg-fifa-iniciante { background: linear-gradient(135deg, #4b5563, #1f2937); color: white; }
+        .fut-stat-row { display: flex; justify-content: space-between; padding: 0 10%; font-weight: 700; font-size: 0.8rem; }
+        .fut-player-img { mask-image: linear-gradient(to bottom, black 80%, transparent 100%); }
+
+        /* Utilitários */
+        .text-glow { text-shadow: 0 0 10px rgba(59, 130, 246, 0.7); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        
+        /* Loading Animation */
+        .loader-spin { border: 4px solid rgba(255,255,255,0.1); border-left-color: #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .fut-card { clip-path: none; border-radius: 8px; aspect-ratio: auto; padding-bottom: 10px; }
+            .fut-player-img { width: 60px; height: 60px; border-radius: 50%; mask-image: none; margin: 0 auto; }
+            .mobile-row-card { display: flex; align-items: center; padding: 10px; }
+            .mobile-stats-hidden { display: none; }
+        }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased min-h-screen">
+    <div class="bg-animated"></div>
 
-    <!-- Loading -->
-    <div id="loading" class="fixed inset-0 bg-gray-900 bg-opacity-95 flex items-center justify-center z-50">
-        <div class="flex flex-col items-center">
-            <i class="fas fa-futbol fa-spin text-6xl text-blue-500 mb-4"></i>
-            <p class="text-white text-xl font-bold">Carregando Inimigos da Bola...</p>
-        </div>
+    <div id="loading" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/90 backdrop-blur-lg">
+        <div class="loader-spin mb-4"></div>
+        <h2 class="text-2xl font-bold text-white tracking-widest animate-pulse">CARREGANDO...</h2>
+        <p class="text-blue-400 text-sm mt-2">Processando estatísticas avançadas</p>
     </div>
 
-    <div id="app-container" class="container mx-auto p-4 md:p-6 hidden pb-24">
-        <!-- Header -->
-        <header class="flex flex-wrap justify-between items-center mb-6 gap-4">
-            <div class="flex items-center space-x-4">
-                <img src="https://raw.githubusercontent.com/ittokki/Futebol/ba59ab86cf2095d4e9214bd5e24e21ac8aeaf33a/inimigos%20da%20bola.jpg" class="w-12 h-12 rounded-md shadow">
-                <h1 class="text-2xl md:text-3xl font-bold text-blue-500">Inimigos da Bola</h1>
+    <div id="app-container" class="container mx-auto p-4 hidden">
+        
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 glass-panel p-4 rounded-2xl">
+            <div class="flex items-center gap-4 mb-4 md:mb-0">
+                <div class="w-12 h-12 rounded-lg bg-blue-600 flex items-center justify-center text-2xl font-bold shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+                    IB
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold uppercase tracking-wider text-white">Inimigos da Bola</h1>
+                    <p class="text-xs text-blue-300">Dashboard Competitivo 2.0</p>
+                </div>
             </div>
-            <div class="flex gap-2">
-                <button id="btn-reload" class="p-2 rounded-full card hover:text-blue-500"><i class="fas fa-sync-alt"></i></button>
-                <button id="btn-theme" class="p-2 rounded-full card hover:text-yellow-500"><i class="fas fa-sun"></i></button>
+            
+            <div class="flex flex-wrap justify-center gap-3">
+                <button onclick="app.updateData()" class="px-4 py-2 rounded-lg bg-blue-600/80 hover:bg-blue-500 text-white text-sm font-bold transition flex items-center gap-2">
+                    <i class="fas fa-sync-alt"></i> <span class="hidden sm:inline">Atualizar</span>
+                </button>
+                 <button onclick="app.toggleBalanceador()" class="px-4 py-2 rounded-lg bg-purple-600/80 hover:bg-purple-500 text-white text-sm font-bold transition flex items-center gap-2">
+                    <i class="fas fa-balance-scale"></i> Snake Draft
+                </button>
             </div>
         </header>
 
-        <!-- Nav Desktop -->
-        <nav class="hidden md:block mb-6 border-b border-gray-700">
-            <div class="flex space-x-6">
-                <button onclick="switchTab('rankings')" class="tab-button active py-4 px-2 font-medium border-b-2 border-transparent hover:text-blue-500" data-target="rankings">Rankings</button>
-                <button onclick="switchTab('selecao')" class="tab-button py-4 px-2 font-medium border-b-2 border-transparent hover:text-blue-500" data-target="selecao">Seleção do Mês</button>
-                <button onclick="switchTab('graficos')" class="tab-button py-4 px-2 font-medium border-b-2 border-transparent hover:text-blue-500" data-target="graficos">Gráficos & VS</button>
-                <button onclick="switchTab('partidas')" class="tab-button py-4 px-2 font-medium border-b-2 border-transparent hover:text-blue-500" data-target="partidas">Partidas</button>
-                <button onclick="switchTab('hall')" class="tab-button py-4 px-2 font-medium border-b-2 border-transparent hover:text-blue-500" data-target="hall">Hall da Fama</button>
-                <button onclick="switchTab('curiosidades')" class="tab-button py-4 px-2 font-medium border-b-2 border-transparent hover:text-blue-500" data-target="curiosidades">Curiosidades</button>
-                <button onclick="switchTab('admins')" class="tab-button py-4 px-2 font-medium border-b-2 border-transparent hover:text-blue-500" data-target="admins">Admins</button>
-            </div>
+        <nav class="mb-8 overflow-x-auto scrollbar-hide">
+            <div class="flex space-x-2 md:justify-center min-w-max p-1" id="tabs-container">
+                </div>
         </nav>
 
-        <main>
-            <!-- RANKINGS -->
-            <div id="rankings" class="tab-pane fade-in">
-                <div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
-                    <input type="text" id="search-player" placeholder="Buscar jogador..." class="w-full md:w-1/2 p-3 rounded-lg card focus:ring-2 ring-blue-500 outline-none">
-                    <select id="month-filter" class="w-full md:w-1/4 p-3 rounded-lg card cursor-pointer"></select>
+        <main id="tab-content" class="min-h-[60vh] relative">
+            
+            <div id="tab-rankings" class="tab-pane animate-fade-in">
+                
+                <div class="glass-panel p-4 rounded-xl mb-6 flex flex-col md:flex-row gap-4 justify-between items-center">
+                    <div class="relative w-full md:w-1/3">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="player-search" placeholder="Buscar jogador..." 
+                            class="w-full bg-black/30 border border-gray-700 rounded-lg py-2 pl-10 text-white focus:outline-none focus:border-blue-500 transition">
+                    </div>
+                    <select id="month-filter" class="w-full md:w-1/4 bg-black/30 border border-gray-700 rounded-lg py-2 px-3 text-white focus:outline-none">
+                        <option value="Geral">Temporada Completa</option>
+                    </select>
                 </div>
-                <div id="destaque-mes-container" class="mb-8"></div>
-                <div id="rankings-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+
+                <div id="cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                    </div>
             </div>
 
-            <!-- SELEÇÃO MÊS -->
-            <div id="selecao" class="tab-pane hidden fade-in">
-                <div class="max-w-md mx-auto mb-6">
-                    <label class="block text-center text-sm text-gray-500 mb-2 uppercase font-bold">Escolha o Mês</label>
-                    <select id="selecao-filter" class="w-full p-3 rounded-lg card"></select>
-                </div>
-                <div id="selecao-display"></div>
-            </div>
-
-            <!-- GRÁFICOS -->
-            <div id="graficos" class="tab-pane hidden fade-in">
-                <!-- Comparador -->
-                <div class="card p-6 rounded-xl border-t-4 border-blue-500 mb-8">
-                    <h2 class="text-2xl font-bold mb-4"><i class="fas fa-balance-scale mr-2"></i>Comparador</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-blue-500">1</span>
-                                <select id="p1-select" class="flex-1 p-2 rounded card"></select>
+            <div id="tab-balanceador" class="tab-pane hidden animate-fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <div class="glass-panel p-4 rounded-xl h-[80vh] flex flex-col">
+                        <h3 class="text-xl font-bold mb-4 text-blue-400"><i class="fas fa-users mr-2"></i>Disponíveis</h3>
+                        <div class="mb-2">
+                            <input type="text" id="draft-search" placeholder="Buscar..." class="w-full bg-black/20 p-2 rounded text-sm">
+                        </div>
+                        <div id="draft-pool" class="flex-grow overflow-y-auto space-y-2 pr-2">
                             </div>
-                            <div class="text-center text-xs text-gray-500">VS</div>
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-red-500">2</span>
-                                <select id="p2-select" class="flex-1 p-2 rounded card"></select>
+                        <button onclick="draftSystem.runSnakeDraft()" class="mt-4 w-full py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold shadow-lg transition transform active:scale-95">
+                            SORTEAR TIMES (SNAKE)
+                        </button>
+                    </div>
+
+                    <div class="lg:col-span-2 space-y-6">
+                        
+                        <div id="ia-verdict" class="glass-panel p-6 rounded-xl border border-purple-500/30 hidden relative overflow-hidden">
+                            <div class="absolute -right-10 -top-10 text-9xl text-purple-500/10"><i class="fas fa-robot"></i></div>
+                            <h3 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-2">VEREDITO DA IA</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center items-center">
+                                <div class="text-left">
+                                    <p class="text-sm text-gray-400">Favorito Técnico</p>
+                                    <p id="verdict-fav-tech" class="text-xl font-bold">Analisando...</p>
+                                </div>
+                                <div class="text-4xl font-bold text-white/20">VS</div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-400">Poder de Fogo</p>
+                                    <p id="verdict-fav-goals" class="text-xl font-bold">Analisando...</p>
+                                </div>
+                            </div>
+                            <p id="verdict-text" class="mt-4 text-gray-300 italic text-center border-t border-white/10 pt-4"></p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="glass-panel p-4 rounded-xl border-t-4 border-blue-500">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-xl font-bold text-blue-400">Time A</h3>
+                                    <span id="score-team-a" class="text-xs bg-blue-900 px-2 py-1 rounded">OVR: 0</span>
+                                </div>
+                                <ul id="list-team-a" class="space-y-2"></ul>
+                            </div>
+
+                            <div class="glass-panel p-4 rounded-xl border-t-4 border-red-500">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-xl font-bold text-red-400">Time B</h3>
+                                    <span id="score-team-b" class="text-xs bg-red-900 px-2 py-1 rounded">OVR: 0</span>
+                                </div>
+                                <ul id="list-team-b" class="space-y-2"></ul>
                             </div>
                         </div>
-                        <div class="h-64 relative flex justify-center"><canvas id="radarChart"></canvas></div>
                     </div>
-                    <div id="comparison-table" class="mt-4"></div>
-                </div>
-
-                <!-- Charts Grid -->
-                <h3 class="text-xl font-bold mb-4 border-l-4 border-purple-500 pl-2">Estatísticas</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="card p-4 rounded-lg h-80"><canvas id="chart-gols"></canvas></div>
-                    <div class="card p-4 rounded-lg h-80"><canvas id="chart-assists"></canvas></div>
-                    <div class="card p-4 rounded-lg h-80"><canvas id="chart-evolucao"></canvas></div>
-                    <div class="card p-4 rounded-lg h-80"><canvas id="chart-aprov"></canvas></div>
-                    <div class="card p-4 rounded-lg h-80"><canvas id="chart-monthly"></canvas></div>
                 </div>
             </div>
 
-            <!-- PARTIDAS -->
-            <div id="partidas" class="tab-pane hidden fade-in space-y-4"></div>
-
-            <!-- HALL DA FAMA -->
-            <div id="hall" class="tab-pane hidden fade-in">
-                <div id="hall-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div id="tab-partidas" class="tab-pane hidden">
+                <div id="matches-container" class="space-y-4"></div>
             </div>
-
-            <!-- CURIOSIDADES -->
-            <div id="curiosidades" class="tab-pane hidden fade-in">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-bold">Curiosidades</h2>
-                    <button onclick="renderFacts()" class="px-4 py-1 bg-blue-600 text-white rounded-full text-sm">Gerar Novas</button>
-                </div>
-                <div id="facts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-            </div>
-
-            <!-- ADMINS -->
-            <div id="admins" class="tab-pane hidden fade-in">
-                <h2 class="text-2xl font-bold mb-6">Administradores</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="card p-4 rounded-lg text-center"><h4 class="font-bold">Henrique Amaral</h4><p class="text-sm text-blue-500">Admin</p></div>
-                    <div class="card p-4 rounded-lg text-center"><h4 class="font-bold">Douglas Daitx</h4><p class="text-sm text-blue-500">Admin</p></div>
-                    <div class="card p-4 rounded-lg text-center"><h4 class="font-bold">Willy Grafumbek</h4><p class="text-sm text-blue-500">Admin</p></div>
-                    <div class="card p-4 rounded-lg text-center bg-gradient-to-tr from-gray-700 to-gray-800 text-white"><h4 class="font-bold">Iago Nunes</h4><p class="text-sm text-green-400">Dev</p></div>
+            
+            <div id="tab-graficos" class="tab-pane hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-panel p-4 rounded-xl h-80"><canvas id="chart-gols"></canvas></div>
+                    <div class="glass-panel p-4 rounded-xl h-80"><canvas id="chart-assist"></canvas></div>
                 </div>
             </div>
+
         </main>
     </div>
 
-    <!-- Mobile Nav -->
-    <nav class="fixed bottom-0 left-0 w-full bg-white dark:bg-gray-900 border-t dark:border-gray-800 flex justify-around py-3 md:hidden z-40">
-        <button onclick="switchTab('rankings')" class="text-xs flex flex-col items-center text-gray-500"><i class="fas fa-trophy text-xl mb-1"></i>Rank</button>
-        <button onclick="switchTab('selecao')" class="text-xs flex flex-col items-center text-gray-500"><i class="fas fa-calendar-star text-xl mb-1"></i>Seleção</button>
-        <button onclick="switchTab('partidas')" class="text-xs flex flex-col items-center text-gray-500"><i class="fas fa-futbol text-xl mb-1"></i>Jogos</button>
-        <button onclick="switchTab('graficos')" class="text-xs flex flex-col items-center text-gray-500"><i class="fas fa-chart-pie text-xl mb-1"></i>Stats</button>
-        <button onclick="switchTab('admins')" class="text-xs flex flex-col items-center text-gray-500"><i class="fas fa-bars text-xl mb-1"></i>Menu</button>
-    </nav>
-
-    <!-- MODAL JOGADOR (FIFA CARD) -->
-    <div id="player-modal" class="modal fixed inset-0 bg-black bg-opacity-80 items-center justify-center z-50 backdrop-blur-sm p-4">
-        <div class="card w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl relative shadow-2xl">
-            <button onclick="closeModal('player-modal')" class="absolute top-4 right-4 w-8 h-8 bg-black/50 text-white rounded-full z-10 flex items-center justify-center">&times;</button>
-            <div id="player-modal-content"></div>
-        </div>
-    </div>
-
-    <!-- MODAL PARTIDA -->
-    <div id="match-modal" class="modal fixed inset-0 bg-black bg-opacity-80 items-center justify-center z-50 backdrop-blur-sm p-4">
-        <div class="card w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl relative shadow-2xl">
-            <button onclick="closeModal('match-modal')" class="absolute top-4 right-4 w-8 h-8 bg-black/50 text-white rounded-full z-10 flex items-center justify-center">&times;</button>
-            <div id="match-modal-content" class="p-6"></div>
-        </div>
-    </div>
-
-    <!-- MODAL RANKING COMPLETO -->
-    <div id="ranking-modal" class="modal fixed inset-0 bg-black bg-opacity-80 items-center justify-center z-50 backdrop-blur-sm p-4">
-        <div class="card w-full max-w-lg h-[80vh] rounded-2xl relative shadow-2xl flex flex-col overflow-hidden">
-            <div class="p-4 border-b border-gray-700 bg-gray-800 flex justify-between items-center sticky top-0 z-10">
-                <h2 id="ranking-modal-title" class="text-lg font-bold text-white truncate">Ranking</h2>
-                <button onclick="closeModal('ranking-modal')" class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center font-bold transition shadow-md"><i class="fas fa-times"></i></button>
-            </div>
-            <div id="ranking-modal-content" class="p-0 overflow-y-auto flex-1 bg-gray-900"></div>
+    <div id="player-modal" class="fixed inset-0 z-[60] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl relative animate-scale-in">
+            <button onclick="document.getElementById('player-modal').classList.add('hidden')" class="absolute top-4 right-4 text-white hover:text-red-500 text-2xl">&times;</button>
+            <div id="modal-content" class="p-6"></div>
         </div>
     </div>
 
 <script>
-    // 1. CONFIG
-    const CONFIG = {
-        sheetId: "1TvrVT8ksYYMlpw8gkKIFvpnnCf02J8uYTkhHc5c0vdo",
-        apiKey: "AIzaSyCL19ds6YqVOv5vV-zygBjeC-byy-rDPfM",
-        rangeJogadores: "Página1!A2:H100",
-        rangePartidas: "Página2!A2:L1000" 
-    };
+// =========================================================================
+// CONFIGURAÇÃO E DADOS
+// =========================================================================
+const CONFIG = {
+    apiKey: "AIzaSyCL19ds6YqVOv5vV-zygBjeC-byy-rDPfM",
+    spreadsheetId: "1TvrVT8ksYYMlpw8gkKIFvpnnCf02J8uYTkhHc5c0vdo",
+    rangePagina1: "Página1!A2:H100",
+    rangePagina2: "Página2!A2:L300",
+};
 
-    const PHOTOS = {
-        "HENRIQUE AMARAL": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/henrique.jpg", "VITOR": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Vitor%20gol.jpg", "MARCO DAITX": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Marco.jpg", "EDUARDO DUDU": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Eduardo.jpg", "WILIAN SILVA": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Wilian%20Silva.jpg", "DOUGLAS DAITX": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Douglas.jpg", "GUSTAVO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Gustavo.jpg", "ADEMIR": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Ademir.jpg", "DAVI": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Davi%20Mattos.jpg", "VICTOR MATHEUS": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Victor%20Matheus.jpg", "MATHEUS": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/matheus.jpg", "ANDRE": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/main/Andre.jpg", "MAICON": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Maicon.jpg", "CRISTIANO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Cristiano.jpg", "CLAUDIO SCHNEIRDER": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Claudio.jpg", "WILIAN": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/main/Wiliam.jpg", "IAGO NUNES": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Iago%20Nunes.jpg", "WILLY": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/WILLY.jpg", "ZECA": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/ZECA.jpg", "FRANCISCO CHICO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/FRANCISCO%20CHICO.jpg", "PEDRALLI": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/PEDRALLI.jpg", "THALES RAMOS": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Thales%20Ramos.jpg", "BRUNO GUIMARAES": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Bruno.jpg", "EVERTON": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Everton.jpg", "JUAREZ CARDOSO": "https://github.com/ittokki/Fotos-jogadores/blob/main/juarez.jpg?raw=true", "CARLOS ALEXANDRE": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Carlos%20alexandre.jpg"
-    };
+// Mapeamento de Fotos - Atualize as URLs aqui conforme sua pasta do Drive
+// Para usar drive, use links diretos ou serviços de hospedagem de imagem.
+// Exemplo com link ficticio para estrutura.
+const playerPhotos = {
+    "HENRIQUE AMARAL": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/henrique.jpg", 
+    "VITOR": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Vitor%20gol.jpg", 
+    "MARCO DAITX": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Marco.jpg", 
+    "EDUARDO DUDU": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Eduardo.jpg", 
+    "WILIAN SILVA": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Wilian%20Silva.jpg", 
+    "DOUGLAS DAITX": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Douglas.jpg", 
+    "GUSTAVO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Gustavo.jpg", 
+    "ADEMIR": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Ademir.jpg", 
+    "DAVI": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Davi%20Mattos.jpg", 
+    "VICTOR MATHEUS": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Victor%20Matheus.jpg", 
+    "MATHEUS": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/matheus.jpg", 
+    "ANDRE": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/main/Andre.jpg", 
+    "MAICON": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Maicon.jpg", 
+    "CRISTIANO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Cristiano.jpg", 
+    "CLAUDIO SCHNEIRDER": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Claudio.jpg", 
+    "WILIAN": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/main/Wiliam.jpg", 
+    "IAGO NUNES": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Iago%20Nunes.jpg", 
+    "WILLY": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/WILLY.jpg", 
+    "ZECA": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/ZECA.jpg", 
+    "FRANCISCO CHICO": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/FRANCISCO%20CHICO.jpg", 
+    "PEDRALLI": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/PEDRALLI.jpg", 
+    "THALES RAMOS": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Thales%20Ramos.jpg", 
+    "BRUNO GUIMARAES": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Bruno.jpg", 
+    "EVERTON": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Everton.jpg", 
+    "JUAREZ CARDOSO": "https://github.com/ittokki/Fotos-jogadores/blob/main/juarez.jpg?raw=true", 
+    "CARLOS ALEXANDRE": "https://raw.githubusercontent.com/ittokki/Fotos-jogadores/refs/heads/main/Carlos%20alexandre.jpg"
+};
 
-    let allPlayersData = [];
-    let allMatchesData = [];
-    let chartInstances = {};
-    let comparisonChartInstance = null;
+let globalData = { players: [], matches: [] };
 
-    // 2. HELPERS
-    function parseNum(val) {
-        if (typeof val === "number") return val;
-        if (!val) return 0;
-        return Number(val.toString().replace(',', '.').trim()) || 0;
-    }
+// =========================================================================
+// LÓGICA DE DADOS (MOTOR DO TANQUE)
+// =========================================================================
+const DataEngine = {
+    async fetchAll() {
+        const fetchSheet = async (range) => {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.spreadsheetId}/values/${range}?key=${CONFIG.apiKey}`;
+            const res = await fetch(url);
+            const json = await res.json();
+            return json.values || [];
+        };
+        const [p1, p2] = await Promise.all([fetchSheet(CONFIG.rangePagina1), fetchSheet(CONFIG.rangePagina2)]);
+        return this.processRawData(p1, p2);
+    },
 
-    function norm(nome) {
-        if (!nome || typeof nome !== 'string') return '';
-        return nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").replace(/\(GOL\)/gi, "").trim().toUpperCase();
-    }
+    normalizaNome(nome) {
+        return nome ? nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").replace(/\(GOL\)/gi, "").trim().toUpperCase() : "";
+    },
 
-    function format(v, t) {
-        if (v === undefined || v === null || isNaN(v)) return '-';
-        if (t === 'pct') return v.toFixed(0) + '%';
-        if (t === 'dec') return v.toFixed(1);
-        return Math.round(v);
-    }
-
-    function mapPosition(pos) {
-        if (!pos || typeof pos !== 'string') return 'N/A';
-        const p = pos.toLowerCase().trim();
-        if (p.includes('ata')) return 'ata';
-        if (p.includes('mei')) return 'mei';
-        if (p.includes('ala')) return 'ala';
-        if (p.includes('zag')) return 'zag';
-        if (p.includes('gol')) return 'gol';
-        return 'N/A';
-    }
-
-    function getMonthLabel(dateStr) {
-        const [m, y] = dateStr.split('/');
-        const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-        return `${months[parseInt(m)-1]} ${y}`;
-    }
-
-    // 3. DATA LOAD
-    async function loadData() {
-        try {
-            const f1 = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetId}/values/${CONFIG.rangePartidas}?key=${CONFIG.apiKey}`);
-            const f2 = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetId}/values/${CONFIG.rangeJogadores}?key=${CONFIG.apiKey}`);
-            
-            if(!f1.ok || !f2.ok) throw new Error("Erro API");
-            
-            const pData = await f1.json();
-            const jData = await f2.json();
-            
-            processarDados(pData.values, jData.values);
-            initUI();
-        } catch(e) {
-            console.error(e);
-            document.getElementById('loading').style.display = 'none';
-            alert("Erro ao carregar dados.");
-        }
-    }
-
-    // 4. LOGIC
-    function calcularNotaPartida(dados) {
-        const isGoleiro = dados.isGoleiro;
-        const PESO_ADM = 5;
-        const PESO_GOLS = 0.7;
-        const PESO_ASSIST = 0.6;
-        const PESO_GOLS_TOMADOS = isGoleiro ? -0.15 : 0;
-        const PESO_GOLS_CONTRA = -0.7;
-        const NOTA_BASE = 6.0;
-
-        const notaTecnica = NOTA_BASE + (dados.gols * PESO_GOLS) + (dados.assistencias * PESO_ASSIST) + (dados.golsTomados * PESO_GOLS_TOMADOS) + (dados.golsContra * PESO_GOLS_CONTRA);
-        let notaPonderada = (notaTecnica + (dados.notaADM * PESO_ADM)) / (1 + PESO_ADM);
-        const bonusResultado = dados.vitoria === 1 ? 0.3 : (dados.vitoria === 0.5 ? 0.15 : 0);
-        return Math.max(0, Math.min(10, Math.round((notaPonderada + bonusResultado) * 10) / 10));
-    }
-
-    function calcularConquistas(jogador, partidasJogador) {
-        const conquistas = [];
-        if(!partidasJogador) return [];
-        partidasJogador.forEach(p => {
-            if (p.gols >= 6) conquistas.push({ nome: "Exterminador", desc: `6 gols em ${p.dataJogo}`, icon: "fa-skull-crossbones", rarity: "mitico" });
-            else if (p.gols >= 5) conquistas.push({ nome: "Repoker", desc: `5 gols em ${p.dataJogo}`, icon: "fa-star", rarity: "lendario" });
-            else if (p.gols >= 4) conquistas.push({ nome: "Pôquer", desc: `4 gols em ${p.dataJogo}`, icon: "fa-dice-four", rarity: "epico" });
-            else if (p.gols >= 3) conquistas.push({ nome: "Hat-Trick", desc: `3 gols em ${p.dataJogo}`, icon: "fa-futbol", rarity: "raro" });
-            else if (p.gols >= 2) conquistas.push({ nome: "Doblete", desc: `2 gols em ${p.dataJogo}`, icon: "fa-person-running", rarity: "comum" });
-
-            if (p.assistencias >= 6) conquistas.push({ nome: "Maestro", desc: `6+ assistências em ${p.dataJogo}`, icon: "fa-theater-masks", rarity: "mitico" });
-            else if (p.assistencias >= 5) conquistas.push({ nome: "5 Assistências", desc: `5 assist. em ${p.dataJogo}`, icon: "fa-crown", rarity: "lendario" });
-            else if (p.assistencias >= 4) conquistas.push({ nome: "4 Assistências", desc: `4 assistências em ${p.dataJogo}`, icon: "fa-brain", rarity: "epico" });
-            else if (p.assistencias >= 3) conquistas.push({ nome: "Hat-Trick de Assist.", desc: `3 assist. em ${p.dataJogo}`, icon: "fa-hat-wizard", rarity: "raro" });
-            else if (p.assistencias >= 2) conquistas.push({ nome: "2 Assistências", desc: `2 assistências em ${p.dataJogo}`, icon: "fa-hands-helping", rarity: "comum" });
-
-            if (p.notaPartida >= 9.5) conquistas.push({ nome: "Lenda do Jogo", desc: `Nota ${p.notaPartida}`, icon: "fa-gavel", rarity: "lendario" });
-            else if (p.notaPartida >= 9) conquistas.push({ nome: "Partida Épica", desc: `Nota ${p.notaPartida}`, icon: "fa-meteor", rarity: "epico" });
-        });
-        if (jogador.jogos >= 25) conquistas.push({ nome: "Veterano", desc: "25 partidas", icon: "fa-shield-halved", rarity: "raro" });
-        if (jogador.vitorias >= 10) conquistas.push({ nome: "Campeão", desc: "10 vitórias", icon: "fa-trophy", rarity: "raro" });
-        return conquistas;
-    }
-
-    function processarDados(partidasRaw, jogadoresRaw) {
-        const jMap = new Map();
-        jogadoresRaw.forEach(r => {
-            const n = norm(r[1]);
-            if(n) jMap.set(n, { id: r[0], nome: n, nomeOriginal: r[1] });
+    processRawData(jogadoresRaw, partidasRaw) {
+        // Mapa de jogadores base
+        const playersMap = new Map();
+        jogadoresRaw.forEach(row => {
+            const nomeNorm = this.normalizaNome(row[1]);
+            if (nomeNorm) playersMap.set(nomeNorm, { id: row[0], nome: nomeNorm, nomeReal: row[1], rawPos: row[2] });
         });
 
-        const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
-        allMatchesData = partidasRaw.map(r => {
-            const vit = (r[7]||"").toLowerCase().trim();
-            const isG = (r[0]||"").toUpperCase().includes('(GOL)') || parseNum(r[3]) > 0;
+        // Processamento de Partidas
+        const matches = partidasRaw.map(row => {
+            const isGoleiro = (row[0] || "").toUpperCase().includes('(GOL)') || Number(row[3]) > 0;
+            const vitoriaStatus = (row[7] || "").toLowerCase().trim();
+            const pos = row[11] ? row[11].toLowerCase() : 'na';
             
-            const obj = {
-                nome: norm(r[0]), nomeRaw: r[0],
-                gols: parseNum(r[1]), assistencias: parseNum(r[2]),
-                golsTomados: parseNum(r[3]), golsContra: parseNum(r[4]),
-                notaADM: parseNum(r[5]), dataJogo: r[6],
-                vitoria: vit === 'sim' ? 1 : (vit === 'empate' ? 0.5 : 0),
-                time: r[8] || 'N/A', jogoAconteceu: (r[10]||"").toLowerCase() === 'sim',
-                isGoleiro: isG, posicao: mapPosition(r[11])
+            return {
+                nome: this.normalizaNome(row[0]),
+                gols: Number(row[1]) || 0,
+                assist: Number(row[2]) || 0,
+                golsSofridos: Number(row[3]) || 0,
+                notaADM: Number(row[5]) || 0,
+                data: row[6],
+                vitoria: vitoriaStatus === 'sim' ? 1 : vitoriaStatus === 'empate' ? 0.5 : 0,
+                time: row[8],
+                jogou: (row[10] || "").toLowerCase() === 'sim',
+                isGoleiro: isGoleiro,
+                posicaoPartida: pos.includes('ata') ? 'ATA' : pos.includes('mei') ? 'MEI' : pos.includes('zag') ? 'ZAG' : pos.includes('gol') ? 'GOL' : 'ALA'
             };
-            obj.notaPartida = obj.jogoAconteceu ? calcularNotaPartida(obj) : 0;
-            return obj;
-        }).filter(p => p.nome && dateRegex.test(p.dataJogo));
+        }).filter(m => m.nome && m.jogou);
 
-        // Seleção da Semana (Contagem)
-        const selCounts = new Map();
-        const byWeek = allMatchesData.reduce((acc,p) => { if(p.jogoAconteceu) (acc[p.dataJogo] = acc[p.dataJogo] || []).push(p); return acc; }, {});
+        // Agregação de Stats
+        const statsMap = new Map();
         
-        Object.values(byWeek).forEach(weekP => {
-            const best = (pos,n) => weekP.filter(p=>p.posicao===pos).sort((a,b)=>b.notaPartida-a.notaPartida).slice(0,n);
-            const team = [...best('ata',2), ...best('mei',1), ...best('ala',2), ...best('zag',1), ...best('gol',1)];
-            team.forEach(p => { if(p) selCounts.set(p.nome, (selCounts.get(p.nome)||0)+1); });
-        });
-
-        // Agregar Stats
-        allPlayersData = recalculateStats(Array.from(jMap.values()), allMatchesData);
-        allPlayersData.forEach(p => {
-            p.timeDaSemanaCount = selCounts.get(p.nome) || 0;
-            if(p.timeDaSemanaCount > 0) {
-                p.conquistas.unshift({nome: `${p.timeDaSemanaCount}x Seleção`, desc: "Na seleção da semana", icon: "fa-award", rarity: "raro"});
+        matches.forEach(m => {
+            if (!statsMap.has(m.nome)) {
+                statsMap.set(m.nome, {
+                    jogos: 0, gols: 0, assist: 0, vitorias: 0, golsSofridos: 0, 
+                    notas: [], posicoes: {}, jogosGoleiro: 0
+                });
             }
-        });
-    }
-
-    function recalculateStats(baseList, matches) {
-        const map = new Map();
-        baseList.forEach(p => map.set(p.nome, { ...p, jogos:0, vitorias:0, empates:0, gols:0, assistencias:0, golsTomados:0, partidas:[], notasGeral:[], notasGoleiro:[] }));
-
-        matches.filter(m => m.jogoAconteceu).forEach(m => {
-            if(map.has(m.nome)) {
-                const p = map.get(m.nome);
-                p.jogos++;
-                if(m.vitoria === 1) p.vitorias++;
-                if(m.vitoria === 0.5) p.empates++;
-                p.gols += m.gols;
-                p.assistencias += m.assistencias;
-                p.golsTomados += m.golsTomados;
-                p.partidas.push(m);
-                p.notasGeral.push(m.notaPartida);
-                if(m.isGoleiro) p.notasGoleiro.push(m.notaPartida);
-            }
-        });
-
-        const res = Array.from(map.values()).filter(p => p.jogos > 0);
-        res.forEach(p => {
-            p.notaGeral = p.notasGeral.length ? p.notasGeral.reduce((a,b)=>a+b,0)/p.notasGeral.length : 0;
-            p.jogosGoleiro = p.notasGoleiro.length;
-            p.mediaGolsSofridos = p.jogosGoleiro ? p.golsTomados/p.jogosGoleiro : 0;
-            p.aproveitamento = ((p.vitorias + p.empates*0.5)/p.jogos)*100;
-            p.conquistas = calcularConquistas(p, p.partidas);
+            const s = statsMap.get(m.nome);
             
-            const cnt = {};
-            p.partidas.forEach(m => cnt[m.posicao] = (cnt[m.posicao]||0)+1);
-            p.posicaoPrimaria = Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0] || 'N/A';
+            // Calculo da Nota (Lógica Antiga)
+            const PESO_ADM = 5, NOTA_BASE = 6.0;
+            let notaTecnica = NOTA_BASE + (m.gols * 0.7) + (m.assist * 0.6) + (m.isGoleiro ? m.golsSofridos * -0.15 : 0) + (m.golsContra * -0.7 || 0);
+            let notaPonderada = (notaTecnica + (m.notaADM * PESO_ADM)) / (1 + PESO_ADM);
+            let notaFinal = Math.max(0, Math.min(10, notaPonderada + (m.vitoria === 1 ? 0.3 : m.vitoria === 0.5 ? 0.15 : 0)));
 
-            if(p.notaGeral >= 9) p.nivel = 'Lenda';
-            else if(p.notaGeral >= 8) p.nivel = 'Craque';
-            else if(p.notaGeral >= 7) p.nivel = 'Diferenciado';
-            else if(p.notaGeral >= 6) p.nivel = 'Esforçado';
-            else p.nivel = 'Iniciante';
-        });
-        return res;
-    }
-
-    function calculateFifaStats(p) {
-        const all = allPlayersData;
-        const maxG = Math.max(...all.map(x=>x.gols)) || 1;
-        const maxA = Math.max(...all.map(x=>x.assistencias)) || 1;
-        const maxJ = Math.max(...all.map(x=>x.jogos)) || 1;
-        
-        const scale = (v,m) => Math.min(99, Math.max(40, Math.round((v/m)*99)));
-        
-        let pac;
-        let sho;
-        let pas;
-        let dri;
-        let def;
-        let phy;
-
-        const activityScore = (p.jogos / maxJ) * 60;
-        const outputScore = ((p.gols + p.assistencias) / (maxG + maxA)) * 40;
-        pac = Math.round(activityScore + outputScore);
-        if(p.posicaoPrimaria.match(/ala|ata/)) pac += 5;
-        
-        // SHO: Lógica corrigida (Média)
-        const mediaGols = p.gols / p.jogos;
-        if (mediaGols >= 1.5) sho = 99;
-        else if (mediaGols >= 1.0) sho = 90 + ((mediaGols-1.0) * 18);
-        else sho = scale(p.gols, maxG);
-
-        pas = Math.round(((p.assistencias/maxA)*70) + ((p.notaGeral/10)*30));
-        dri = Math.round(((p.notaGeral/10)*50) + (((p.gols+p.assistencias)/(maxG+maxA))*50));
-        def = (p.posicaoPrimaria.match(/gol|zag/)) ? Math.round((p.notaGeral/10)*90) : Math.round((p.jogos/maxJ)*50);
-        phy = scale(p.jogos, maxJ);
-
-        const clamp = v => Math.min(99, Math.max(40, v));
-        return { PAC:clamp(pac), SHO:clamp(sho), PAS:clamp(pas), DRI:clamp(dri), DEF:clamp(def), PHY:clamp(phy) };
-    }
-
-    // 5. RENDER UI
-    function initUI() {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('app-container').classList.remove('hidden');
-
-        // Ordenação e Label dos Meses
-        const months = [...new Set(allMatchesData.map(m => m.dataJogo.slice(3)))].sort((a, b) => {
-            const [ma, ya] = a.split('/').map(Number);
-            const [mb, yb] = b.split('/').map(Number);
-            return (yb - ya) || (mb - ma); 
+            s.jogos++;
+            s.gols += m.gols;
+            s.assist += m.assist;
+            s.vitorias += m.vitoria;
+            s.golsSofridos += m.golsSofridos;
+            s.notas.push(notaFinal);
+            if(m.isGoleiro) s.jogosGoleiro++;
+            
+            // Contagem de posição dinâmica
+            s.posicoes[m.posicaoPartida] = (s.posicoes[m.posicaoPartida] || 0) + 1;
+            
+            m.notaCalculada = notaFinal; // Salva na partida para uso posterior
         });
 
-        const opt = '<option value="all">Geral</option>' + months.map(m => `<option value="${m}">${getMonthLabel(m)}</option>`).join('');
-        document.getElementById('month-filter').innerHTML = opt;
-        document.getElementById('selecao-filter').innerHTML = months.map(m => `<option value="${m}">${getMonthLabel(m)}</option>`).join('');
+        // Montagem Final dos Jogadores
+        const finalPlayers = [];
+        playersMap.forEach((base, key) => {
+            const s = statsMap.get(key);
+            if (s && s.jogos > 0) {
+                const media = s.notas.reduce((a,b)=>a+b,0) / s.jogos;
+                
+                // Determina posição mais jogada
+                let mainPos = Object.keys(s.posicoes).sort((a,b) => s.posicoes[b] - s.posicoes[a])[0] || 'MEI';
 
-        document.getElementById('month-filter').addEventListener('change', (e) => updateRankings(e.target.value));
-        document.getElementById('search-player').addEventListener('input', (e) => updateRankings('Geral', e.target.value));
-        document.getElementById('selecao-filter').addEventListener('change', renderSelecaoMes);
-        document.getElementById('btn-theme').onclick = () => document.documentElement.classList.toggle('dark');
-
-        document.body.addEventListener('click', e => {
-            const pEl = e.target.closest('.player-card');
-            if(pEl) openPlayerModal(pEl.dataset.playerName);
-            const mEl = e.target.closest('.match-card');
-            if(mEl) openMatchModal(mEl.dataset.gamedate);
+                finalPlayers.push({
+                    ...base,
+                    ...s,
+                    mediaGeral: media,
+                    mediaGols: s.gols / s.jogos,
+                    mediaAssist: s.assist / s.jogos,
+                    posicaoPrincipal: mainPos,
+                    fifa: this.calculateFIFAAttributes(media, s.gols, s.assist, s.jogos, mainPos, s.golsSofridos, s.jogosGoleiro)
+                });
+            }
         });
 
-        updateRankings('all');
-        renderSelecaoMes(); 
-        renderPartidas();
-        renderHall();
-        renderCuriosidades();
-        setupComparison();
-        renderCharts();
-    }
+        return { players: finalPlayers, matches: matches };
+    },
 
-    function updateRankings(month, search='') {
-        let list = allPlayersData;
-        if(month !== 'all' && month !== 'Geral') {
-            const matches = allMatchesData.filter(m => m.dataJogo.slice(3) === month);
-            list = recalculateStats(allPlayersData, matches);
-        }
-        if(search) list = list.filter(p => p.nome.includes(norm(search)));
+    calculateFIFAAttributes(media, gols, assist, jogos, pos, golsSofridos, jogosGoleiro) {
+        // Algoritmo FIFA Customizado
+        const ovr = Math.min(99, Math.round(media * 10)); // Ex: Nota 8.5 vira 85
         
-        renderRankings(list);
-        renderDestaqueDoMes(list, month === 'all' || month === 'Geral' ? 'Geral' : getMonthLabel(month));
-    }
+        // Ritmo (PAC): Atacantes ganham bonus por gols, Alas por assist
+        let pac = 60 + (gols/jogos * 15) + (assist/jogos * 10);
+        if(pos === 'ATA' || pos === 'ALA') pac += 10;
+        
+        // Chute (SHO): Gols puro
+        let sho = 50 + (gols/jogos * 40);
+        
+        // Passe (PAS): Assistencia pura
+        let pas = 50 + (assist/jogos * 45);
+        
+        // Defesa (DEF)
+        let def = 50;
+        if(pos === 'GOL') def = 99 - (golsSofridos/jogosGoleiro * 10);
+        else if(pos === 'ZAG') def = 70 + (media * 2);
+        else def = 40 + (media);
 
-    function renderRankings(players) {
-        const container = document.getElementById('rankings-grid');
-        container.innerHTML = '';
-        const cards = [
-            { title: 'Nota Geral', key: 'notaGeral' },
-            { title: 'SELEÇÃO DA SEMANA', key: 'timeDaSemanaCount' },
-            { title: 'Gols', key: 'gols' },
-            { title: 'Assistências', key: 'assistencias' },
-            { title: 'Vitórias', key: 'vitorias' },
-            { title: 'Jogos', key: 'jogos' },
-            { title: 'Ranking Goleiros (Média Gols Sofridos)', key: 'mediaGolsSofridos', higherIsBetter: false },
-            { title: 'Aproveitamento', key: 'aproveitamento', unit: '%' },
+        // Físico (PHY) - Baseado em jogos (experiência)
+        let phy = 50 + Math.min(40, jogos);
+
+        // Drible (DRI) - Baseado em nota técnica implícita
+        let dri = media * 8.5;
+
+        // Classificação da Carta
+        let cardType = 'comum';
+        if(ovr >= 90) cardType = 'lenda';
+        else if(ovr >= 80) cardType = 'craque';
+        else if(ovr >= 70) cardType = 'diferenciado';
+
+        return {
+            ovr: ovr,
+            pac: Math.round(Math.min(99, pac)),
+            sho: Math.round(Math.min(99, sho)),
+            pas: Math.round(Math.min(99, pas)),
+            dri: Math.round(Math.min(99, dri)),
+            def: Math.round(Math.min(99, def)),
+            phy: Math.round(Math.min(99, phy)),
+            cardType: cardType
+        };
+    }
+};
+
+// =========================================================================
+// UI & RENDERIZAÇÃO
+// =========================================================================
+const UI = {
+    init() {
+        this.setupTabs();
+        this.renderCards(globalData.players);
+        this.populateSnakeDraft(globalData.players);
+    },
+
+    setupTabs() {
+        const tabs = [
+            { id: 'rankings', icon: 'fa-trophy', label: 'Ultimate Team' },
+            { id: 'balanceador', icon: 'fa-balance-scale', label: 'Balanceador Snake' },
+            { id: 'partidas', icon: 'fa-history', label: 'Partidas' },
+            { id: 'graficos', icon: 'fa-chart-pie', label: 'Estatísticas' }
         ];
-        cards.forEach(card => {
-            const data = (card.key === 'mediaGolsSofridos') ? players.filter(p => p.jogosGoleiro > 0) : players;
-            container.innerHTML += createRankingCard(card.title, data, card.key, card.unit, card.higherIsBetter);
+        
+        const container = document.getElementById('tabs-container');
+        tabs.forEach(t => {
+            const btn = document.createElement('button');
+            btn.className = `tab-btn px-6 py-3 rounded-xl flex items-center gap-2 text-sm font-bold transition ${t.id === 'rankings' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`;
+            btn.innerHTML = `<i class="fas ${t.icon}"></i> ${t.label}`;
+            btn.onclick = () => this.switchTab(t.id, btn);
+            container.appendChild(btn);
+        });
+    },
+
+    switchTab(tabId, btnElement) {
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+        document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+        
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.className = 'tab-btn px-6 py-3 rounded-xl flex items-center gap-2 text-sm font-bold transition bg-white/5 text-gray-400 hover:bg-white/10';
+        });
+        btnElement.className = 'tab-btn px-6 py-3 rounded-xl flex items-center gap-2 text-sm font-bold transition bg-blue-600 text-white shadow-lg';
+    },
+
+    renderCards(players) {
+        const grid = document.getElementById('cards-grid');
+        grid.innerHTML = '';
+        
+        // Ordenar por OVR
+        const sorted = [...players].sort((a,b) => b.fifa.ovr - a.fifa.ovr);
+
+        sorted.forEach((p, index) => {
+            const photo = playerPhotos[p.nome] || `https://ui-avatars.com/api/?name=${p.nome.replace(' ','+')}&background=random`;
+            const stats = p.fifa;
+            
+            const html = `
+                <div class="glass-card fut-card card-bg-${stats.cardType} cursor-pointer group" onclick="UI.openPlayerModal('${p.nome}')">
+                    <div class="relative h-full w-full p-2 flex flex-col">
+                        <div class="flex justify-between items-start z-10">
+                            <div class="text-left">
+                                <div class="text-3xl font-bold leading-none">${stats.ovr}</div>
+                                <div class="text-xs font-bold uppercase">${p.posicaoPrincipal}</div>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-black/20 flex items-center justify-center">
+                                <span class="font-bold text-xs">#${index+1}</span>
+                            </div>
+                        </div>
+
+                        <div class="absolute top-8 left-0 right-0 flex justify-center z-0">
+                            <img src="${photo}" class="fut-player-img w-32 h-32 object-cover object-top" onerror="this.src='https://ui-avatars.com/api/?name=${p.nome}&background=random'">
+                        </div>
+
+                        <div class="mt-auto z-10 text-center relative pt-20">
+                            <div class="text-lg font-bold uppercase truncate border-b border-black/20 pb-1 mb-1">${p.nomeReal.split(' ')[0]}</div>
+                            
+                            <div class="grid grid-cols-2 gap-x-2 gap-y-0 text-center">
+                                <div class="fut-stat-row"><span>${stats.pac}</span> <span class="opacity-60 font-normal">PAC</span></div>
+                                <div class="fut-stat-row"><span>${stats.dri}</span> <span class="opacity-60 font-normal">DRI</span></div>
+                                <div class="fut-stat-row"><span>${stats.sho}</span> <span class="opacity-60 font-normal">SHO</span></div>
+                                <div class="fut-stat-row"><span>${stats.def}</span> <span class="opacity-60 font-normal">DEF</span></div>
+                                <div class="fut-stat-row"><span>${stats.pas}</span> <span class="opacity-60 font-normal">PAS</span></div>
+                                <div class="fut-stat-row"><span>${stats.phy}</span> <span class="opacity-60 font-normal">PHY</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            grid.innerHTML += html;
+        });
+    },
+
+    populateSnakeDraft(players) {
+        const pool = document.getElementById('draft-pool');
+        pool.innerHTML = '';
+        
+        // Ordena alfabeticamente para facilitar a busca
+        const sorted = [...players].sort((a,b) => a.nomeReal.localeCompare(b.nomeReal));
+        
+        sorted.forEach(p => {
+            const div = document.createElement('div');
+            div.className = "flex items-center justify-between p-2 hover:bg-white/5 rounded cursor-pointer border border-transparent hover:border-blue-500/30 transition";
+            div.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <img src="${playerPhotos[p.nome] || 'https://ui-avatars.com/api/?name='+p.nome}" class="w-8 h-8 rounded-full object-cover">
+                    <div>
+                        <p class="font-bold text-sm">${p.nomeReal}</p>
+                        <p class="text-xs text-gray-400">OVR: ${p.fifa.ovr} | ${p.posicaoPrincipal}</p>
+                    </div>
+                </div>
+                <input type="checkbox" class="draft-check w-5 h-5 accent-blue-500 rounded" value="${p.nome}">
+            `;
+            div.onclick = (e) => {
+                if(e.target.type !== 'checkbox') {
+                    const chk = div.querySelector('input');
+                    chk.checked = !chk.checked;
+                }
+            };
+            pool.appendChild(div);
+        });
+
+        // Search listener
+        document.getElementById('draft-search').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            Array.from(pool.children).forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(term) ? 'flex' : 'none';
+            });
+        });
+    },
+
+    openPlayerModal(nome) {
+        const p = globalData.players.find(x => x.nome === nome);
+        if(!p) return;
+        
+        const modal = document.getElementById('player-modal');
+        const content = document.getElementById('modal-content');
+        
+        content.innerHTML = `
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="flex-shrink-0 text-center">
+                    <div class="w-48 h-64 mx-auto fut-card card-bg-${p.fifa.cardType} shadow-2xl transform scale-100">
+                         <div class="relative h-full w-full p-4 flex flex-col">
+                            <div class="flex justify-between items-start z-10">
+                                <div>
+                                    <div class="text-4xl font-bold">${p.fifa.ovr}</div>
+                                    <div class="text-sm font-bold uppercase">${p.posicaoPrincipal}</div>
+                                </div>
+                            </div>
+                            <img src="${playerPhotos[p.nome] || ''}" class="absolute top-10 left-0 right-0 w-36 h-36 mx-auto object-cover rounded-full">
+                            <div class="mt-auto text-center z-10 pt-24">
+                                <div class="text-xl font-bold uppercase mb-2">${p.nomeReal}</div>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+                
+                <div class="flex-grow space-y-6">
+                    <h2 class="text-3xl font-bold text-white border-b border-gray-700 pb-2">${p.nomeReal}</h2>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div class="bg-black/40 p-3 rounded-lg text-center">
+                            <p class="text-2xl font-bold text-blue-400">${p.jogos}</p>
+                            <p class="text-xs text-gray-500">JOGOS</p>
+                        </div>
+                        <div class="bg-black/40 p-3 rounded-lg text-center">
+                            <p class="text-2xl font-bold text-green-400">${p.gols}</p>
+                            <p class="text-xs text-gray-500">GOLS</p>
+                        </div>
+                        <div class="bg-black/40 p-3 rounded-lg text-center">
+                            <p class="text-2xl font-bold text-yellow-400">${p.assist}</p>
+                            <p class="text-xs text-gray-500">ASSIST.</p>
+                        </div>
+                        <div class="bg-black/40 p-3 rounded-lg text-center">
+                            <p class="text-2xl font-bold text-purple-400">${p.mediaGeral.toFixed(1)}</p>
+                            <p class="text-xs text-gray-500">NOTA MÉDIA</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-gray-300 mb-2">Evolução Recente</h3>
+                        <canvas id="modal-chart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        modal.classList.remove('hidden');
+        
+        // Render Chart
+        const ctx = document.getElementById('modal-chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: p.notas.map((_, i) => `Jogo ${i+1}`),
+                datasets: [{
+                    label: 'Nota',
+                    data: p.notas,
+                    borderColor: '#3b82f6',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { min: 0, max: 10, grid: { color: 'rgba(255,255,255,0.1)' } } }
+            }
         });
     }
+};
 
-    function createRankingCard(title, data, key, unit = '', higherIsBetter = true) {
-        const sortedData = [...data].sort((a, b) => higherIsBetter ? b[key] - a[key] : a[key] - b[key]);
-        const top5 = sortedData.slice(0, 5);
-        let html = `<div class="card p-4 rounded-lg flex flex-col fade-in"><h3 class="font-bold text-lg mb-4">${title}</h3><div class="flex-grow space-y-3">`;
-        if (top5.length === 0) {
-             html += `<p class="text-gray-500 text-sm h-full flex items-center justify-center">Nenhum jogador encontrado.</p>`;
-        } else {
-            top5.forEach((p, index) => {
-                const value = format(p[key], key==='notaGeral'||key==='mediaGolsSofridos'?'dec':(unit==='%'?'pct':''));
-                const photoUrl = PHOTOS[p.nome] || `https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random`;
-                html += `
-                    <div class="player-card flex items-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-md" data-player-name="${p.nomeOriginal}">
-                        <span class="font-bold w-6">${index + 1}.</span>
-                        <img src="${photoUrl}" class="w-10 h-10 rounded-full object-cover mr-3" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${p.nome.replace(' ', '+')}&background=random';">
-                        <div class="flex-grow player-info">
-                            <p class="font-semibold truncate leading-tight">${p.nomeOriginal}</p>
+// =========================================================================
+// SISTEMA SNAKE DRAFT & IA VERDICT
+// =========================================================================
+const draftSystem = {
+    runSnakeDraft() {
+        // 1. Pegar selecionados
+        const checkboxes = document.querySelectorAll('.draft-check:checked');
+        const selectedNames = Array.from(checkboxes).map(c => c.value);
+        
+        if(selectedNames.length < 2) return alert("Selecione pelo menos 2 jogadores.");
+
+        // 2. Recuperar objetos completos e ordenar por OVR
+        const pool = globalData.players
+            .filter(p => selectedNames.includes(p.nome))
+            .sort((a,b) => b.fifa.ovr - a.fifa.ovr); // O melhor primeiro
+
+        // 3. Distribuição Snake (A, B, B, A, A, B...)
+        const teamA = [];
+        const teamB = [];
+        
+        pool.forEach((player, index) => {
+            // Lógica Snake: 0->A, 1->B, 2->B, 3->A, 4->A, 5->B...
+            // Padrão repete a cada 4: A, B, B, A
+            const cycle = index % 4;
+            if (cycle === 0 || cycle === 3) {
+                teamA.push(player);
+            } else {
+                teamB.push(player);
+            }
+        });
+
+        this.renderTeams(teamA, teamB);
+        this.runAIVerdict(teamA, teamB);
+    },
+
+    renderTeams(teamA, teamB) {
+        const renderList = (team, containerId, scoreId) => {
+            const ul = document.getElementById(containerId);
+            ul.innerHTML = '';
+            let totalOvr = 0;
+            
+            team.forEach(p => {
+                totalOvr += p.fifa.ovr;
+                ul.innerHTML += `
+                    <li class="flex justify-between items-center bg-black/20 p-2 rounded">
+                        <div class="flex items-center gap-2">
+                            <div class="text-xs font-bold w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center">${p.fifa.ovr}</div>
+                            <span>${p.nomeReal}</span>
                         </div>
-                        <span class="font-bold text-blue-500">${value}${unit}</span>
-                    </div>
+                        <span class="text-xs text-gray-400">${p.posicaoPrincipal}</span>
+                    </li>
                 `;
             });
-        }
-        html += `</div><button class="ver-mais-btn mt-4 text-sm text-blue-500 hover:underline" onclick="openFullRanking('${title}', '${key}', '${unit}', ${key==='mediaGolsSofridos'})">Ver Ranking Completo</button></div>`;
-        return html;
-    }
-
-    function renderDestaqueDoMes(players, monthLabel) {
-         const container = document.getElementById('destaque-mes-container');
-         const bestPlayer = [...players].filter(p => p.jogos > 0).sort((a,b) => b.notaGeral - a.notaGeral)[0];
-         if(bestPlayer) {
-             const photoUrl = PHOTOS[bestPlayer.nome] || `https://ui-avatars.com/api/?name=${bestPlayer.nome.replace(' ', '+')}&background=random`;
-             // Destaque COM DADOS
-             container.innerHTML = `
-             <div class="card p-6 rounded-xl bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-2xl relative overflow-hidden cursor-pointer player-card" data-player-name="${bestPlayer.nomeOriginal}">
-                 <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full transform translate-x-10 -translate-y-10"></div>
-                 <div class="relative z-10 flex items-center gap-6">
-                     <img src="${photoUrl}" class="w-24 h-24 rounded-full object-cover border-4 border-yellow-400 shadow-md" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${bestPlayer.nome.replace(' ', '+')}&background=random';">
-                     <div class="flex-1">
-                         <div class="text-xs font-bold bg-yellow-400 text-black inline-block px-2 py-1 rounded mb-1 uppercase tracking-widest">Destaque ${monthLabel}</div>
-                         <h2 class="text-3xl font-bold mb-2">${bestPlayer.nomeOriginal}</h2>
-                         <div class="flex gap-4 text-sm font-medium">
-                            <div class="bg-white/20 px-3 py-1 rounded"><i class="fas fa-star text-yellow-300 mr-1"></i>${bestPlayer.notaGeral.toFixed(1)}</div>
-                            <div class="bg-white/20 px-3 py-1 rounded"><i class="fas fa-futbol mr-1"></i>${bestPlayer.gols} Gols</div>
-                            <div class="bg-white/20 px-3 py-1 rounded"><i class="fas fa-hands-helping mr-1"></i>${bestPlayer.assistencias} Ass.</div>
-                            <div class="bg-white/20 px-3 py-1 rounded"><i class="fas fa-running mr-1"></i>${bestPlayer.jogos} J</div>
-                         </div>
-                     </div>
-                 </div>
-             </div>`;
-         } else {
-               container.innerHTML = `
-                   <div class="card p-5 rounded-lg">
-                       <h3 class="text-xl font-bold mb-2">Destaque de ${monthLabel}</h3>
-                       <p class="text-gray-500">Nenhum jogador com partidas registradas neste mês.</p>
-                   </div>`;
-         }
-    }
-
-    function renderSelecaoMes() {
-        const month = document.getElementById('selecao-filter').value;
-        const container = document.getElementById('selecao-display');
-        if(!month) return;
-
-        const matches = allMatchesData.filter(m => m.jogoAconteceu && m.dataJogo.slice(3) === month);
-        if(!matches.length) { container.innerHTML='<p class="text-center p-4">Sem dados.</p>'; return; }
-
-        const stats = {};
-        matches.forEach(m => {
-            if(!stats[m.nome]) stats[m.nome] = { nome:m.nome, nomeRaw:m.nomeRaw, s:0, c:0, pos:m.posicao };
-            stats[m.nome].s += m.notaPartida; stats[m.nome].c++;
-        });
-        const pl = Object.values(stats).map(p => ({...p, avg: p.s/p.c}));
-        const best = (pos,n) => pl.filter(p=>p.pos===pos).sort((a,b)=>b.avg-a.avg).slice(0,n);
-        
-        const sq = { gol:best('gol',1), zag:best('zag',1), ala:best('ala',2), mei:best('mei',1), ata:best('ata',2) };
-        
-        // CORREÇÃO: Exibir nome completo sem cortar
-        const pHTML = (p) => !p ? '<div class="w-12"></div>' : `<div class="flex flex-col items-center w-16 player-card cursor-pointer" data-player-name="${p.nomeRaw}"><img src="${PHOTOS[p.nome]||''}" class="w-10 h-10 rounded-full border-2 border-yellow-400 bg-gray-700"><span class="text-[9px] bg-black/60 px-1 rounded mt-1 leading-tight w-full text-center break-words">${p.nomeRaw}</span><span class="text-xs text-yellow-400 font-bold">${p.avg.toFixed(1)}</span></div>`;
-
-        container.innerHTML = `
-            <div class="soccer-field h-[400px] rounded-xl flex flex-col justify-around py-4 relative shadow-2xl mx-auto max-w-2xl">
-                 <!-- Desenho do Campo Society -->
-                <div class="field-outline"></div>
-                <div class="field-midline"></div>
-                <div class="field-center-circle"></div>
-                <div class="field-box-top"></div>
-                <div class="field-box-bottom"></div>
-
-                <div class="flex justify-center gap-8 relative z-10 pt-2">${sq.ata.map(pHTML).join('')}</div>
-                <div class="flex justify-center relative z-10">${sq.mei.map(pHTML).join('')}</div>
-                <div class="flex justify-center gap-12 relative z-10">${sq.ala.map(pHTML).join('')}</div>
-                <div class="flex justify-center relative z-10">${sq.zag.map(pHTML).join('')}</div>
-                <div class="flex justify-center relative z-10 pb-2">${sq.gol.map(pHTML).join('')}</div>
-            </div>`;
-    }
-
-    function renderPartidas() {
-        const container = document.getElementById('partidas');
-        container.innerHTML = '';
-        const grp = allMatchesData.reduce((acc,p) => { (acc[p.dataJogo]=acc[p.dataJogo]||[]).push(p); return acc; }, {});
-        Object.keys(grp).sort((a,b) => new Date(b.split('/').reverse().join('-')) - new Date(a.split('/').reverse().join('-'))).forEach(d => {
-            const m = grp[d];
-            const played = m.some(p=>p.jogoAconteceu);
-            const sA = m.filter(p=>p.time.toUpperCase()==='BOCA').reduce((s,p)=>s+p.gols,0);
-            const sB = m.filter(p=>p.time.toUpperCase()==='RIVER').reduce((s,p)=>s+p.gols,0);
-            container.innerHTML += `<div class="card p-4 rounded-lg match-card cursor-pointer hover:bg-white/5" data-gamedate="${d}"><div class="flex justify-between text-sm text-gray-500 mb-2"><span>${d}</span><span>${played?'Fim':'Agendado'}</span></div><div class="flex justify-between items-center font-bold text-xl"><span class="text-blue-500">BOCA</span><div class="bg-gray-800 px-3 py-1 rounded text-white">${played?`${sA} - ${sB}`:'VS'}</div><span class="text-red-500">RIVER</span></div></div>`;
-        });
-    }
-
-    function renderHall() {
-        const container = document.getElementById('hall-container'); // Correção ID
-        if (!container) return;
-        
-        const list = allPlayersData.filter(p=>p.conquistas.length).sort((a,b)=>b.conquistas.length-a.conquistas.length);
-        container.innerHTML = list.map(p => `<div class="card p-4 rounded-lg flex gap-4 player-card cursor-pointer" data-player-name="${p.nomeOriginal}"><img src="${PHOTOS[p.nome]||''}" class="w-16 h-16 rounded-full border-2 border-yellow-500 bg-gray-700"><div><h4 class="font-bold">${p.nomeOriginal}</h4><span class="text-xs bg-yellow-500 text-black px-2 rounded font-bold">${p.conquistas.length} Conquistas</span></div></div>`).join('');
-    }
-
-    function renderCuriosidades() {
-        const container = document.getElementById('facts-container');
-        container.innerHTML = '';
-        const facts = [];
-        const p = allPlayersData.filter(x=>x.jogos>0);
-        if(!p.length) return;
-        const scorer = [...p].sort((a,b)=>b.gols-a.gols)[0];
-        if(scorer) facts.push({icon:'⚽', t:`Rei do Gol: <b>${scorer.nomeOriginal}</b> (${scorer.gols})`});
-        const gk = p.filter(x=>x.jogosGoleiro>0).sort((a,b)=>a.mediaGolsSofridos-b.mediaGolsSofridos)[0];
-        if(gk) facts.push({icon:'🧤', t:`Paredão: <b>${gk.nomeOriginal}</b> (${gk.mediaGolsSofridos.toFixed(2)} gols/j)`});
-        
-        const sel = [...p].sort((a,b)=>b.timeDaSemanaCount-a.timeDaSemanaCount)[0];
-        if(sel && sel.timeDaSemanaCount>0) facts.push({icon:'🌟', t:`<b>${sel.nomeOriginal}</b> entrou na Seleção da Semana ${sel.timeDaSemanaCount} vezes.`});
-
-        const veteran = p.filter(x => x.jogos >= 5);
-        if (veteran.length) {
-            const lucky = veteran.sort((a, b) => b.aproveitamento - a.aproveitamento)[0];
-            facts.push({icon: '🍀', t: `Amuleto: <b>${lucky.nomeOriginal}</b> (${lucky.aproveitamento.toFixed(0)}% de aproveitamento)`});
-        }
-
-        const fominha = [...p].sort((a, b) => b.jogos - a.jogos)[0];
-        if (fominha) facts.push({icon: '🏃', t: `Fominha: <b>${fominha.nomeOriginal}</b> (${fominha.jogos} jogos)`});
-        
-        const assist = [...p].sort((a, b) => b.assistencias - a.assistencias)[0];
-        if (assist) facts.push({icon: '🍽️', t: `Garçom: <b>${assist.nomeOriginal}</b> (${assist.assistencias} assistências)`});
-
-        facts.forEach(f => {
-            container.innerHTML += `<div class="card p-4 rounded-lg flex flex-col items-center justify-center text-center fade-in"><div class="text-3xl mb-3">${f.icon}</div><p class="text-base">${f.t}</p></div>`;
-        });
-    }
-
-    function setupComparison() {
-        const s1 = document.getElementById('p1-select'), s2 = document.getElementById('p2-select');
-        const opts = '<option value="">Escolha...</option>' + allPlayersData.sort((a,b)=>a.nome.localeCompare(b.nome)).map(p=>`<option value="${p.nomeOriginal}">${p.nomeOriginal}</option>`).join('');
-        s1.innerHTML = opts; s2.innerHTML = opts;
-        
-        const update = () => {
-            if(!s1.value || !s2.value) return;
-            const p1 = allPlayersData.find(p=>p.nomeOriginal===s1.value), p2 = allPlayersData.find(p=>p.nomeOriginal===s2.value);
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            if(comparisonChartInstance) comparisonChartInstance.destroy();
             
-            const n = (v,m) => (v/m)*10; const maxG = Math.max(...allPlayersData.map(p=>p.gols));
-            comparisonChartInstance = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['Geral', 'Gols', 'Ass', 'Vit', 'Jogos'],
-                    datasets: [
-                        { label: p1.nomeOriginal, data: [p1.notaGeral, n(p1.gols,maxG), n(p1.assistencias,20), n(p1.vitorias,30), n(p1.jogos,50)], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.2)' },
-                        { label: p2.nomeOriginal, data: [p2.notaGeral, n(p2.gols,maxG), n(p2.assistencias,20), n(p2.vitorias,30), n(p2.jogos,50)], borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.2)' }
-                    ]
-                },
-                options: { scales: { r: { min:0, max:10, ticks:{display:false} } } }
-            });
-            document.getElementById('comparison-table').innerHTML = `<div class="flex justify-between border-b py-2"><span class="text-blue-500 font-bold">${p1.notaGeral.toFixed(1)}</span><span>Nota</span><span class="text-red-500 font-bold">${p2.notaGeral.toFixed(1)}</span></div>`;
-        };
-        s1.onchange = update; s2.onchange = update;
-    }
-
-    function renderCharts() {
-        const p = allPlayersData.filter(x=>x.jogos>0);
-        if(!p.length) return;
-        
-        const build = (id, type, title, fn, color) => {
-            const s = [...p].sort(fn).slice(0,10);
-            if(chartInstances[id]) chartInstances[id].destroy();
-            chartInstances[id] = new Chart(document.getElementById(id), {
-                type, data: { labels: s.map(x=>x.nomeOriginal), datasets: [{ label: title, data: s.map(x=>x._val), backgroundColor: color }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: title } } }
-            });
+            const avg = Math.round(totalOvr / team.length);
+            document.getElementById(scoreId).innerText = `Média OVR: ${avg}`;
+            return { avg, totalGoals: team.reduce((a,b) => a + b.gols, 0) };
         };
 
-        p.forEach(x=>x._val=x.gols); build('chart-gols', 'bar', 'Gols', (a,b)=>b.gols-a.gols, '#3b82f6');
-        p.forEach(x=>x._val=x.assistencias); build('chart-assists', 'bar', 'Assistências', (a,b)=>b.assistencias-a.assistencias, '#10b981');
-        p.forEach(x=>x._val=x.aproveitamento); build('chart-aprov', 'bar', 'Aproveitamento %', (a,b)=>b.aproveitamento-a.aproveitamento, '#f59e0b');
-        
-        // Evolução
-        const evo = p.map(x => {
-            const m = x.partidas.filter(j=>j.jogoAconteceu);
-            return { ...x, val: m.length >= 3 ? m[m.length-1].notaPartida - m[m.length-3].notaPartida : -99 };
-        }).filter(x=>x.val > -10).sort((a,b)=>b.val-a.val).slice(0,10);
-        
-        evo.forEach(x=>x._val=x.val);
-        build('chart-evolucao', 'bar', 'Evolução Recente', (a,b)=>b.val-a.val, '#8b5cf6');
+        this.statsA = renderList(teamA, 'list-team-a', 'score-team-a');
+        this.statsB = renderList(teamB, 'list-team-b', 'score-team-b');
+    },
 
-        // Monthly
-        const monthlyGoals = allMatchesData.filter(p => p.jogoAconteceu).reduce((acc, p) => { acc[p.dataJogo.slice(3)] = (acc[p.dataJogo.slice(3)]||0)+p.gols; return acc; }, {});
-        const ctxM = document.getElementById('chart-monthly').getContext('2d');
-        if(chartInstances['chart-monthly']) chartInstances['chart-monthly'].destroy();
-        chartInstances['chart-monthly'] = new Chart(ctxM, { type: 'line', data: { labels: Object.keys(monthlyGoals), datasets: [{ label: 'Gols', data: Object.values(monthlyGoals), borderColor: '#ec4899', tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false } });
+    runAIVerdict(teamA, teamB) {
+        const panel = document.getElementById('ia-verdict');
+        panel.classList.remove('hidden');
+        panel.classList.add('animate-pulse'); // Efeito de processando
+
+        setTimeout(() => {
+            panel.classList.remove('animate-pulse');
+            
+            const statsA = this.statsA;
+            const statsB = this.statsB;
+
+            // Analise
+            const techWinner = statsA.avg > statsB.avg ? "TIME A" : statsA.avg < statsB.avg ? "TIME B" : "EMPATE";
+            const goalsWinner = statsA.totalGoals > statsB.totalGoals ? "TIME A" : statsA.totalGoals < statsB.totalGoals ? "TIME B" : "EMPATE";
+
+            document.getElementById('verdict-fav-tech').innerText = techWinner;
+            document.getElementById('verdict-fav-goals').innerText = goalsWinner;
+
+            // Texto gerado
+            let text = "";
+            if (techWinner === goalsWinner && techWinner !== "EMPATE") {
+                text = `O ${techWinner} é o favorito absoluto. Possui tecnicamente os melhores jogadores e maior histórico de gols.`;
+            } else if (techWinner === "EMPATE") {
+                text = "Equilíbrio total. O Snake Draft funcionou perfeitamente.";
+            } else {
+                text = `Jogo interessante! O ${techWinner} tem mais técnica (OVR), mas o ${goalsWinner} tem mais faro de gol. A partida será decidida na defesa.`;
+            }
+            document.getElementById('verdict-text').innerText = text;
+
+        }, 1500);
     }
+};
 
-    // --- GLOBAL ACTIONS ---
-    window.switchTab = (id) => {
-        document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll(`[onclick="switchTab('${id}')"]`).forEach(b => b.classList.add('active'));
-        if(id === 'graficos') renderCharts();
-    };
-    window.closeModal = (id) => document.getElementById(id).classList.remove('show');
-    
-    window.openPlayerModal = (name) => {
-        const p = allPlayersData.find(x => x.nomeOriginal === name);
-        if(!p) return;
-        const stats = calculateFifaStats(p);
-        const bg = p.nivel==='Lenda' ? 'bg-fifa-lenda' : (p.nivel==='Craque'?'bg-fifa-craque':'bg-fifa-comum');
-        
-        document.getElementById('player-modal-content').innerHTML = `
-            <div class="flex flex-col md:flex-row gap-6 bg-gray-900 p-6 rounded-xl">
-                <div class="w-64 h-96 ${bg} rounded-[1.5rem] relative flex flex-col items-center p-4 shadow-2xl mx-auto text-current select-none">
-                    <div class="absolute top-6 left-6 text-left leading-none"><div class="text-4xl font-bold">${p.notaGeral.toFixed(0)}</div><div class="text-xs uppercase">OVR</div></div>
-                    <img src="${PHOTOS[p.nome]||''}" class="w-32 h-32 rounded-full object-cover mt-8 border-2 border-white/30 bg-gray-800">
-                    <!-- CORREÇÃO: NOME COMPLETO CENTRALIZADO -->
-                    <div class="mt-4 text-xl font-bold uppercase border-b border-white/30 pb-1 mb-2 text-center w-full leading-tight break-words px-2">${p.nomeOriginal}</div>
-                    <div class="grid grid-cols-2 w-full px-4 text-sm font-bold">
-                        <div class="flex justify-between"><span>PAC</span><span>${stats.PAC}</span></div>
-                        <div class="flex justify-between"><span>DRI</span><span>${stats.DRI}</span></div>
-                        <div class="flex justify-between"><span>SHO</span><span>${stats.SHO}</span></div>
-                        <div class="flex justify-between"><span>DEF</span><span>${stats.DEF}</span></div>
-                        <div class="flex justify-between"><span>PAS</span><span>${stats.PAS}</span></div>
-                        <div class="flex justify-between"><span>PHY</span><span>${stats.PHY}</span></div>
-                    </div>
-                </div>
-                <div class="flex-1 text-white">
-                    <h2 class="text-3xl font-bold">${p.nomeOriginal}</h2>
-                    <p class="text-blue-400 font-bold mb-4 uppercase">${p.nivel}</p>
-                    <div class="grid grid-cols-3 gap-4 mb-6 text-center">
-                        <div class="bg-gray-800 p-3 rounded"><div class="text-2xl font-bold">${p.jogos}</div><div class="text-xs text-gray-400">Jogos</div></div>
-                        <div class="bg-gray-800 p-3 rounded"><div class="text-2xl font-bold text-blue-400">${p.gols}</div><div class="text-xs text-gray-400">Gols</div></div>
-                        <div class="bg-gray-800 p-3 rounded"><div class="text-2xl font-bold text-green-400">${p.assistencias}</div><div class="text-xs text-gray-400">Assist</div></div>
-                    </div>
-                    <h3 class="font-bold mb-2 text-yellow-500">Conquistas (${p.conquistas.length})</h3>
-                    <div class="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto">
-                        ${p.conquistas.map(c => `<div class="flex items-center gap-3 p-2 bg-gray-800 rounded border border-gray-700"><i class="fas ${c.icon} text-yellow-500"></i><div><div class="font-bold text-sm">${c.nome}</div><div class="text-xs text-gray-400">${c.desc}</div></div></div>`).join('')}
-                    </div>
-                </div>
-            </div>`;
-        document.getElementById('player-modal').classList.add('show');
-    };
-
-    window.openMatchModal = (date) => {
-        const m = allMatchesData.filter(x => x.dataJogo === date);
-        const played = m.some(x=>x.jogoAconteceu);
-        
-        const best = (pos, n) => m.filter(x=>x.posicao===pos).sort((a,b)=>b.notaPartida-a.notaPartida).slice(0,n);
-        const sq = { gol:best('gol',1)[0], zag:best('zag',1)[0], ala:best('ala',2), mei:best('mei',1)[0], ata:best('ata',2) };
-        
-        // CORREÇÃO: Nome completo no modal da partida
-        const pHTML = (p) => !p ? '<div class="w-12"></div>' : `<div class="flex flex-col items-center w-16"><img src="${PHOTOS[p.nome]||''}" class="w-10 h-10 rounded-full bg-gray-700"><span class="text-[9px] bg-black px-1 rounded text-white mt-1 leading-tight text-center w-full break-words">${p.nomeRaw}</span></div>`;
-
-        const tHtml = (t) => `<div class="bg-gray-800 p-3 rounded"><h4 class="font-bold text-center border-b border-gray-600 pb-1 mb-2">${t}</h4>${m.filter(x=>x.time.toUpperCase()===t).map(x=>`<div class="flex justify-between text-xs py-1"><span>${x.nomeRaw}</span><span class="${x.notaPartida>=8?'text-green-400':''}">${x.notaPartida.toFixed(1)}</span></div>`).join('')}</div>`;
-
-        document.getElementById('match-modal-content').innerHTML = `
-            <h2 class="text-xl font-bold text-center mb-4 text-white">Partida ${date}</h2>
-            <div class="grid grid-cols-2 gap-4 mb-6">${tHtml('BOCA')}${tHtml('RIVER')}</div>
-            ${played ? `<div class="soccer-field h-[300px] rounded-lg flex flex-col justify-around py-2 relative shadow-inner mx-auto max-w-md">
-                <div class="flex justify-center gap-8 relative z-10">${sq.ata.map(pHTML).join('')}</div>
-                <div class="flex justify-center relative z-10">${[sq.mei].map(pHTML).join('')}</div>
-                <div class="flex justify-center gap-12 relative z-10">${sq.ala.map(pHTML).join('')}</div>
-                <div class="flex justify-center relative z-10">${[sq.zag].map(pHTML).join('')}</div>
-                <div class="flex justify-center relative z-10">${[sq.gol].map(pHTML).join('')}</div>
-            </div>` : ''}`;
-        document.getElementById('match-modal').classList.add('show');
-    };
-
-    window.openFullRanking = (title, key, unit, isGoalie) => {
-        document.getElementById('ranking-modal-title').innerText = title;
-        let list = allPlayersData;
-        const month = document.getElementById('month-filter').value;
-        if(month !== 'all' && month !== 'Geral') {
-            const matches = allMatchesData.filter(m => m.dataJogo.slice(3) === month);
-            list = recalculateStats(allPlayersData, matches);
+// =========================================================================
+// INICIALIZAÇÃO
+// =========================================================================
+const app = {
+    async init() {
+        try {
+            const data = await DataEngine.fetchAll();
+            globalData = data;
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('app-container').classList.remove('hidden');
+            UI.init();
+        } catch (e) {
+            console.error(e);
+            alert("Erro ao carregar dados. Verifique a API Key ou conexão.");
         }
-        if(isGoalie) list = list.filter(p => p.jogosGoleiro > 0 && p.mediaGolsSofridos !== undefined);
-        if(key === 'timeDaSemanaCount') list = list.filter(p => p.timeDaSemanaCount > 0);
+    },
+    
+    toggleBalanceador() {
+        const btn = document.querySelector('button[onclick*="balanceador"]'); // Hack simples pra achar o botao
+        // Simplesmente simula clique na tab
+        const tabBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.innerHTML.includes('Balanceador'));
+        if(tabBtn) tabBtn.click();
+    },
 
-        list.sort((a,b) => {
-            if(key==='mediaGolsSofridos') return a[key]-b[key];
-            return b[key]-a[key];
-        });
+    updateData() {
+        location.reload();
+    }
+};
 
-        document.getElementById('ranking-modal-content').innerHTML = `<table class="w-full text-left border-collapse text-sm"><thead class="bg-gray-800 text-gray-400 sticky top-0"><tr><th class="p-3">#</th><th class="p-3">Jogador</th><th class="p-3 text-right">Val</th></tr></thead><tbody>${list.map((p,i) => `<tr class="border-b border-gray-700 hover:bg-white/5"><td class="p-3 font-bold">${i+1}</td><td class="p-3 flex items-center gap-2"><img src="${PHOTOS[p.nome]||''}" class="w-6 h-6 rounded-full bg-gray-600">${p.nomeOriginal}</td><td class="p-3 text-right font-bold text-blue-400">${format(p[key], unit==='%'?'pct':(key==='notaGeral'||key==='mediaGolsSofridos'?'dec':''))}</td></tr>`).join('')}</tbody></table>`;
-        document.getElementById('ranking-modal').classList.add('show');
-    };
+document.addEventListener('DOMContentLoaded', () => app.init());
 
-    loadData();
 </script>
 </body>
 </html>
