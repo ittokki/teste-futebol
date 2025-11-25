@@ -521,13 +521,13 @@
             <h2 class="text-3xl font-bold text-white mb-8 text-center font-fifa uppercase tracking-widest">Face-a-Face</h2>
             
             <!-- Selectors -->
-            <div class="flex justify-center items-center gap-8 mb-8">
-                <div class="w-64">
+            <div class="flex flex-col md:flex-row justify-center items-center gap-8 mb-8">
+                <div class="w-full md:w-64">
                     <label class="block text-xs text-blue-400 font-bold uppercase mb-2">Jogador 1</label>
                     <select id="p1-select" class="w-full bg-black/40 text-white p-3 rounded-lg border border-blue-500/30 focus:outline-none focus:border-blue-500 transition"></select>
                 </div>
                 <div class="text-4xl font-bold text-white font-fifa opacity-50">VS</div>
-                <div class="w-64">
+                <div class="w-full md:w-64">
                     <label class="block text-xs text-red-400 font-bold uppercase mb-2">Jogador 2</label>
                     <select id="p2-select" class="w-full bg-black/40 text-white p-3 rounded-lg border border-red-500/30 focus:outline-none focus:border-red-500 transition"></select>
                 </div>
@@ -540,7 +540,7 @@
             
             <!-- Radar Chart Container (Hidden initially) -->
             <div id="radar-container" class="hidden mt-8 justify-center">
-                <div class="w-[400px] h-[300px] relative">
+                <div class="w-full max-w-md h-[300px] relative">
                     <canvas id="radar-chart"></canvas>
                 </div>
             </div>
