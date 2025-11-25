@@ -673,14 +673,37 @@ document.addEventListener('DOMContentLoaded', () => {
         return conquistas;
     }
 
+    // CORREÇÃO AQUI: Lógica de contagem respeitando a formação tática
     function calculateSelectionCount(matches) {
-        const dates = [...new Set(matches.filter(m=>m.jogoAconteceu).map(m => m.dataJogo))];
+        const dates = [...new Set(matches.filter(m => m.jogoAconteceu).map(m => m.dataJogo))];
         const counts = {};
+
         dates.forEach(date => {
             const dayMatches = matches.filter(m => m.dataJogo === date && m.jogoAconteceu);
-            const sorted = dayMatches.sort((a,b) => b.notaPartida - a.notaPartida).slice(0, 7);
-            sorted.forEach(p => { counts[p.nome] = (counts[p.nome] || 0) + 1; });
+
+            // Função auxiliar para pegar os N melhores daquela posição naquele dia
+            const getBestOfPos = (pos, limit) => {
+                return dayMatches
+                    .filter(p => p.posicao === pos)
+                    .sort((a, b) => b.notaPartida - a.notaPartida)
+                    .slice(0, limit);
+            };
+
+            // Seleciona o time ideal do dia respeitando: 1 GOL, 1 ZAG, 2 ALA, 1 MEI, 2 ATA
+            const selectionOfDay = [
+                ...getBestOfPos('gol', 1),
+                ...getBestOfPos('zag', 1),
+                ...getBestOfPos('ala', 2),
+                ...getBestOfPos('mei', 1),
+                ...getBestOfPos('ata', 2)
+            ];
+
+            // Só incrementa a contagem se o jogador entrou nessa lista seleta
+            selectionOfDay.forEach(p => {
+                counts[p.nome] = (counts[p.nome] || 0) + 1;
+            });
         });
+
         return counts;
     }
 
@@ -846,12 +869,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- HERO SECTION ---
     function renderHero(players) {
         if(!players.length) return;
-        const hero = players.sort((a,b) => b.notaGeral - a.notaGeral)[0]; // Best by rating
+
+        const filterVal = document.getElementById('month-filter').value;
+        let candidates = players;
+
+        // Se for filtro mensal, exige mínimo de 2 jogos
+        if (filterVal !== 'Geral') {
+            const filtered = players.filter(p => p.jogos >= 2);
+            // Só aplica o filtro se houver jogadores elegíveis, senão mantém todos (fallback para início de mês)
+            if (filtered.length > 0) {
+                candidates = filtered;
+            }
+        }
+
+        const hero = candidates.sort((a,b) => b.notaGeral - a.notaGeral)[0]; // Best by rating
         const container = document.getElementById('hero-section');
         container.classList.remove('hidden');
 
         // Dynamic Label
-        const filterVal = document.getElementById('month-filter').value;
         const label = filterVal === 'Geral' ? "MELHOR DA TEMPORADA" : `MELHOR DE ${document.getElementById('month-filter').options[document.getElementById('month-filter').selectedIndex].text.toUpperCase()}`;
         
         document.getElementById('hero-label').innerText = label;
