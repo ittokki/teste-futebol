@@ -781,7 +781,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 nome: p.nome, nomeOriginal: p.nomeOriginal,
                 jogos: p.stats.jogos, gols: p.stats.gols, assistencias: p.stats.ass, vitorias: p.stats.vitorias,
                 notaGeral: notaGeral, posicaoPref: primaryPos, partidas: p.partidas || [],
-                mediaGolsSofridos: p.stats.jogosGol > 0 ? (p.stats.golsTomados / p.stats.jogosGol) : null,
+                mediaGolsSofridos: p.stats.jogosGol > 0 ? (p.stats.golsTomados / p.stats.jogosGol) : 0,
                 jogosGoleiro: p.stats.jogosGol,
                 ga: p.stats.gols + p.stats.ass,
                 aproveitamento: p.stats.jogos > 0 ? (p.stats.vitorias / p.stats.jogos) * 100 : 0,
@@ -826,7 +826,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             allMatchesData.forEach(p => {
                 if(p.jogoAconteceu) {
-                    const base = 6.0 + (p.gols * 0.7) + (p.assistencias * 0.6) + (p.isGoleiro ? p.golsTomados * -0.15 : 0) + (p.golsContra * -0.7);
+                    // CÁLCULO DA NOTA - Penalidade aumentada para gol contra (-1.5)
+                    const base = 6.0 + (p.gols * 0.7) + (p.assistencias * 0.6) + (p.isGoleiro ? p.golsTomados * -0.15 : 0) + (p.golsContra * -1.5);
                     let ponderada = (base + (p.notaADM * 5)) / 6;
                     p.notaPartida = Math.max(0, Math.min(10, ponderada + (p.vitoria === 1 ? 0.3 : p.vitoria === 0.5 ? 0.15 : 0)));
                 } else p.notaPartida = 0;
@@ -872,6 +873,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 else { filteredMatches = allMatchesData.filter(m => m.dataJogo.substring(3) === val); }
 
                 const filteredPlayers = processDataForPeriod(filteredMatches, jogadoresRaw);
+                // ATUALIZAÇÃO GLOBAL PARA GARANTIR QUE OS MODAIS PEGUEM OS DADOS CERTOS
+                allPlayersData = filteredPlayers;
+                
                 const is2026 = val.includes('2026') || val.endsWith('/2026');
                 updatePitchLayout(is2026);
                 updateDashboard(filteredPlayers, filteredMatches);
@@ -1232,7 +1236,18 @@ document.addEventListener('DOMContentLoaded', () => {
         let scoreA = 0, scoreB = 0;
         let boca = matches.filter(m => m.time.toUpperCase().includes('BOCA')).sort((a,b) => b.notaPartida - a.notaPartida);
         let river = matches.filter(m => m.time.toUpperCase().includes('RIVER')).sort((a,b) => b.notaPartida - a.notaPartida);
-        if (happened) { scoreA = boca.reduce((a,b) => a + b.gols, 0); scoreB = river.reduce((a,b) => a + b.gols, 0); }
+        
+        // CORREÇÃO: SOMAR GOLS CONTRA DO ADVERSÁRIO AO PLACAR
+        const golsBoca = boca.reduce((a,b) => a + b.gols, 0);
+        const contraBoca = boca.reduce((a,b) => a + b.golsContra, 0); // Gol contra feito pelo Boca conta pro River
+        
+        const golsRiver = river.reduce((a,b) => a + b.gols, 0);
+        const contraRiver = river.reduce((a,b) => a + b.golsContra, 0); // Gol contra feito pelo River conta pro Boca
+
+        if (happened) { 
+            scoreA = golsBoca + contraRiver; // Placar Boca
+            scoreB = golsRiver + contraBoca; // Placar River
+        }
 
         document.getElementById('match-date').innerText = `RESUMO: ${date}`;
         document.getElementById('score-a').innerText = happened ? scoreA : '-';
@@ -1256,6 +1271,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="flex gap-1 h-3 items-center">
                              ${happened && p.gols > 0 ? `<span class="text-[8px] bg-green-500/20 text-green-400 px-1 rounded border border-green-500/20 font-bold">${p.gols}G</span>` : ''}
                              ${happened && p.assistencias > 0 ? `<span class="text-[8px] bg-blue-500/20 text-blue-400 px-1 rounded border border-blue-500/20 font-bold">${p.assistencias}A</span>` : ''}
+                             ${happened && p.golsContra > 0 ? `<span class="text-[8px] bg-red-500/20 text-red-400 px-1 rounded border border-red-500/20 font-bold">GC</span>` : ''}
                         </div>
                     </div>
                 </div>
@@ -1307,18 +1323,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         document.getElementById('match-team-display').innerHTML = htmlInner;
         modal.classList.remove('hidden'); modal.classList.add('flex');
-    }
-
-    function renderHistory(matches) {
-        const div = document.getElementById('matches-list');
-        const dates = [...new Set(matches.map(m => m.dataJogo))].sort((a,b) => new Date(b.split('/').reverse().join('-')) - new Date(a.split('/').reverse().join('-')));
-        div.innerHTML = dates.map(d => {
-            const ms = matches.filter(m => m.dataJogo === d);
-            const happened = ms.some(x => x.jogoAconteceu);
-            const ga = ms.filter(x => x.time.toUpperCase().includes('BOCA')).reduce((a,b)=>a+b.gols,0);
-            const gb = ms.filter(x => x.time.toUpperCase().includes('RIVER')).reduce((a,b)=>a+b.gols,0);
-            return `<div class="glass-panel p-4 rounded-xl flex justify-between items-center border border-white/5 hover:bg-white/5 transition cursor-pointer" onclick="window.openMatchModal('${d}')"><span class="text-gray-400 text-xs md:text-sm font-mono">${d}</span>${happened ? `<span class="font-bold text-white text-lg md:text-xl font-fifa"><span class="text-blue-400">BOCA ${ga}</span> <span class="text-gray-600 text-xs md:text-sm mx-1 md:mx-2">VS</span> <span class="text-red-400">${gb} RIVER</span></span>` : '<span class="text-[10px] md:text-xs bg-white/10 px-2 py-1 rounded text-gray-400">AGENDADO</span>'}</div>`;
-        }).join('');
     }
 
     function renderDraftList(players) {
