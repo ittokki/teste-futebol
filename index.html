@@ -234,13 +234,15 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 .chart-title { font-family: var(--font-mono); font-size: 9px; color: var(--text3); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
 
 /* HISTORY TAB */
-.history-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.15s; margin-bottom: 8px; }
+.history-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: all 0.15s; margin-bottom: 8px; }
 .history-item:hover { border-color: var(--border2); background: var(--surface2); }
-.history-item-date { font-family: var(--font-mono); font-size: 12px; color: var(--text3); }
-.history-score { font-family: var(--font-display); font-size: 22px; letter-spacing: 2px; display: flex; align-items: center; gap: 10px; }
+.history-item-top { display: flex; align-items: center; justify-content: space-between; }
+.history-item-bottom { display: flex; align-items: center; justify-content: space-between; }
+.history-item-date { font-family: var(--font-mono); font-size: 11px; color: var(--text3); flex-shrink: 0; }
+.history-score { font-family: var(--font-display); font-size: 20px; letter-spacing: 2px; display: flex; align-items: center; gap: 8px; }
 .history-score .boca { color: var(--boca); }
 .history-score .river { color: var(--river); }
-.history-score .sep { color: var(--text3); font-size: 14px; }
+.history-score .sep { color: var(--text3); font-size: 13px; }
 .history-badge { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--text3); }
 .history-badge.pending { color: var(--accent3); border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
 
@@ -1391,7 +1393,28 @@ function buildStatsContext() {
   return lines.join('\n');
 }
 
-const SYSTEM_BASE = `Você é o analista oficial de uma pelada de futebol de salão entre amigos chamada "Inimigos da Bola 2026". O grupo é competitivo, zoeiro, e adora uma boa resenha. Seus comentários devem ser em português brasileiro, informais, divertidos e baseados nos dados reais. Seja criativo, dramático quando necessário, e não tenha medo de zoar (com bom humor).
+const BAGRE_MSGS = [
+  'foi lá só pra tomar água',
+  'jogou de olho fechado',
+  'confundiu o campo com o sofá',
+  'sumiu como Chapolin no perigo',
+  'estava presente em corpo, ausente em alma',
+  'fez o número: apareceu no nome mas não no campo',
+  'o uniforme jogou mais que ele',
+  'deu trabalho só na hora do lanche',
+  'estava no jogo? ninguém viu',
+  'tocou na bola menos que o gandula',
+  'contribuiu com a presença. só.',
+  'perdeu pra sombra em bola dividida',
+  'confundiu futebol com passeio no parque',
+  'jogou como se tivesse num piquenique',
+  'foi pra pelada mas a pelada não foi nele',
+  'rendeu menos que geladeira sem tomada',
+  'mais fácil achar Wally do que ele em campo',
+  'entrou, andou, saiu. digno.',
+  'o técnico perguntou onde ele estava. ele estava lá.',
+  'nota baixa, salário alto (no ego)',
+]; `Você é o analista oficial de uma pelada de futebol de salão entre amigos chamada "Inimigos da Bola 2026". O grupo é competitivo, zoeiro, e adora uma boa resenha. Seus comentários devem ser em português brasileiro, informais, divertidos e baseados nos dados reais. Seja criativo, dramático quando necessário, e não tenha medo de zoar (com bom humor).
 
 CONTEXTO IMPORTANTE: É futebol 7 em campo sintético. Isso significa que os GOLEIROS NATURALMENTE TOMAM MUITOS GOLS — é normal tomar entre 4 e 8 gols por jogo nesse formato. Por isso, a régua para avaliar goleiros é diferente:
 - Média ABAIXO de 4 gols/jogo = goleiro EXCEPCIONAL, elogie muito
@@ -1399,6 +1422,73 @@ CONTEXTO IMPORTANTE: É futebol 7 em campo sintético. Isso significa que os GOL
 - Média entre 6 e 8 gols/jogo = goleiro REGULAR, dentro do esperado
 - Média ACIMA de 8 gols/jogo = goleiro ruim, pode zoar com carinho
 NUNCA critique goleiro por não ter gols ou assistências — isso não é função dele. Elogie especialmente goleiros com média baixa pois isso é raridade no futebol 7.`;
+
+// Monta contexto rico de goleiro com ranking ponderado entre os goleiros do grupo
+function buildGkContext(p) {
+  const MIN_JOGOS_RANKING = 3; // mínimo pra entrar no ranking oficial
+
+  const gksComDados = allPlayersData
+    .filter(x => (x.posicaoPref === 'gol' || x.jogosGoleiro > 0) && x.mediaGolsSofridos != null);
+
+  // Ranking ponderado: só entram quem tem mínimo de jogos
+  const gksRanking = gksComDados
+    .filter(x => x.jogos >= MIN_JOGOS_RANKING)
+    .sort((a, b) => a.mediaGolsSofridos - b.mediaGolsSofridos);
+
+  // Goleiros com poucos jogos ficam fora do ranking oficial
+  const gksPoucoJogos = gksComDados
+    .filter(x => x.jogos < MIN_JOGOS_RANKING)
+    .sort((a, b) => a.mediaGolsSofridos - b.mediaGolsSofridos);
+
+  const mgls = p.mediaGolsSofridos != null ? p.mediaGolsSofridos.toFixed(2) : 'N/A';
+
+  // Posição no ranking oficial (só se tiver jogos suficientes)
+  const rankPos = gksRanking.findIndex(x => x.nome === p.nome) + 1;
+  const rankTotal = gksRanking.length;
+  const temRanking = rankPos > 0;
+
+  let rankStr;
+  if (temRanking) {
+    rankStr = rankPos === 1
+      ? `MELHOR goleiro do grupo no ranking oficial (1° de ${rankTotal}, com ${p.jogos} jogos — amostra confiável)`
+      : `${rankPos}° de ${rankTotal} no ranking oficial (${p.jogos} jogos — amostra confiável)`;
+  } else {
+    rankStr = `FORA do ranking oficial por ter menos de ${MIN_JOGOS_RANKING} jogos (${p.jogos} jogo${p.jogos!==1?'s':''} — amostra pequena, análise limitada)`;
+  }
+
+  const qualidade = p.mediaGolsSofridos != null
+    ? p.mediaGolsSofridos < 4 ? 'EXCEPCIONAL para futebol 7'
+    : p.mediaGolsSofridos < 6 ? 'BOM para futebol 7'
+    : p.mediaGolsSofridos < 8 ? 'regular (dentro do esperado no futebol 7)'
+    : 'abaixo do esperado mesmo pro futebol 7'
+    : 'sem dados';
+
+  // Monta o ranking visual com destaque nos jogos
+  const rankingStr = gksRanking.length > 0
+    ? '📊 RANKING OFICIAL (mín. ' + MIN_JOGOS_RANKING + ' jogos):\n' +
+      gksRanking.map((g, i) =>
+        `  ${i+1}° ${g.nomeOriginal}: ${g.mediaGolsSofridos.toFixed(2)} gols/jogo — ${g.jogos} jogos ✓`
+      ).join('\n')
+    : '📊 Nenhum goleiro atingiu o mínimo de jogos ainda.';
+
+  const poucoStr = gksPoucoJogos.length > 0
+    ? '\n⚠️ FORA DO RANKING (poucos jogos):\n' +
+      gksPoucoJogos.map(g =>
+        `  ${g.nomeOriginal}: ${g.mediaGolsSofridos.toFixed(2)} gols/jogo — apenas ${g.jogos} jogo${g.jogos!==1?'s':''} (amostra pequena, não comparar ainda)`
+      ).join('\n')
+    : '';
+
+  return `GOLEIRO ${p.nomeOriginal}:
+- ${p.jogos} jogo${p.jogos!==1?'s':''} no gol
+- Média: ${mgls} gols sofridos/jogo → ${qualidade}
+- Status no ranking: ${rankStr}
+- Nota média: ${p.notaGeral.toFixed(2)} | ${p.vitorias} vitórias | aproveitamento ${p.aproveitamento.toFixed(0)}%
+- OVR FIFA: ${p.fifa.ovr}
+
+${rankingStr}${poucoStr}
+
+INSTRUÇÃO: Ao analisar, leve em conta tanto a média de gols quanto a quantidade de jogos. Um goleiro com 1 jogo e média boa NÃO é necessariamente melhor que um com 6 jogos e média um pouco maior — a amostra importa muito. Quanto mais jogos, mais confiável a média.`;
+}
 
 // ==============================
 // COMENTARISTA
@@ -1420,16 +1510,7 @@ async function runComentarista() {
   const isGk = p.posicaoPref === 'gol' || p.jogosGoleiro > 0;
   const system = `${SYSTEM_BASE} ${estiloMap[estilo]} Máximo 150 palavras.`;
   const user = isGk
-    ? (() => {
-        const mgls = p.mediaGolsSofridos != null ? p.mediaGolsSofridos.toFixed(2) : 'N/A';
-        const qualidade = p.mediaGolsSofridos != null
-          ? p.mediaGolsSofridos < 4 ? 'EXCEPCIONAL (menos de 4/jogo é raridade no futebol 7!)'
-          : p.mediaGolsSofridos < 6 ? 'BOM (abaixo da média do futebol 7)'
-          : p.mediaGolsSofridos < 8 ? 'regular (dentro do esperado no futebol 7)'
-          : 'ruim (acima de 8/jogo mesmo pro futebol 7)'
-          : '';
-        return `Faça um comentário sobre o GOLEIRO ${p.nomeOriginal}. Dados: ${p.jogos} jogos no gol, média de ${mgls} gols sofridos/jogo — classificação: ${qualidade}. Nota média ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias, ${p.selectionCount} vezes na seleção da rodada. Lembre: é futebol 7 sintético, tomar 4-8 gols é normal!`;
-      })()
+    ? `Faça um comentário sobre este goleiro:\n${buildGkContext(p)}`
     : `Faça um comentário sobre ${p.nomeOriginal} com os seguintes dados da temporada: ${p.jogos} jogos, ${p.gols} gols, ${p.assistencias} assistências, nota média ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias, ${p.selectionCount} vezes na seleção da rodada, OVR FIFA ${p.fifa.ovr}, nível: ${p.nivel}.`;
   await askGroq(system, user, document.getElementById('out-comentarista'), document.getElementById('text-comentarista'));
   btn.disabled = false;
@@ -1448,7 +1529,7 @@ async function generateModalComment() {
   const isGkM = p.posicaoPref === 'gol' || p.jogosGoleiro > 0;
   const system = `${SYSTEM_BASE} Seja engraçado e use no máximo 80 palavras. Estilo irônico e zoador.`;
   const user = isGkM
-    ? `Faça um comentário curto e engraçado sobre o GOLEIRO ${p.nomeOriginal}: ${p.jogos} jogos no gol, média de ${p.mediaGolsSofridos!=null?p.mediaGolsSofridos.toFixed(2):'N/A'} gols sofridos por jogo, nota ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias. OVR ${p.fifa.ovr}. Goleiro bom = toma poucos gols!`
+    ? `Comentário curto e engraçado sobre este goleiro:\n${buildGkContext(p)}`
     : `Faça um comentário curto e engraçado sobre ${p.nomeOriginal}: ${p.jogos} jogos, ${p.gols} gols, ${p.assistencias} assists, nota ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias. OVR ${p.fifa.ovr}.`;
   const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
@@ -1482,16 +1563,7 @@ async function runTribunal() {
 {"crime":"descrição do crime principal baseado nos dados","provas":"3 provas com os números reais","defesa":"um argumento ridículo de defesa que o jogador poderia dar","pena":"pena criativa e engraçada"}`;
   const gpj = (p.gols / (p.jogos||1)).toFixed(2);
   const user = isGkT
-    ? (() => {
-        const mgls = p.mediaGolsSofridos != null ? p.mediaGolsSofridos.toFixed(2) : 'N/A';
-        const qualidade = p.mediaGolsSofridos != null
-          ? p.mediaGolsSofridos < 4 ? 'EXCEPCIONAL — tomar menos de 4/jogo no futebol 7 é raro'
-          : p.mediaGolsSofridos < 6 ? 'BOM — abaixo da média do futebol 7'
-          : p.mediaGolsSofridos < 8 ? 'regular — dentro do esperado no futebol 7'
-          : 'ruim — mesmo pro futebol 7 tomar mais de 8/jogo é demais'
-          : '';
-        return `Julgue o GOLEIRO ${p.nomeOriginal}: ${p.jogos} jogos no gol, média de ${mgls} gols sofridos/jogo (desempenho: ${qualidade}). Nota ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias, aproveitamento ${p.aproveitamento.toFixed(0)}%. Se ele tem uma boa média, os crimes precisam ser outros (arrogância, gritar com a zaga, sair do gol na hora errada, etc). Se a média for ruim, aí pode arrasar. Seja criativo e engraçado!`;
-      })()
+    ? `Julgue este goleiro no Tribunal da Pelada:\n${buildGkContext(p)}\nSe a média dele for boa entre os goleiros do grupo, os crimes precisam ser outros (arrogância, gritar com a zaga, sair do gol na hora errada, fingir que a culpa é da defesa, etc). Seja criativo e engraçado!`
     : `Julgue ${p.nomeOriginal}: ${p.jogos} jogos, ${p.gols} gols (${gpj}/jogo), ${p.assistencias} assists, nota ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias, aproveitamento ${p.aproveitamento.toFixed(0)}%, ${p.selectionCount} seleções, ${p.partidas.reduce((a,m)=>a+m.golsContra,0)} gols contra. Seja criativo, engraçado e cruel (com bom humor).`;
   try {
     const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -2023,7 +2095,7 @@ function renderSpotlights(players) {
     mkCard('GARÇOM', garcom, `${garcom?garcom.assistencias:0} assistências`, '#f59e0b') +
     mkCard('ARTILHEIRO', topS, `${topS?topS.gols:0} gols`, '#22c55e') +
     mkCard('PAREDÃO (GK)', gk, gk?`${gk.mediaGolsSofridos.toFixed(2)} gols/jogo`:'Sem dados suficientes', '#00e5ff') +
-    mkCard('🐟 BAGRE DA TEMPORADA', bagreGeral, bagreGeral?`nota ${bagreGeral.notaGeral.toFixed(2)} · ${bagreGeral.jogos} jogos`:'Sem dados', '#60a5fa', '🐟', 'border-style:dashed;border-color:rgba(96,165,250,0.3)');
+    mkCard('🐟 BAGRE DA TEMPORADA', bagreGeral, bagreGeral?`${BAGRE_MSGS[Math.floor(Math.random()*BAGRE_MSGS.length)]}`:'Sem dados', '#60a5fa', '🐟', 'border-style:dashed;border-color:rgba(96,165,250,0.3)');
 }
 
 function renderRankings(players) {
@@ -2177,15 +2249,24 @@ function renderHistory(matches) {
     const craque=hap.length?[...hap].sort((a,b)=>b.notaPartida-a.notaPartida)[0]:null;
     const bagre=hap.length?[...hap].filter(p=>!p.isGoleiro).sort((a,b)=>a.notaPartida-b.notaPartida)[0]||[...hap].sort((a,b)=>a.notaPartida-b.notaPartida)[0]:null;
     return `<div class="history-item" onclick="openMatchModal('${d}')">
-      <span class="history-item-date">${d}</span>
-      ${happened?`<div class="history-score"><span class="boca">BOCA ${pA}</span><span class="sep">×</span><span class="river">${pB} RIVER</span></div>`:
-      `<span class="history-badge pending">AGENDADO</span>`}
-      ${happened&&craque?`<div style="display:flex;gap:8px;align-items:center">
-        <span style="font-size:11px;color:var(--accent3)">⭐ ${craque.nomeRaw.split(' ')[0]}</span>
-        <span style="font-size:10px;color:var(--text3)">·</span>
-        <span style="font-size:11px;color:#60a5fa">🐟 ${bagre.nomeRaw.split(' ')[0]}</span>
-      </div>`:''}
-      <div style="display:flex;align-items:center;gap:6px;color:var(--text3);font-size:12px;"><i class="fas fa-chevron-right"></i></div>
+      <div class="history-item-top">
+        <span class="history-item-date">${d}</span>
+        ${happened
+          ? `<div class="history-score"><span class="boca">BOCA ${pA}</span><span class="sep">×</span><span class="river">${pB} RIVER</span></div>`
+          : `<span class="history-badge pending">AGENDADO</span>`}
+        <div style="color:var(--text3);font-size:12px;flex-shrink:0"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      ${happened && craque ? `
+      <div class="history-item-bottom">
+        <div style="display:flex;align-items:center;gap:6px;min-width:0">
+          <span style="font-size:13px;flex-shrink:0">⭐</span>
+          <span style="font-size:11px;color:var(--accent3);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${craque.nomeRaw.split(' ')[0]}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;min-width:0">
+          <span style="font-size:13px;flex-shrink:0">🐟</span>
+          <span style="font-size:11px;color:#60a5fa;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${bagre.nomeRaw.split(' ')[0]}</span>
+        </div>
+      </div>` : ''}
     </div>`;
   }).join('');
 }
@@ -2361,7 +2442,7 @@ window.openMatchModal = date => {
         <div>
           <div style="font-family:var(--font-mono);font-size:8px;color:#60a5fa;letter-spacing:2px">🐟 BAGRE DA SEMANA</div>
           <div style="font-family:var(--font-display);font-size:17px;letter-spacing:1px;color:var(--text2)">${bagre.nomeRaw.split(' ')[0]}</div>
-          <div style="font-family:var(--font-mono);font-size:10px;color:#60a5fa">${bagre.notaPartida.toFixed(1)} · descansou demais</div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:#60a5fa">${bagre.notaPartida.toFixed(1)} · ${BAGRE_MSGS[Math.floor(Math.random()*BAGRE_MSGS.length)]}</div>
         </div>
       </div>`;
   }
