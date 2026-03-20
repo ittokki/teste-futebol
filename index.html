@@ -92,7 +92,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 .panel-subtitle { font-size: 11px; color: var(--text3); font-family: var(--font-mono); }
 
 /* HUB */
-.hub-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.hub-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; position: relative; overflow: hidden; cursor: pointer; transition: all 0.2s; }
 .stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
 .stat-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 60%, rgba(255,255,255,0.02)); pointer-events: none; }
@@ -710,7 +710,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
   #mobile-menu-btn { display: flex; }
   #sidebar { display: none; }
   #main { padding: 16px; }
-  .hub-grid { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .hub-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
   .stat-card { padding: 12px; }
   .stat-card-name { font-size: 14px; }
   .stat-card-img { width: 32px; height: 32px; }
@@ -756,7 +756,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
   .secret-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 480px) {
-  .hub-grid { grid-template-columns: 1fr; }
+  .hub-grid { grid-template-columns: 1fr 1fr; }
   #rankings-grid { grid-template-columns: 1fr; }
   .hall-grid { grid-template-columns: 1fr 1fr; }
   .player-stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1165,7 +1165,7 @@ button, .btn-icon, .nav-item, .rank-row, .history-item, .hall-card, .stat-card, 
       <div class="fut-card-divider"></div>
       <div class="fut-card-stats">
         <div class="fut-stat-item"><span class="fut-stat-val" id="stat-pac">00</span><span class="fut-stat-label">PAC</span></div>
-        <div class="fut-stat-item"><span class="fut-stat-val" id="stat-sho">00</span><span class="fut-stat-label">SHO</span></div>
+        <div class="fut-stat-item"><span class="fut-stat-val" id="stat-sho">00</span><span class="fut-stat-label" data-stat-label="sho">SHO</span></div>
         <div class="fut-stat-item"><span class="fut-stat-val" id="stat-pas">00</span><span class="fut-stat-label">PAS</span></div>
         <div class="fut-stat-item"><span class="fut-stat-val" id="stat-def">00</span><span class="fut-stat-label">DEF</span></div>
         <div class="fut-stat-item"><span class="fut-stat-val" id="stat-phy">00</span><span class="fut-stat-label">PHY</span></div>
@@ -1178,7 +1178,7 @@ button, .btn-icon, .nav-item, .rank-row, .history-item, .hall-card, .stat-card, 
       <div class="player-stats-grid">
         <div class="player-stat-box"><span class="player-stat-box-label">MÉDIA</span><span class="player-stat-box-val" id="detail-media" style="color:var(--accent)">0.0</span></div>
         <div class="player-stat-box"><span class="player-stat-box-label">GOLS</span><span class="player-stat-box-val" id="detail-gols" style="color:var(--green)">0</span></div>
-        <div class="player-stat-box"><span class="player-stat-box-label">ASSISTS</span><span class="player-stat-box-val" id="detail-assist" style="color:var(--accent3)">0</span></div>
+        <div class="player-stat-box"><span class="player-stat-box-label" data-stat-detail="assist-label">ASSISTS</span><span class="player-stat-box-val" id="detail-assist" style="color:var(--accent3)">0</span></div>
         <div class="player-stat-box"><span class="player-stat-box-label">VITÓRIAS</span><span class="player-stat-box-val" id="detail-wins" style="color:#c084fc">0</span></div>
       </div>
       <div class="player-chart-wrap">
@@ -1637,13 +1637,25 @@ function renderSecretStats(players, matches) {
       </ul>
     </div>`;
 
+  // 7. BAGRE DA SEMANA — pior nota em cada rodada, quem mais vezes foi bagre
+  const bagreCount = {};
+  const allDates2=[...new Set(matches.filter(m=>m.jogoAconteceu).map(m=>m.dataJogo))];
+  allDates2.forEach(date=>{
+    const dm=matches.filter(m=>m.dataJogo===date&&m.jogoAconteceu&&!m.isGoleiro);
+    if(!dm.length) return;
+    const bagre=[...dm].sort((a,b)=>a.notaPartida-b.notaPartida)[0];
+    bagreCount[bagre.nome]=(bagreCount[bagre.nome]||0)+1;
+  });
+  const bagreData=players.map(p=>({...p,vezesBagre:bagreCount[p.nome]||0})).filter(p=>p.vezesBagre>0).sort((a,b)=>b.vezesBagre-a.vezesBagre);
+
   grid.innerHTML =
     mkCard('🧿 O JINXADO','Jogadores com maior % de derrotas quando estão em campo (mín. 4 jogos)','🧿','#ef4444','rgba(239,68,68,0.1)',jinxData,p=>`${p.jinxRate.toFixed(0)}% derr.`,()=>'var(--red)') +
     mkCard('🏜️ NA SECA','Maior sequência de jogos consecutivos sem marcar um gol','🏜️','#f59e0b','rgba(245,158,11,0.1)',secoData,p=>`${p.maxSeco} j`,p=>p.maxSeco>=5?'var(--red)':p.maxSeco>=3?'var(--accent3)':'var(--text2)') +
     mkCard('👻 O FANTASMA','Mais rodadas faltadas — de quem o grupo sente falta (ou não)','👻','#8b949e','rgba(139,148,158,0.1)',fantasmaData,p=>`${p.faltas} faltas`) +
     mkCard('🤦 O ENCOSTADO','Maior % de jogos sem participar de gol nenhum (mín. 3 jogos)','🤦','#c084fc','rgba(192,132,252,0.1)',encostadoData,p=>`${p.pctEncostado.toFixed(0)}%`,()=>'#c084fc') +
     (gcData.length?mkCard('🙈 REI DO GOLS CONTRA','Os "artilheiros" do adversário — heróis involuntários da pelada','🙈','#60a5fa','rgba(59,130,246,0.1)',gcData,p=>`${p.gcs} GC`,()=>'var(--boca)'):'') +
-    mkCard('🎯 O ROBÔ','Menor desvio padrão de notas — o mais consistente (mín. 4 jogos)','🎯','#22c55e','rgba(34,197,94,0.1)',constData,p=>`σ ${p.std.toFixed(2)}`,()=>'var(--green)');
+    mkCard('🎯 O ROBÔ','Menor desvio padrão de notas — o mais consistente (mín. 4 jogos)','🎯','#22c55e','rgba(34,197,94,0.1)',constData,p=>`σ ${p.std.toFixed(2)}`,()=>'var(--green)') +
+    (bagreData.length?mkCard('🐟 CAMPEÃO DO BAGRE','Quem mais vezes foi eleito o pior da rodada — título indesejável','🐟','#60a5fa','rgba(59,130,246,0.08)',bagreData,p=>`${p.vezesBagre}x 🐟`,()=>'#60a5fa'):'');
 }
 
 // ==============================
@@ -1762,7 +1774,7 @@ async function initData() {
       vitoria:(row[7]||"").toLowerCase().trim()==='sim'?1:(row[7]||"").toLowerCase().trim()==='empate'?0.5:0,
       time:row[8]||'N/A',
       jogoAconteceu:(row[10]||"").toLowerCase()==='sim',
-      isGoleiro:(row[0]||"").toUpperCase().includes('(GOL)')||parseNum(row[3])>0,
+      isGoleiro:(row[0]||"").toUpperCase().includes('(GOL)')||parseNum(row[3])>0||(row[11]||'').toLowerCase().includes('gol'),
       posicao:mapPos(row[11])
     })).filter(p=>p.nome&&/^\d{2}\/\d{2}\/\d{4}$/.test(p.dataJogo));
 
@@ -1931,19 +1943,23 @@ function renderSpotlights(players) {
   const topS = [...players].sort((a,b)=>b.gols-a.gols)[0];
   const gks = players.filter(p=>p.jogosGoleiro>=3).sort((a,b)=>a.mediaGolsSofridos-b.mediaGolsSofridos);
   const gk = gks[0];
-  const mkCard = (label, player, val, color) => player ? `
-    <div class="stat-card" onclick="openPlayerModal('${player.nome}')">
+  // Bagre geral: pior nota média (mín 3 jogos, excluindo goleiros)
+  const bagreGeral = [...players].filter(p=>p.jogos>=3&&p.posicaoPref!=='gol').sort((a,b)=>a.notaGeral-b.notaGeral)[0];
+  const mkCard = (label, player, val, color, icon='', extraStyle='') => player ? `
+    <div class="stat-card" onclick="openPlayerModal('${player.nome}')" style="${extraStyle}">
       <div class="stat-card-accent" style="background:${color}"></div>
       <div class="stat-card-label">${label}</div>
       <div class="stat-card-main">
         <img src="${getPhoto(player.nome)}" class="stat-card-img" onerror="this.style.display='none'">
         <div><div class="stat-card-name">${player.nomeOriginal.split(' ')[0]}</div><div class="stat-card-val">${val}</div></div>
+        ${icon?`<div style="font-size:28px;margin-left:auto;opacity:0.5">${icon}</div>`:''}
       </div>
     </div>` : `<div class="stat-card"><div class="stat-card-label">${label}</div><div class="stat-card-val" style="color:var(--text3)">Sem dados</div></div>`;
   document.getElementById('hub-spotlights').innerHTML =
     mkCard('GARÇOM', garcom, `${garcom?garcom.assistencias:0} assistências`, '#f59e0b') +
     mkCard('ARTILHEIRO', topS, `${topS?topS.gols:0} gols`, '#22c55e') +
-    mkCard('PAREDÃO (GK)', gk, gk?`${gk.mediaGolsSofridos.toFixed(2)} gols/jogo`:'Sem dados suficientes', '#00e5ff');
+    mkCard('PAREDÃO (GK)', gk, gk?`${gk.mediaGolsSofridos.toFixed(2)} gols/jogo`:'Sem dados suficientes', '#00e5ff') +
+    mkCard('🐟 BAGRE DA TEMPORADA', bagreGeral, bagreGeral?`nota ${bagreGeral.notaGeral.toFixed(2)} · ${bagreGeral.jogos} jogos`:'Sem dados', '#60a5fa', '🐟', 'border-style:dashed;border-color:rgba(96,165,250,0.3)');
 }
 
 function renderRankings(players) {
@@ -2087,15 +2103,24 @@ function renderHistory(matches) {
   document.getElementById('matches-list').innerHTML=dates.map(d=>{
     const ms=matches.filter(m=>m.dataJogo===d);
     const happened=ms.some(x=>x.jogoAconteceu);
-    const golsBoca=ms.filter(x=>x.time.toUpperCase().includes('BOCA')).reduce((a,b)=>a+b.gols,0);
-    const contraBoca=ms.filter(x=>x.time.toUpperCase().includes('BOCA')).reduce((a,b)=>a+b.golsContra,0);
-    const golsRiver=ms.filter(x=>x.time.toUpperCase().includes('RIVER')).reduce((a,b)=>a+b.gols,0);
-    const contraRiver=ms.filter(x=>x.time.toUpperCase().includes('RIVER')).reduce((a,b)=>a+b.golsContra,0);
+    const golsBoca=ms.filter(x=>(x.time||'').toUpperCase().includes('BOCA')).reduce((a,b)=>a+b.gols,0);
+    const contraBoca=ms.filter(x=>(x.time||'').toUpperCase().includes('BOCA')).reduce((a,b)=>a+b.golsContra,0);
+    const golsRiver=ms.filter(x=>(x.time||'').toUpperCase().includes('RIVER')).reduce((a,b)=>a+b.gols,0);
+    const contraRiver=ms.filter(x=>(x.time||'').toUpperCase().includes('RIVER')).reduce((a,b)=>a+b.golsContra,0);
     const pA=golsBoca+contraRiver, pB=golsRiver+contraBoca;
+    // Craque e Bagre da rodada
+    const hap=ms.filter(x=>x.jogoAconteceu);
+    const craque=hap.length?[...hap].sort((a,b)=>b.notaPartida-a.notaPartida)[0]:null;
+    const bagre=hap.length?[...hap].filter(p=>!p.isGoleiro).sort((a,b)=>a.notaPartida-b.notaPartida)[0]||[...hap].sort((a,b)=>a.notaPartida-b.notaPartida)[0]:null;
     return `<div class="history-item" onclick="openMatchModal('${d}')">
       <span class="history-item-date">${d}</span>
       ${happened?`<div class="history-score"><span class="boca">BOCA ${pA}</span><span class="sep">×</span><span class="river">${pB} RIVER</span></div>`:
       `<span class="history-badge pending">AGENDADO</span>`}
+      ${happened&&craque?`<div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:11px;color:var(--accent3)">⭐ ${craque.nomeRaw.split(' ')[0]}</span>
+        <span style="font-size:10px;color:var(--text3)">·</span>
+        <span style="font-size:11px;color:#60a5fa">🐟 ${bagre.nomeRaw.split(' ')[0]}</span>
+      </div>`:''}
       <div style="display:flex;align-items:center;gap:6px;color:var(--text3);font-size:12px;"><i class="fas fa-chevron-right"></i></div>
     </div>`;
   }).join('');
@@ -2170,14 +2195,30 @@ window.openPlayerModal = nome => {
   document.getElementById('card-pos').innerText=pos3(p.posicaoPref);
   document.getElementById('card-img').src=getPhoto(p.nome);
   document.getElementById('card-name').innerText=p.nomeOriginal.split(' ')[0];
-  document.getElementById('stat-pac').innerText=s.pac; document.getElementById('stat-sho').innerText=s.sho;
+  const isGk = p.posicaoPref==='gol';
+  document.getElementById('stat-pac').innerText=s.pac;
+  // Para goleiros: trocar SHO por média de gols sofridos
+  if(isGk) {
+    document.getElementById('stat-sho').innerText = p.mediaGolsSofridos!=null ? p.mediaGolsSofridos.toFixed(1) : '--';
+    document.querySelector('[data-stat-label="sho"]').innerText = 'GLS';
+  } else {
+    document.getElementById('stat-sho').innerText=s.sho;
+    document.querySelector('[data-stat-label="sho"]').innerText = 'SHO';
+  }
   document.getElementById('stat-pas').innerText=s.pas; document.getElementById('stat-def').innerText=s.def;
   document.getElementById('stat-phy').innerText=s.phy; document.getElementById('stat-jog').innerText=p.jogos;
   document.getElementById('detail-name').innerText=p.nomeOriginal;
   document.getElementById('detail-level').innerText=p.nivel;
   document.getElementById('detail-media').innerText=p.notaGeral.toFixed(2);
   document.getElementById('detail-gols').innerText=p.gols;
-  document.getElementById('detail-assist').innerText=p.assistencias;
+  // Para goleiros: mostrar gols sofridos no lugar de assistências
+  if(isGk && p.jogosGoleiro>0) {
+    document.getElementById('detail-assist').innerText = p.mediaGolsSofridos!=null ? p.mediaGolsSofridos.toFixed(1) : '0';
+    document.querySelector('[data-stat-detail="assist-label"]').innerText = 'GLS/JG';
+  } else {
+    document.getElementById('detail-assist').innerText=p.assistencias;
+    document.querySelector('[data-stat-detail="assist-label"]').innerText = 'ASSISTS';
+  }
   document.getElementById('detail-wins').innerText=p.vitorias;
   // Reset AI comment
   document.getElementById('modal-ai-comment').classList.remove('visible');
@@ -2193,6 +2234,7 @@ window.openPlayerModal = nome => {
         ${m.gols>0?`<span class="badge badge-g">${m.gols}G</span>`:''}
         ${m.assistencias>0?`<span class="badge badge-a">${m.assistencias}A</span>`:''}
         ${m.golsContra>0?`<span class="badge badge-gc">GC</span>`:''}
+        ${m.isGoleiro&&m.golsTomados>=0?`<span class="badge" style="background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2)">🧤 ${m.golsTomados}ST</span>`:''}
       </div>
       <span class="history-nota ${m.notaPartida>=8?'nota-high':m.notaPartida>=6?'nota-mid':'nota-low'}">${m.notaPartida.toFixed(1)}</span>
     </div>`).join('');
@@ -2216,26 +2258,73 @@ window.openPlayerModal = nome => {
 window.openMatchModal = date => {
   const matches=allMatchesData.filter(m=>m.dataJogo===date); if(!matches.length) return;
   const happened=matches.some(m=>m.jogoAconteceu);
-  const boca=matches.filter(m=>m.time.toUpperCase().includes('BOCA')).sort((a,b)=>b.notaPartida-a.notaPartida);
-  const river=matches.filter(m=>m.time.toUpperCase().includes('RIVER')).sort((a,b)=>b.notaPartida-a.notaPartida);
+  // Detecção robusta dos times: pega qualquer string que contenha BOCA ou RIVER
+  const boca=matches.filter(m=>{const t=(m.time||'').toUpperCase(); return t.includes('BOCA')||t.includes('A');}).sort((a,b)=>b.notaPartida-a.notaPartida);
+  const river=matches.filter(m=>{const t=(m.time||'').toUpperCase(); return t.includes('RIVER')||t.includes('B');}).sort((a,b)=>b.notaPartida-a.notaPartida);
+  // Fallback: se a detecção acima falhar, divide pela metade
+  const allPlayers = matches.filter(m=>m.jogoAconteceu||!happened);
+  const bocaFinal = boca.length>0 ? boca : allPlayers.slice(0, Math.ceil(allPlayers.length/2));
+  const riverFinal = river.length>0 ? river : allPlayers.slice(Math.ceil(allPlayers.length/2));
   let sA=0,sB=0;
   if(happened){
-    sA=boca.reduce((a,b)=>a+b.gols,0)+river.reduce((a,b)=>a+b.golsContra,0);
-    sB=river.reduce((a,b)=>a+b.gols,0)+boca.reduce((a,b)=>a+b.golsContra,0);
+    sA=bocaFinal.reduce((a,b)=>a+b.gols,0)+riverFinal.reduce((a,b)=>a+b.golsContra,0);
+    sB=riverFinal.reduce((a,b)=>a+b.gols,0)+bocaFinal.reduce((a,b)=>a+b.golsContra,0);
   }
   document.getElementById('match-date').innerText=`RESUMO · ${date}`;
   document.getElementById('score-a').innerText=happened?sA:'-';
   document.getElementById('score-b').innerText=happened?sB:'-';
+
+  // CRAQUE e BAGRE DA SEMANA
+  const happened_players = matches.filter(m=>m.jogoAconteceu);
+  let cracqueHtml='', bagreHtml='';
+  if(happened_players.length>0) {
+    const craque = [...happened_players].sort((a,b)=>b.notaPartida-a.notaPartida)[0];
+    // Bagre: pior nota, de preferência alguém que jogou (mín 1 jogo)
+    const bagre = [...happened_players].filter(p=>!p.isGoleiro).sort((a,b)=>a.notaPartida-b.notaPartida)[0]
+                  || [...happened_players].sort((a,b)=>a.notaPartida-b.notaPartida)[0];
+    
+    cracqueHtml = `
+      <div style="display:flex;align-items:center;gap:10px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 14px;cursor:pointer" onclick="openPlayerModal('${craque.nome}')">
+        <img src="${getPhoto(craque.nome)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--accent3)">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:8px;color:var(--accent3);letter-spacing:2px">⭐ CRAQUE DA RODADA</div>
+          <div style="font-family:var(--font-display);font-size:17px;letter-spacing:1px">${craque.nomeRaw.split(' ')[0]}</div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent3)">${craque.notaPartida.toFixed(1)} ${craque.gols>0?`· ${craque.gols}G`:''} ${craque.assistencias>0?`${craque.assistencias}A`:''}</div>
+        </div>
+      </div>`;
+
+    bagreHtml = `
+      <div style="display:flex;align-items:center;gap:10px;background:rgba(59,130,246,0.05);border:1px dashed rgba(59,130,246,0.25);border-radius:10px;padding:10px 14px;cursor:pointer;position:relative;overflow:hidden" onclick="openPlayerModal('${bagre.nome}')">
+        <div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:36px;opacity:0.15;pointer-events:none">🐟</div>
+        <img src="${getPhoto(bagre.nome)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px dashed #60a5fa;filter:grayscale(30%)">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:8px;color:#60a5fa;letter-spacing:2px">🐟 BAGRE DA SEMANA</div>
+          <div style="font-family:var(--font-display);font-size:17px;letter-spacing:1px;color:var(--text2)">${bagre.nomeRaw.split(' ')[0]}</div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:#60a5fa">${bagre.notaPartida.toFixed(1)} · descansou demais</div>
+        </div>
+      </div>`;
+  }
+
+  // Atualiza a área de craque/bagre no header do modal
+  let cracqueBagreEl = document.getElementById('match-craque-bagre');
+  if(!cracqueBagreEl) {
+    cracqueBagreEl = document.createElement('div');
+    cracqueBagreEl.id = 'match-craque-bagre';
+    cracqueBagreEl.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;padding:0 4px';
+    document.querySelector('.match-modal-header').appendChild(cracqueBagreEl);
+  }
+  cracqueBagreEl.innerHTML = happened ? cracqueHtml + bagreHtml : '';
+
   const posClass=p=>{ const pp=pos3(p.posicao).toLowerCase(); return `pos-${pp}`; };
   const renderList=team=>team.map(p=>`
     <div class="match-player-row" onclick="openPlayerModal('${p.nome}')">
       <span class="match-player-pos ${posClass(p)}">${pos3(p.posicao)}</span>
-      <span class="match-player-name">${p.nomeRaw.split(' ')[0]}</span>
-      ${happened?`<div class="match-player-badges">${p.gols>0?`<span class="badge badge-g">${p.gols}G</span>`:''} ${p.assistencias>0?`<span class="badge badge-a">${p.assistencias}A</span>`:''} ${p.golsContra>0?`<span class="badge badge-gc">GC</span>`:''}</div>`:''}
+      <span class="match-player-name">${p.nomeRaw.split(' ')[0]}${p.isGoleiro?' 🧤':''}</span>
+      ${happened?`<div class="match-player-badges">${p.gols>0?`<span class="badge badge-g">${p.gols}G</span>`:''} ${p.assistencias>0?`<span class="badge badge-a">${p.assistencias}A</span>`:''} ${p.golsContra>0?`<span class="badge badge-gc">GC</span>`:''} ${p.isGoleiro&&p.golsTomados>0?`<span class="badge" style="background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2)">${p.golsTomados} ST</span>`:''}</div>`:''}
       ${happened?`<span class="match-player-nota ${p.notaPartida>=8?'nota-high':p.notaPartida>=6?'nota-mid':'nota-low'}">${p.notaPartida.toFixed(1)}</span>`:''}
     </div>`).join('');
-  document.getElementById('list-boca').innerHTML=renderList(boca);
-  document.getElementById('list-river').innerHTML=renderList(river);
+  document.getElementById('list-boca').innerHTML=renderList(bocaFinal);
+  document.getElementById('list-river').innerHTML=renderList(riverFinal);
   let html='';
   if(happened){
     const renderP=(p,xPct,yPct)=>`<div class="pitch-player" style="left:${xPct}%;top:${yPct}%" onclick="openPlayerModal('${p.nome}')">
@@ -2246,7 +2335,8 @@ window.openMatchModal = date => {
       <div class="pitch-player-name">${p.nomeRaw.split(' ')[0]}</div>
     </div>`;
     const sel=[], is2026=date.endsWith('2026');
-    const getPos=(posArr,count)=>matches.filter(p=>posArr.includes(p.posicao)&&!sel.includes(p.nome)).sort((a,b)=>b.notaPartida-a.notaPartida).slice(0,count);
+    const allHappened=matches.filter(m=>m.jogoAconteceu);
+    const getPos=(posArr,count)=>allHappened.filter(p=>posArr.includes(p.posicao)&&!sel.includes(p.nome)).sort((a,b)=>b.notaPartida-a.notaPartida).slice(0,count);
     if(is2026){
       const gks=getPos(['gol'],1); gks.forEach(p=>sel.push(p.nome));
       const defs=getPos(['def','zag'],2); defs.forEach(p=>sel.push(p.nome));
@@ -2257,7 +2347,7 @@ window.openMatchModal = date => {
       if(meis[0]) html+=renderP(meis[0],50,48); if(meis[1]) html+=renderP(meis[1],18,48); if(meis[2]) html+=renderP(meis[2],82,48);
       if(atas[0]) html+=renderP(atas[0],50,14);
     } else {
-      const getP=(pos,c)=>matches.filter(p=>p.posicao===pos&&!sel.includes(p.nome)).sort((a,b)=>b.notaPartida-a.notaPartida).slice(0,c);
+      const getP=(pos,c)=>allHappened.filter(p=>p.posicao===pos&&!sel.includes(p.nome)).sort((a,b)=>b.notaPartida-a.notaPartida).slice(0,c);
       const gks=getP('gol',1),zag=getP('zag',1),ala=getP('ala',2),mei=getP('mei',1),ata=getP('ata',2);
       if(gks[0]) html+=renderP(gks[0],50,88);
       if(zag[0]) html+=renderP(zag[0],50,70);
