@@ -1706,7 +1706,7 @@ window.sendSuggestion = btn => {
 function renderSecretStats(players, matches) {
   const grid=document.getElementById('secret-grid');
 
-  // 1. JINXADO — pior aproveitamento do time quando ele joga (excluindo goleiros)
+  // 1. AZARADO — pior aproveitamento do time quando ele joga (excluindo goleiros)
   const jinxData = players.filter(p=>p.jogos>=4&&p.posicaoPref!=='gol'&&p.jogosGoleiro===0).map(p=>{
     const wins=p.partidas.filter(m=>m.jogoAconteceu&&m.vitoria===1).length;
     const played=p.partidas.filter(m=>m.jogoAconteceu).length;
@@ -1779,7 +1779,7 @@ function renderSecretStats(players, matches) {
   const bagreData=players.map(p=>({...p,vezesBagre:bagreCount[p.nome]||0})).filter(p=>p.vezesBagre>0).sort((a,b)=>b.vezesBagre-a.vezesBagre);
 
   grid.innerHTML =
-    mkCard('🧿 O JINXADO','Jogadores com maior % de derrotas quando estão em campo (mín. 4 jogos)','🧿','#ef4444','rgba(239,68,68,0.1)',jinxData,p=>`${p.jinxRate.toFixed(0)}% derr.`,()=>'var(--red)') +
+    mkCard('🍀 O AZARADO','Jogadores com maior % de derrotas quando estão em campo (mín. 4 jogos)','🍀','#ef4444','rgba(239,68,68,0.1)',jinxData,p=>`${p.jinxRate.toFixed(0)}% derr.`,()=>'var(--red)') +
     mkCard('🏜️ NA SECA','Maior sequência de jogos consecutivos sem marcar um gol','🏜️','#f59e0b','rgba(245,158,11,0.1)',secoData,p=>`${p.maxSeco} j`,p=>p.maxSeco>=5?'var(--red)':p.maxSeco>=3?'var(--accent3)':'var(--text2)') +
     mkCard('👻 O FANTASMA','Mais rodadas faltadas — de quem o grupo sente falta (ou não)','👻','#8b949e','rgba(139,148,158,0.1)',fantasmaData,p=>`${p.faltas} faltas`) +
     mkCard('🤦 O ENCOSTADO','Maior % de jogos sem participar de gol nenhum (mín. 3 jogos)','🤦','#c084fc','rgba(192,132,252,0.1)',encostadoData,p=>`${p.pctEncostado.toFixed(0)}%`,()=>'#c084fc') +
