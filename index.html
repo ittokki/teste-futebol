@@ -1576,26 +1576,26 @@ window.sendSuggestion = btn => {
 function renderSecretStats(players, matches) {
   const grid=document.getElementById('secret-grid');
 
-  // 1. JINXADO — pior aproveitamento do time quando ele joga
-  const jinxData = players.filter(p=>p.jogos>=4).map(p=>{
+  // 1. JINXADO — pior aproveitamento do time quando ele joga (excluindo goleiros)
+  const jinxData = players.filter(p=>p.jogos>=4&&p.posicaoPref!=='gol'&&p.jogosGoleiro===0).map(p=>{
     const wins=p.partidas.filter(m=>m.jogoAconteceu&&m.vitoria===1).length;
     const played=p.partidas.filter(m=>m.jogoAconteceu).length;
     return {...p, jinxRate: played>0?((played-wins)/played)*100:0};
   }).sort((a,b)=>b.jinxRate-a.jinxRate);
 
-  // 2. SECO — mais jogos consecutivos sem gol
-  const secoData = players.map(p=>{
+  // 2. SECO — mais jogos consecutivos sem gol (excluindo goleiros)
+  const secoData = players.filter(p=>p.posicaoPref!=='gol'&&p.jogosGoleiro===0).map(p=>{
     let maxSeco=0, curr=0;
-    p.partidas.filter(m=>m.jogoAconteceu).forEach(m=>{
+    p.partidas.filter(m=>m.jogoAconteceu&&!m.isGoleiro).forEach(m=>{
       if(m.gols===0) { curr++; maxSeco=Math.max(maxSeco,curr); } else curr=0;
     });
     return {...p, maxSeco};
   }).sort((a,b)=>b.maxSeco-a.maxSeco);
 
-  // 3. ENCOSTADO — mais jogos sem participação (sem gol nem assist)
-  const encostadoData = players.map(p=>{
-    const semParticip=p.partidas.filter(m=>m.jogoAconteceu&&m.gols===0&&m.assistencias===0).length;
-    const total=p.partidas.filter(m=>m.jogoAconteceu).length;
+  // 3. ENCOSTADO — mais jogos sem participação (excluindo goleiros)
+  const encostadoData = players.filter(p=>p.posicaoPref!=='gol'&&p.jogosGoleiro===0).map(p=>{
+    const semParticip=p.partidas.filter(m=>m.jogoAconteceu&&!m.isGoleiro&&m.gols===0&&m.assistencias===0).length;
+    const total=p.partidas.filter(m=>m.jogoAconteceu&&!m.isGoleiro).length;
     return {...p, pctEncostado: total>0?(semParticip/total)*100:0, semParticip};
   }).filter(p=>p.jogos>=3).sort((a,b)=>b.pctEncostado-a.pctEncostado);
 
@@ -1605,8 +1605,8 @@ function renderSecretStats(players, matches) {
     return {...p, gcs};
   }).filter(p=>p.gcs>0).sort((a,b)=>b.gcs-a.gcs);
 
-  // 5. CONSTANTE — menor desvio padrão de notas (mais consistente)
-  const constData = players.filter(p=>p.jogos>=4).map(p=>{
+  // 5. CONSTANTE — menor desvio padrão de notas (excluindo goleiros)
+  const constData = players.filter(p=>p.jogos>=4&&p.posicaoPref!=='gol'&&p.jogosGoleiro===0).map(p=>{
     const ns=p.partidas.filter(m=>m.jogoAconteceu).map(m=>m.notaPartida);
     const avg=ns.reduce((a,b)=>a+b,0)/ns.length;
     const std=Math.sqrt(ns.reduce((a,b)=>a+(b-avg)**2,0)/ns.length);
@@ -2258,13 +2258,10 @@ window.openPlayerModal = nome => {
 window.openMatchModal = date => {
   const matches=allMatchesData.filter(m=>m.dataJogo===date); if(!matches.length) return;
   const happened=matches.some(m=>m.jogoAconteceu);
-  // Detecção robusta dos times: pega qualquer string que contenha BOCA ou RIVER
-  const boca=matches.filter(m=>{const t=(m.time||'').toUpperCase(); return t.includes('BOCA')||t.includes('A');}).sort((a,b)=>b.notaPartida-a.notaPartida);
-  const river=matches.filter(m=>{const t=(m.time||'').toUpperCase(); return t.includes('RIVER')||t.includes('B');}).sort((a,b)=>b.notaPartida-a.notaPartida);
-  // Fallback: se a detecção acima falhar, divide pela metade
-  const allPlayers = matches.filter(m=>m.jogoAconteceu||!happened);
-  const bocaFinal = boca.length>0 ? boca : allPlayers.slice(0, Math.ceil(allPlayers.length/2));
-  const riverFinal = river.length>0 ? river : allPlayers.slice(Math.ceil(allPlayers.length/2));
+  // Detecção dos times: usa apenas BOCA e RIVER, sem fallback por letra
+  const allHappenedM = matches.filter(m=>m.jogoAconteceu);
+  const bocaFinal = matches.filter(m=>(m.time||'').toUpperCase().includes('BOCA')).sort((a,b)=>b.notaPartida-a.notaPartida);
+  const riverFinal = matches.filter(m=>(m.time||'').toUpperCase().includes('RIVER')).sort((a,b)=>b.notaPartida-a.notaPartida);
   let sA=0,sB=0;
   if(happened){
     sA=bocaFinal.reduce((a,b)=>a+b.gols,0)+riverFinal.reduce((a,b)=>a+b.golsContra,0);
