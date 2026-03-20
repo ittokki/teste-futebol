@@ -1330,6 +1330,7 @@ const playerPhotos = {
   "PEDRALLI": "https://drive.google.com/thumbnail?id=1oxuryNnAVqHfU1u4Mg1lZ9YtUOKvkIK_&sz=w500",
   "THALES RAMOS": "https://drive.google.com/thumbnail?id=1lQQ5tWG1rMaQJj0ogkNUqyz1si5GwfkA&sz=w500",
   "VICTOR MATHEUS": "https://drive.google.com/thumbnail?id=1c3Cq36Bw2KCqpFCz6vwRr9gJ344gK4bo&sz=w500",
+  "VITOR": "https://drive.google.com/thumbnail?id=1grOX0fY5p2AWjktDV70T-YXjmJQTa4Ux&sz=w500",
   "VITOR (GOL)": "https://drive.google.com/thumbnail?id=1grOX0fY5p2AWjktDV70T-YXjmJQTa4Ux&sz=w500",
   "WILIAN": "https://drive.google.com/thumbnail?id=1Pe30oPHtNC54iOzX1nrhdAbQQwWg2L5P&sz=w500",
   "WILLY": "https://drive.google.com/thumbnail?id=1epf6bJAQomcxDOtcdbGDLQDOM20x199j&sz=w500",
@@ -1377,7 +1378,13 @@ function buildStatsContext() {
     const isGk = p.posicaoPref === 'gol' || p.jogosGoleiro > 0;
     if (isGk) {
       const mgls = p.mediaGolsSofridos != null ? p.mediaGolsSofridos.toFixed(2) : 'N/A';
-      return `${p.nomeOriginal} [GOLEIRO]: ${p.jogos} jogos no gol, média de ${mgls} gols sofridos por jogo (quanto menor melhor!), nota média ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias, aproveitamento ${p.aproveitamento.toFixed(0)}%, OVR FIFA ${p.fifa.ovr}. ATENÇÃO: para goleiros, a métrica de qualidade é gols sofridos por jogo — quanto MENOS gols tomar, MELHOR o goleiro.`;
+      const qualidade = p.mediaGolsSofridos != null
+        ? p.mediaGolsSofridos < 4 ? 'EXCEPCIONAL para futebol 7'
+        : p.mediaGolsSofridos < 6 ? 'BOM para futebol 7'
+        : p.mediaGolsSofridos < 8 ? 'regular (dentro do esperado no futebol 7)'
+        : 'abaixo do esperado'
+        : 'sem dados suficientes';
+      return `${p.nomeOriginal} [GOLEIRO - FUTEBOL 7]: ${p.jogos} jogos no gol, média de ${mgls} gols sofridos/jogo (no futebol 7 é normal tomar 4-8/jogo, então ${qualidade}), nota média ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias, aproveitamento ${p.aproveitamento.toFixed(0)}%, OVR FIFA ${p.fifa.ovr}.`;
     }
     return `${p.nomeOriginal} [${pos3(p.posicaoPref)}]: ${p.jogos} jogos, ${p.gols} gols, ${p.assistencias} assists, nota média ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias, aproveitamento ${p.aproveitamento.toFixed(0)}%, OVR FIFA ${p.fifa.ovr}`;
   });
@@ -1386,7 +1393,12 @@ function buildStatsContext() {
 
 const SYSTEM_BASE = `Você é o analista oficial de uma pelada de futebol de salão entre amigos chamada "Inimigos da Bola 2026". O grupo é competitivo, zoeiro, e adora uma boa resenha. Seus comentários devem ser em português brasileiro, informais, divertidos e baseados nos dados reais. Seja criativo, dramático quando necessário, e não tenha medo de zoar (com bom humor).
 
-REGRA CRÍTICA SOBRE GOLEIROS: Goleiros são avaliados pelos gols SOFRIDOS por jogo — quanto MENOS gols tomar, MELHOR o goleiro. Um goleiro que toma 2 gols por jogo é muito melhor do que um que toma 6. Nunca critique um goleiro por não ter gols ou assistências — isso não é função dele. Elogie goleiros que têm média BAIXA de gols sofridos. Critique goleiros que têm média ALTA de gols sofridos.`;
+CONTEXTO IMPORTANTE: É futebol 7 em campo sintético. Isso significa que os GOLEIROS NATURALMENTE TOMAM MUITOS GOLS — é normal tomar entre 4 e 8 gols por jogo nesse formato. Por isso, a régua para avaliar goleiros é diferente:
+- Média ABAIXO de 4 gols/jogo = goleiro EXCEPCIONAL, elogie muito
+- Média entre 4 e 6 gols/jogo = goleiro BOM, acima da média do formato
+- Média entre 6 e 8 gols/jogo = goleiro REGULAR, dentro do esperado
+- Média ACIMA de 8 gols/jogo = goleiro ruim, pode zoar com carinho
+NUNCA critique goleiro por não ter gols ou assistências — isso não é função dele. Elogie especialmente goleiros com média baixa pois isso é raridade no futebol 7.`;
 
 // ==============================
 // COMENTARISTA
@@ -1408,7 +1420,16 @@ async function runComentarista() {
   const isGk = p.posicaoPref === 'gol' || p.jogosGoleiro > 0;
   const system = `${SYSTEM_BASE} ${estiloMap[estilo]} Máximo 150 palavras.`;
   const user = isGk
-    ? `Faça um comentário sobre o GOLEIRO ${p.nomeOriginal} com os seguintes dados: ${p.jogos} jogos no gol, média de ${p.mediaGolsSofridos!=null?p.mediaGolsSofridos.toFixed(2):'N/A'} gols sofridos por jogo, nota média ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias, ${p.selectionCount} vezes na seleção da rodada, OVR FIFA ${p.fifa.ovr}. Lembre: goleiro bom é o que toma POUCOS gols!`
+    ? (() => {
+        const mgls = p.mediaGolsSofridos != null ? p.mediaGolsSofridos.toFixed(2) : 'N/A';
+        const qualidade = p.mediaGolsSofridos != null
+          ? p.mediaGolsSofridos < 4 ? 'EXCEPCIONAL (menos de 4/jogo é raridade no futebol 7!)'
+          : p.mediaGolsSofridos < 6 ? 'BOM (abaixo da média do futebol 7)'
+          : p.mediaGolsSofridos < 8 ? 'regular (dentro do esperado no futebol 7)'
+          : 'ruim (acima de 8/jogo mesmo pro futebol 7)'
+          : '';
+        return `Faça um comentário sobre o GOLEIRO ${p.nomeOriginal}. Dados: ${p.jogos} jogos no gol, média de ${mgls} gols sofridos/jogo — classificação: ${qualidade}. Nota média ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias, ${p.selectionCount} vezes na seleção da rodada. Lembre: é futebol 7 sintético, tomar 4-8 gols é normal!`;
+      })()
     : `Faça um comentário sobre ${p.nomeOriginal} com os seguintes dados da temporada: ${p.jogos} jogos, ${p.gols} gols, ${p.assistencias} assistências, nota média ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias, ${p.selectionCount} vezes na seleção da rodada, OVR FIFA ${p.fifa.ovr}, nível: ${p.nivel}.`;
   await askGroq(system, user, document.getElementById('out-comentarista'), document.getElementById('text-comentarista'));
   btn.disabled = false;
@@ -1461,7 +1482,16 @@ async function runTribunal() {
 {"crime":"descrição do crime principal baseado nos dados","provas":"3 provas com os números reais","defesa":"um argumento ridículo de defesa que o jogador poderia dar","pena":"pena criativa e engraçada"}`;
   const gpj = (p.gols / (p.jogos||1)).toFixed(2);
   const user = isGkT
-    ? `Julgue o GOLEIRO ${p.nomeOriginal}: ${p.jogos} jogos no gol, média de ${p.mediaGolsSofridos!=null?p.mediaGolsSofridos.toFixed(2):'N/A'} gols sofridos por jogo, nota ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias, aproveitamento ${p.aproveitamento.toFixed(0)}%. LEMBRE: goleiro é julgado pelos gols que TOMOU, não pelos que fez. Se toma muitos gols, é crime grave. Se toma poucos, os crimes têm que ser outros (como arrogância, gritar muito, etc). Seja criativo, engraçado e cruel (com bom humor).`
+    ? (() => {
+        const mgls = p.mediaGolsSofridos != null ? p.mediaGolsSofridos.toFixed(2) : 'N/A';
+        const qualidade = p.mediaGolsSofridos != null
+          ? p.mediaGolsSofridos < 4 ? 'EXCEPCIONAL — tomar menos de 4/jogo no futebol 7 é raro'
+          : p.mediaGolsSofridos < 6 ? 'BOM — abaixo da média do futebol 7'
+          : p.mediaGolsSofridos < 8 ? 'regular — dentro do esperado no futebol 7'
+          : 'ruim — mesmo pro futebol 7 tomar mais de 8/jogo é demais'
+          : '';
+        return `Julgue o GOLEIRO ${p.nomeOriginal}: ${p.jogos} jogos no gol, média de ${mgls} gols sofridos/jogo (desempenho: ${qualidade}). Nota ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias, aproveitamento ${p.aproveitamento.toFixed(0)}%. Se ele tem uma boa média, os crimes precisam ser outros (arrogância, gritar com a zaga, sair do gol na hora errada, etc). Se a média for ruim, aí pode arrasar. Seja criativo e engraçado!`;
+      })()
     : `Julgue ${p.nomeOriginal}: ${p.jogos} jogos, ${p.gols} gols (${gpj}/jogo), ${p.assistencias} assists, nota ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias, aproveitamento ${p.aproveitamento.toFixed(0)}%, ${p.selectionCount} seleções, ${p.partidas.reduce((a,m)=>a+m.golsContra,0)} gols contra. Seja criativo, engraçado e cruel (com bom humor).`;
   try {
     const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -1691,7 +1721,15 @@ const parseNum = v => typeof v === "number" ? v : (Number((v||'').toString().rep
 const norm = n => n ? n.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").replace(/\(GOL\)/gi,"").trim().toUpperCase() : '';
 const mapPos = p => { if(!p) return 'N/A'; p=p.toLowerCase(); if(p.includes('gol')) return 'gol'; if(p.includes('def')) return 'def'; if(p.includes('zag')) return 'zag'; if(p.includes('ala')) return 'ala'; if(p.includes('mei')) return 'mei'; if(p.includes('ata')) return 'ata'; return 'N/A'; };
 const pos3 = p => { if(!p) return 'N/A'; p=p.toLowerCase(); if(p.includes('gol')) return 'GOL'; if(p.includes('def')) return 'DEF'; if(p.includes('zag')) return 'ZAG'; if(p.includes('ala')) return 'ALA'; if(p.includes('mei')) return 'MEI'; if(p.includes('ata')) return 'ATA'; return p.substring(0,3).toUpperCase(); };
-const getPhoto = n => playerPhotos[n] || `https://ui-avatars.com/api/?name=${encodeURIComponent(n.split(' ')[0])}&background=21262d&color=8b949e&size=80`;
+const getPhoto = n => {
+  if (!n) return `https://ui-avatars.com/api/?name=?&background=21262d&color=8b949e&size=80`;
+  // Tenta o nome exato, depois com (GOL), depois sem (GOL), depois só primeiro nome
+  return playerPhotos[n]
+    || playerPhotos[n + ' (GOL)']
+    || playerPhotos[n.replace(/\s*\(GOL\)/i,'').trim()]
+    || playerPhotos[n.split(' ')[0]]
+    || `https://ui-avatars.com/api/?name=${encodeURIComponent(n.split(' ')[0])}&background=21262d&color=8b949e&size=80`;
+};
 
 function calculateFIFAStats(player) {
   let ovr;
