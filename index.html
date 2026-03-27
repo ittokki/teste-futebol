@@ -1390,7 +1390,8 @@ async function askGroq(systemPrompt, userPrompt, outputEl, textEl) {
 
   if (aiCache.has(key)) {
     const cached = aiCache.get(key);
-    if (textEl) textEl.innerHTML = cached.replace(/\n/g, '<br>') + ' <span style="font-family:var(--font-mono);font-size:8px;color:var(--text3);letter-spacing:1px">· cache</span>';
+    if (textEl) textEl.innerHTML = cached.replace(/
+/g, '<br>') + ' <span style="font-family:var(--font-mono);font-size:8px;color:var(--text3);letter-spacing:1px">· cache</span>';
     return cached;
   }
 
@@ -1406,7 +1407,8 @@ async function askGroq(systemPrompt, userPrompt, outputEl, textEl) {
 
     const text = data.reply || 'Erro ao gerar resposta.';
     aiCache.set(key, text);
-    if (textEl) textEl.innerHTML = text.replace(/\n/g, '<br>');
+    if (textEl) textEl.innerHTML = text.replace(/
+/g, '<br>');
     return text;
   } catch(e) {
     if (textEl) textEl.innerHTML = '⚠️ Erro ao conectar com a IA. Tente novamente.';
@@ -1761,9 +1763,7 @@ async function sendChat() {
   try {
     const systemPrompt = chatHistory[0]?.content || `${SYSTEM_BASE} Você responde como analista oficial da pelada.`;
     const historyWithoutSystem = chatHistory.slice(1);
-    const userPrompt = historyWithoutSystem.map(m => `${m.role === 'assistant' ? 'Assistente' : 'Usuário'}: ${m.content}`).join('
-
-');
+    const userPrompt = historyWithoutSystem.map(m => `${m.role === 'assistant' ? 'Assistente' : 'Usuário'}: ${m.content}`).join('\n\n');
 
     const data = await callAIOnAppsScript({
       action: 'chat',
@@ -1774,7 +1774,8 @@ async function sendChat() {
 
     const reply=data.reply || 'Não consegui responder isso.';
     chatHistory.push({role:'assistant',content:reply});
-    thinkingDiv.querySelector('.chat-bubble').innerHTML=reply.replace(/\n/g,'<br>');
+    thinkingDiv.querySelector('.chat-bubble').innerHTML=reply.replace(/
+/g,'<br>');
   } catch(e) {
     chatHistory.pop();
     thinkingDiv.querySelector('.chat-bubble').textContent='⚠️ Erro ao conectar com a IA.';
