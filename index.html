@@ -1322,6 +1322,7 @@ const playerPhotos = {
   "HENRIQUE AMARAL": "https://drive.google.com/thumbnail?id=1V7_e555JZ9DlUtJXl-Q94_TxnRpyRS26&sz=w500",
   "HENRIQUE SILVA": "https://drive.google.com/thumbnail?id=1YMVMfLNkMG0hg1YjfmmFIa-4OvJuGIzk&sz=w500",
   "IAGO NUNES": "https://drive.google.com/thumbnail?id=19BAt94_apJXVWI1rnpNPfLnXG_dzr2IZ&sz=w500",
+  "JOAO LUCIO": "https://drive.google.com/thumbnail?id=1_zB-qFUpJX1BdhQT_cpe8RNzIkLxtZ5E&sz=w500",
   "JUAREZ CARDOSO": "https://drive.google.com/thumbnail?id=1ylBwDdDDa6ZVXNS_gjNW0U5Hu2bDErHk&sz=w500",
   "KAUE": "https://drive.google.com/thumbnail?id=10PTzb7BfKjAEJoQjIX_zsz6thyAx06NC&sz=w500",
   "LUCAS HENRIQUE": "https://drive.google.com/thumbnail?id=1RFSypiSjWo01lSXNh4YWsLUHMi0QhXz4&sz=w500",
@@ -1432,6 +1433,97 @@ function buildStatsContext() {
     return `${p.nomeOriginal} [${pos3(p.posicaoPref)}]: ${p.jogos} jogos, ${p.gols} gols, ${p.assistencias} assists, nota média ${p.notaGeral.toFixed(2)}, ${p.vitorias} vitórias, aproveitamento ${p.aproveitamento.toFixed(0)}%, OVR FIFA ${p.fifa.ovr}`;
   });
   return lines.join('\n');
+}
+
+function parseDatesFromText(text) {
+  if (!text) return [];
+  const matches = text.match(/\d{2}\/\d{2}\/\d{4}/g) || [];
+  return [...new Set(matches)];
+}
+
+function getLatestPlayedMatchDate() {
+  const playedDates = [...new Set(allMatchesData.filter(m => m.jogoAconteceu).map(m => m.dataJogo))];
+  playedDates.sort((a,b) => new Date(b.split('/').reverse().join('-')) - new Date(a.split('/').reverse().join('-')));
+  return playedDates[0] || null;
+}
+
+function resolveRequestedMatchDates(text) {
+  const explicitDates = parseDatesFromText(text);
+  if (explicitDates.length) return explicitDates;
+
+  const t = (text || '').toLowerCase();
+  if (/ultima partida|última partida|ultimo jogo|último jogo|ultima rodada|última rodada|jogo mais recente|partida mais recente/.test(t)) {
+    const latest = getLatestPlayedMatchDate();
+    return latest ? [latest] : [];
+  }
+  return [];
+}
+
+function buildMatchContext(dateStr) {
+  const matches = allMatchesData.filter(m => m.dataJogo === dateStr);
+  if (!matches.length) return `PARTIDA ${dateStr}: sem dados encontrados.`;
+
+  const happened = matches.some(m => m.jogoAconteceu);
+  const boca = matches.filter(m => (m.time || '').toUpperCase().includes('BOCA'));
+  const river = matches.filter(m => (m.time || '').toUpperCase().includes('RIVER'));
+  const scoreBoca = happened ? boca.reduce((a,b) => a + b.gols, 0) + river.reduce((a,b) => a + b.golsContra, 0) : 0;
+  const scoreRiver = happened ? river.reduce((a,b) => a + b.gols, 0) + boca.reduce((a,b) => a + b.golsContra, 0) : 0;
+  const played = matches.filter(m => m.jogoAconteceu);
+
+  if (!happened || !played.length) {
+    return `PARTIDA ${dateStr}: rodada cadastrada, mas marcada como não realizada.`;
+  }
+
+  const sortedByRatingDesc = [...played].sort((a,b) => b.notaPartida - a.notaPartida);
+  const craque = sortedByRatingDesc[0] || null;
+  const bagre = [...played].filter(p => !p.isGoleiro).sort((a,b) => a.notaPartida - b.notaPartida)[0] || [...played].sort((a,b) => a.notaPartida - b.notaPartida)[0] || null;
+  const artilheiros = [...played].filter(p => p.gols > 0).sort((a,b) => b.gols - a.gols || b.assistencias - a.assistencias || b.notaPartida - a.notaPartida).slice(0,5);
+  const garçons = [...played].filter(p => p.assistencias > 0).sort((a,b) => b.assistencias - a.assistencias || b.gols - a.gols || b.notaPartida - a.notaPartida).slice(0,5);
+  const golsContra = played.filter(p => p.golsContra > 0);
+  const goleiros = played.filter(p => p.isGoleiro);
+  const piores = [...played].sort((a,b) => a.notaPartida - b.notaPartida).slice(0,4);
+  const melhores = [...played].sort((a,b) => b.notaPartida - a.notaPartida).slice(0,4);
+
+  const teamSummary = (name, teamPlayers, placar, rivalPlacar) => {
+    const mediaNota = teamPlayers.length ? (teamPlayers.reduce((a,b) => a + b.notaPartida, 0) / teamPlayers.length).toFixed(2) : '0.00';
+    const golsMarcados = teamPlayers.reduce((a,b) => a + b.gols, 0);
+    const assistencias = teamPlayers.reduce((a,b) => a + b.assistencias, 0);
+    const golsContraTime = teamPlayers.reduce((a,b) => a + b.golsContra, 0);
+    return `${name}: placar ${placar}, sofreu ${rivalPlacar}, média de nota ${mediaNota}, gols marcados diretamente ${golsMarcados}, assistências ${assistencias}, gols contra a favor do rival ${golsContraTime}.`;
+  };
+
+  const playerLine = p => {
+    const extras = [];
+    if (p.gols) extras.push(`${p.gols}G`);
+    if (p.assistencias) extras.push(`${p.assistencias}A`);
+    if (p.golsContra) extras.push(`${p.golsContra} GC`);
+    if (p.isGoleiro) extras.push(`${p.golsTomados} sofridos`);
+    return `${p.nomeRaw} [${(p.time || 'SEM TIME').toUpperCase()} | ${pos3(p.posicao)}]: nota ${p.notaPartida.toFixed(1)}${extras.length ? ` | ${extras.join(' · ')}` : ''}`;
+  };
+
+  const lines = [
+    `PARTIDA ${dateStr}`,
+    `PLACAR FINAL: BOCA ${scoreBoca} x ${scoreRiver} RIVER.`,
+    teamSummary('BOCA', boca, scoreBoca, scoreRiver),
+    teamSummary('RIVER', river, scoreRiver, scoreBoca),
+    craque ? `CRAQUE DA RODADA: ${playerLine(craque)}` : '',
+    bagre ? `BAGRE DA RODADA: ${playerLine(bagre)}` : '',
+    artilheiros.length ? `ARTILHEIROS: ${artilheiros.map(playerLine).join(' || ')}` : 'ARTILHEIROS: ninguém marcou.',
+    garçons.length ? `GARÇONS: ${garçons.map(playerLine).join(' || ')}` : 'GARÇONS: ninguém deu assistência.',
+    goleiros.length ? `GOLEIROS: ${goleiros.map(playerLine).join(' || ')}` : '',
+    golsContra.length ? `GOLS CONTRA: ${golsContra.map(playerLine).join(' || ')}` : 'GOLS CONTRA: nenhum.',
+    `MELHORES NOTAS: ${melhores.map(playerLine).join(' || ')}`,
+    `PIORES NOTAS: ${piores.map(playerLine).join(' || ')}`,
+    `TODOS OS JOGADORES DA PARTIDA: ${sortedByRatingDesc.map(playerLine).join(' || ')}`
+  ].filter(Boolean);
+
+  return lines.join('\n');
+}
+
+function buildRelevantContextForChat(text) {
+  const dates = resolveRequestedMatchDates(text);
+  if (!dates.length) return '';
+  return dates.map(buildMatchContext).join('\n\n');
 }
 
 const BAGRE_MSGS = [
@@ -1759,9 +1851,23 @@ async function sendChat() {
   const thinkingDiv = addChatMsg('ai','<span class="ai-typing">Pensando</span>');
 
   try {
-    const systemPrompt = chatHistory[0]?.content || `${SYSTEM_BASE} Você responde como analista oficial da pelada.`;
+    const baseSystemPrompt = chatHistory[0]?.content || `${SYSTEM_BASE} Você responde como analista oficial da pelada.`;
+    const matchContext = buildRelevantContextForChat(text);
+    const extraInstructions = matchContext
+      ? `
+
+Se o usuário pedir análise de uma partida específica e houver contexto abaixo, você DEVE usar os dados da partida. Fale de placar, destaques, bagres, craque, equilíbrio dos times e faça críticas específicas com base nas notas e números. Nunca diga que não tem acesso à partida quando o contexto da partida estiver presente.`
+      : '';
+    const systemPrompt = `${baseSystemPrompt}${extraInstructions}`;
+
     const historyWithoutSystem = chatHistory.slice(1);
-    const userPrompt = historyWithoutSystem.map(m => `${m.role === 'assistant' ? 'Assistente' : 'Usuário'}: ${m.content}`).join('\n\n');
+    let userPrompt = historyWithoutSystem.map(m => `${m.role === 'assistant' ? 'Assistente' : 'Usuário'}: ${m.content}`).join('\n\n');
+    if (matchContext) {
+      userPrompt += `
+
+DADOS DETALHADOS DA PARTIDA SOLICITADA:
+${matchContext}`;
+    }
 
     const data = await callAIOnAppsScript({
       action: 'chat',
