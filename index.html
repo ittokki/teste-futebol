@@ -1437,7 +1437,7 @@ function buildStatsContext() {
 
 function parseDatesFromText(text) {
   if (!text) return [];
-  const matches = text.match(/\d{2}\/\d{2}\/\d{4}/g) || [];
+  const matches = text.match(/\b\d{2}\/\d{2}\/\d{4}\b/g) || [];
   return [...new Set(matches)];
 }
 
@@ -1856,7 +1856,7 @@ async function sendChat() {
     const extraInstructions = matchContext
       ? `
 
-Se o usuário pedir análise de uma partida específica e houver contexto abaixo, você DEVE usar os dados da partida. Fale de placar, destaques, bagres, craque, equilíbrio dos times e faça críticas específicas com base nas notas e números. Nunca diga que não tem acesso à partida quando o contexto da partida estiver presente.`
+Se o usuário pedir análise de uma partida específica e houver contexto abaixo, você DEVE usar os dados da partida. Fale de placar, destaques, bagres, craque, equilíbrio dos times e faça críticas específicas com base nas notas e números. Nunca diga que não tem acesso, que não tem dados em tempo real, ou que precisa de mais informações quando o contexto da partida estiver presente. Trate o contexto abaixo como a fonte oficial da partida.`
       : '';
     const systemPrompt = `${baseSystemPrompt}${extraInstructions}`;
 
